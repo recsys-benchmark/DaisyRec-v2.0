@@ -4,13 +4,15 @@
 
 ## Overview
 
-<!-- ![daisyRec's structure](pics/structure.png) -->
+<!-- ![daisyRec's structure](pics/framework.png) -->
 
 DaisyRec is a Python toolkit dealing with rating prediction and item ranking issue.
 
 The name DAISY (roughly :) ) stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem.
 
-<img src="pics/DiasyRec.png" align="center" width="75%" style="margin: 0 auto">
+<p align="center">
+<img src="pics/framework.png" align="center" width="75%" style="margin: 0 auto">
+</p>
 
 To get all dependencies, run:
 
