@@ -4,13 +4,15 @@
 
 ## Overview
 
-<!-- ![daisyRec's structure](pics/structure.png) -->
+<!-- ![daisyRec's structure](pics/framework.png) -->
 
 DaisyRec is a Python toolkit dealing with rating prediction and item ranking issue.
 
 The name DAISY (roughly :) ) stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem.
 
-<img src="pics/DiasyRec.png" align="center" width="75%" style="margin: 0 auto">
+<p align="center">
+<img src="pics/framework.png" align="center" width="75%" style="margin: 0 auto">
+</p>
 
 To get all dependencies, run:
 
@@ -24,15 +26,15 @@ to generate `.so` or `.pyd` file used for further import.
 
 Make sure you have a **CUDA** enviroment to accelarate since these deep-learning models could be based on it. We will consistently update this repo.
 
-DaisyRec handled ranking issue mainly and split recommendation problem into point-wise ones and pair-wise ones so that different loss function are constructed such as BPR, Top-1, Hinge and Cross Entropy. All algorithms already implemented are exhibited below:
+DaisyRec handled ranking issue mainly and split recommendation problem into point-wise ones and pair-wise ones so that different loss function are constructed such as BPR, Top-1, Hinge and Cross Entropy. <!--All algorithms already implemented are exhibited below:-->
 
-<img src="pics/algos.png" width="40%" height="30%" style="margin: auto; cursor:default" />
+<!--<img src="pics/algos.png" width="40%" height="30%" style="margin: auto; cursor:default" />-->
 
-use `main.py` to achieve KPI results calculated by certain algorithm above. For example, you can implement this program to implement BPR-MF:
+Use `main.py` to achieve KPI results calculated by certain algorithm above. For example, you can implement this program to implement BPR-MF:
 
     python main.py --problem_type=pair --algo_name=mf --loss_type=BPR --num_ng=2
 
-**All experiments code executed in our paper are exhibited in `master` branch. Please check out to `master` branch. Code in `dev` branch is still under developing.**
+
 
 ## Datasets
 
