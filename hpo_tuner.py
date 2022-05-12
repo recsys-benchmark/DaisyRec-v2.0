@@ -254,7 +254,7 @@ if __name__ == '__main__':
                 elif args.algo_name == 'ngcf':
                     from daisy.model.pair.NGCFRecommender import PairNGCF
                     _, norm_adj, _ = get_adj_mat(user_num,item_num)
-                    model = NGCF(
+                    model = PairNGCF(
                         user_num,
                         item_num,
                         norm_adj=norm_adj,
