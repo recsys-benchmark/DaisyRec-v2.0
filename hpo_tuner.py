@@ -252,7 +252,7 @@ if __name__ == '__main__':
                         gpuid=args.gpu
                     )
                 elif args.algo_name == 'ngcf':
-                    from daisy.model.pair.NGCFRecommender import NGCF
+                    from daisy.model.pair.NGCFRecommender import PairNGCF
                     _, norm_adj, _ = get_adj_mat(user_num,item_num)
                     model = NGCF(
                         user_num,
