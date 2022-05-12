@@ -101,6 +101,32 @@ def parse_args():
                         type=float, 
                         default=0.5, 
                         help='VAE KL regularization')
+    parser.add_argument('--alpha', 
+                        type=float, 
+                        default=0.02, 
+                        help='elastic net parameter')
+    parser.add_argument('--elastic', 
+                        type=float, 
+                        default=0.5, 
+                        help='ratio if lasso result, 0 for ridge-regression, 1 for lasso-regression')
+    parser.add_argument('--maxk', 
+                        type=int, 
+                        default=40, 
+                        help='The (max) number of neighbors to take into account')
+    parser.add_argument('--node_dropout_flag', 
+                        type=int, 
+                        default=1,
+                        help='NGCF: 0: Disable node dropout, 1: Activate node dropout')
+    parser.add_argument('--node_dropout',
+                        type=float,  
+                        nargs='?', 
+                        default=0.1,
+                        help='NGCF: Keep probability w.r.t. node dropout (i.e., 1-dropout_ratio) for each deep layer. 1: no dropout.')
+    parser.add_argument('--mess_dropout', 
+                        type=float, 
+                        nargs='?', 
+                        default=0.1,
+                        help='NGCF: Keep probability w.r.t. message dropout (i.e., 1-dropout_ratio) for each deep layer. 1: no dropout.')
     parser.add_argument('--dropout', 
                         type=float, 
                         default=0.5, 
@@ -133,6 +159,9 @@ def parse_args():
                         action='store_false', 
                         default=True, 
                         help='whether do batch normalization in interior layers')
+    parser.add_argument("--tune_testset",
+                        action="store_true",
+                        help="whether directly tune on testset")
     args = parser.parse_args()
 
     return args
