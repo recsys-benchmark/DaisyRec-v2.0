@@ -9,7 +9,8 @@ def param_extract(args):
     param_set = [
         'batch_size', 'dropout', 'factors', 'lr',
         'num_layers', 'num_ng', 'reg_1', 'reg_2',
-        'kl_reg'
+        'kl_reg', 'node_dropout', 'mess_dropout',
+        'maxk', 'alpha', 'elastic'
     ]
 
     print('Decide which parameter you want to tune')

@@ -16,8 +16,9 @@ from daisy.utils.parser import parse_args
 from daisy.utils.data import PointData, PairData, UAEData
 from daisy.utils.splitter import split_test, split_validation
 from daisy.utils.opt_toolkit import param_extract, confirm_space
-from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, build_candidates_set
+from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
+from daisy.utils.config import algo_config
 
 if __name__ == '__main__':
     metric_idx = {
@@ -43,10 +44,13 @@ if __name__ == '__main__':
         kl_reg = space['kl_reg'] if 'kl_reg' in space.keys() else args.kl_reg
         num_layers = int(space['num_layers']) if 'num_layers' in space.keys() else args.num_layers
         dropout = space['dropout'] if 'dropout' in space.keys() else args.dropout
-        # num_ng is a special paramter, not be used together with those above
+        maxk = int(space['maxk']) if 'maxk' in space.keys() else args.maxk
         num_ng = int(space['num_ng']) if 'num_ng' in space.keys() else args.num_ng
         batch_size = int(space['batch_size']) if 'batch_size' in space.keys() else args.batch_size
-
+        node_dropout = space['node_dropout'] if 'node_dropout' in space.keys() else args.node_dropout
+        mess_dropout = space['mess_dropout'] if 'mess_dropout' in space.keys() else args.mess_dropout
+        alpha = space['alpha'] if 'alpha' in space.keys() else args.alpha
+        elastic = space['elastic'] if 'elastic' in space.keys() else args.elastic
         # declare a list to store metric score in order to use as target for optimization
         fnl_metric = []
         for fold in range(fn):
@@ -164,22 +168,28 @@ if __name__ == '__main__':
                         loss_type=args.loss_type,
                         gpuid=args.gpu
                     )
-                elif args.algo_name == 'userknn':
-                    pass
                 elif args.algo_name == 'itemknn':
-                    pass
+                    from daisy.model.KNNCFRecommender import UserKNNCF
+                    model = UserKNNCF(
+                        user_num,
+                        item_num,
+                        maxk=maxk
+                    )
                 elif args.algo_name == 'puresvd':
-                    pass
-                elif args.algo_name == 'afm':
-                    pass
-                elif args.algo_name == 'deepfm':
-                    pass
-                elif args.algo_name == 'item2vec':
-                    pass
-                elif args.algo_name == 'pop':
-                    pass
+                    from daisy.model.PureSVDRecommender import PureSVD
+                    model = PureSVD(
+                        user_num,
+                        item_num,
+                        factors=factors,
+                    )
                 elif args.algo_name == 'slim':
-                    pass
+                    from daisy.model.SLiMRecommender import SLIM
+                    model = SLIM(
+                        user_num,
+                        item_num,
+                        l1_ratio=elastic,
+                        alpha=alpha
+                    )
                 else:
                     raise ValueError('Invalid algorithm name')
             elif args.problem_type == 'pair':
@@ -241,23 +251,41 @@ if __name__ == '__main__':
                         loss_type=args.loss_type,
                         gpuid=args.gpu
                     )
-                elif args.algo_name == 'deepfm':
-                    pass
-                elif args.algo_name == 'afm':
-                    pass
+                elif args.algo_name == 'ngcf':
+                    from daisy.model.pair.NGCFRecommender import NGCF
+                    _, norm_adj, _ = get_adj_mat(user_num,item_num)
+                    model = NGCF(
+                        user_num,
+                        item_num,
+                        norm_adj=norm_adj,
+                        factors=factors,
+                        batch_size=batch_size,
+                        node_dropout=node_dropout,
+                        mess_dropout=mess_dropout,
+                        lr=lr,
+                        reg_2=reg_2,
+                        epochs=args.epochs,
+                        node_dropout_flag=args.node_dropout_flag,
+                        loss_type=args.loss_type,
+                        gpuid=args.gpu
+                    )
                 else:
                     raise ValueError('Invalid algorithm name')
             else:
                 raise ValueError('Invalid problem type')
+            
+            if args.algo_name in ['itemknn', 'puresvd', 'slim']:
+                model.fit(train)
+            else:
+                train_loader = data.DataLoader(
+                    train_dataset, 
+                    batch_size=batch_size, 
+                    shuffle=True, 
+                    num_workers=4,
+                    pin_memory=True
+                )
+                model.fit(train_loader)
 
-            train_loader = data.DataLoader(
-                train_dataset, 
-                batch_size=batch_size, 
-                shuffle=True, 
-                num_workers=4
-            )
-
-            model.fit(train_loader)
             print('Start Calculating Metrics......')
             val_ucands = build_candidates_set(val_ur, train_ur, item_pool, candidates_num)
             # get predict result
@@ -332,7 +360,10 @@ if __name__ == '__main__':
 
         # record all tuning result and settings
         fnl_metric = [f'{mt:.4f}' for mt in fnl_metric]
-        line = ','.join(fnl_metric) + f',{num_ng},{factors},{num_layers},{dropout},{lr},{batch_size},{reg_1},{reg_2},{kl_reg}' + '\n'
+        line = ','.join(fnl_metric)
+        for param in algo_config[args.algo_name]:
+            line += f',{eval(param)}'
+        line = line + '\n'
         f.write(line)
         f.flush()
 
@@ -358,11 +389,18 @@ if __name__ == '__main__':
     item_pool = set(range(item_num))
     candidates_num = args.cand_num
 
-    train_set_list, val_set_list, fn = split_validation(
-        train_set, 
-        args.val_method, 
-        args.fold_num
-    )
+    if args.tune_testset:
+        train_set_list = []
+        val_set_list = []
+        fn = 1
+        train_set_list.append(train_set)
+        val_set_list.append(test_set)
+    else:
+        train_set_list, val_set_list, fn = split_validation(
+            train_set, 
+            args.val_method, 
+            args.fold_num
+        )
 
     print('='*50, '\n')
     # begin tuning here
@@ -371,9 +409,11 @@ if __name__ == '__main__':
         os.makedirs(tune_log_path)
 
     f = open(tune_log_path + f'{args.loss_type}_{args.algo_name}_{args.dataset}_{args.prepro}_{args.val_method}.csv', 
-            'w', 
-            encoding='utf-8')
-    f.write('Pre,Rec,HR,MAP,MRR,NDCG,num_ng,factors,num_layers,dropout,lr,batch_size,reg_1,reg_2,kl_reg' + '\n')
+            'w', encoding='utf-8')
+    line = 'Pre,Rec,HR,MAP,MRR,NDCG'
+    for param in algo_config[args.algo_name]:
+        line += f',{param}'
+    f.write(line + '\n')
     f.flush()
 
     # param_limit = param_extract(args)
@@ -385,6 +425,9 @@ if __name__ == '__main__':
         if val[3] == 'int':
             print(key, 'quniform', val[0], val[1], int(val[2]))
             space[key] = hp.quniform(key, val[0], val[1], int(val[2]))
+        elif val[3] == 'uint':
+            print(key, 'uniform', val[0], val[1])
+            space[key] = hp.uniform(key, val[0], val[1])
         elif val[3] == 'float':
             print(key, 'loguniform', np.log(val[0]), np.log(val[1]))
             space[key] = hp.loguniform(key, np.log(val[0]), np.log(val[1]))
