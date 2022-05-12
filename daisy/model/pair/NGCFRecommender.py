@@ -4,23 +4,6 @@ Tinglin Huang (huangtinglin@outlook.com)
 https://github.com/huangtinglin/NGCF-PyTorch
 Cong Geng
 '''
-
-import os
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-import torch.backends.cudnn as cudnn
-from tqdm import tqdm
-
-'''
-Created on March 24, 2020
-
-@author: 
-Tinglin Huang (huangtinglin@outlook.com)
-Cong Geng
-'''
-
 import os
 import torch
 import torch.nn as nn
