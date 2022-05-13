@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
+from daisy.utils.config import model_config, initializer_config, optimizer_config
 
 
 class PairNFM(nn.Module):
@@ -20,7 +21,9 @@ class PairNFM(nn.Module):
                  lr, 
                  reg_1=0.,
                  reg_2=0.,
-                 loss_type='BPR', 
+                 loss_type='BPR',
+                 optimizer='sgd',
+                 initializer='normal', 
                  gpuid='0', 
                  early_stop=True):
         """
@@ -58,6 +61,7 @@ class PairNFM(nn.Module):
         self.reg_2 = reg_2
         self.epochs = epochs
         self.loss_type = loss_type
+        self.optimizer = optimizer
         self.early_stop = early_stop
 
         self.embed_user = nn.Embedding(user_num, factors)
@@ -94,22 +98,31 @@ class PairNFM(nn.Module):
 
         self.prediction = nn.Linear(predict_size, 1, bias=False)
 
-        self._init_weight()
+        self._init_weight(initializer)
 
-    def _init_weight(self):
-        nn.init.normal_(self.embed_item.weight, std=0.01)
-        nn.init.normal_(self.embed_user.weight, std=0.01)
+    def _init_weight(self, initializer):
+        initializer_config[initializer](self.embed_user.weight, **model_config['initializer'][initializer])
+        initializer_config[initializer](self.embed_item.weight, **model_config['initializer'][initializer])
         nn.init.constant_(self.u_bias.weight, 0.0)
         nn.init.constant_(self.i_bias.weight, 0.0)
 
         # for deep layers
-        if self.num_layers > 0:
-            for m in self.deep_layers:
-                if isinstance(m, nn.Linear):
-                    nn.init.xavier_normal_(m.weight)
-            nn.init.xavier_normal_(self.prediction.weight)
+        if initializer == 'normal':
+            if self.num_layers > 0:  # len(self.layers)
+                for m in self.deep_layers:
+                    if isinstance(m, nn.Linear):
+                        nn.init.xavier_normal_(m.weight)
+                nn.init.xavier_normal_(self.prediction.weight)
+            else:
+                nn.init.constant_(self.prediction.weight, 1.0)
         else:
-            nn.init.constant_(self.prediction.weight, 1.0)
+            if self.num_layers > 0:  # len(self.layers)
+                for m in self.deep_layers:
+                    if isinstance(m, nn.Linear):
+                        initializer_config[initializer](m.weight)
+                initializer_config[initializer](self.prediction.weight)
+            else:
+                nn.init.constant_(self.prediction.weight, 1.0)
 
     def forward(self, u, i, j):
         user = self.embed_user(u)
@@ -140,7 +153,7 @@ class PairNFM(nn.Module):
         else:
             self.cpu()
 
-        optimizer = optim.Adagrad(self.parameters(), lr=self.lr, initial_accumulator_value=1e-8)
+        optimizer = optimizer_config[self.optimizer](self.parameters(), lr=self.lr)
 
         last_loss = 0.
         for epoch in range(1, self.epochs + 1):
@@ -166,7 +179,7 @@ class PairNFM(nn.Module):
                 pred_i, pred_j = self.forward(user, item_i, item_j)
 
                 if self.loss_type == 'BPR':
-                    loss = -(pred_i - pred_j).sigmoid().log().sum()
+                    loss = -((pred_i - pred_j).sigmoid() + 1e-24).log().sum()
                 elif self.loss_type == 'HL':
                     loss = torch.clamp(1 - (pred_i - pred_j) * label, min=0).sum()
                 elif self.loss_type == 'TL':

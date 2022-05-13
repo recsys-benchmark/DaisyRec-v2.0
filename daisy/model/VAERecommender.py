@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
+from daisy.utils.config import model_config, initializer_config, optimizer_config
 
 
 class VAE(nn.Module):
@@ -20,6 +21,8 @@ class VAE(nn.Module):
                  reg_2=0.,
                  beta=0.5,
                  loss_type='CL',
+                 optimizer='adam',
+                 initializer='xavier_normal',
                  gpuid='0',
                  early_stop=True):
         """
@@ -45,6 +48,7 @@ class VAE(nn.Module):
         self.reg_2 = reg_2
         self.beta = beta
         self.loss_type = loss_type
+        self.optimizer = optimizer
         self.early_stop = early_stop
 
         os.environ['CUDA_VISIBLE_DEVICES'] = gpuid
@@ -75,29 +79,32 @@ class VAE(nn.Module):
             [nn.Linear(d_in, d_out) for d_in, d_out in zip(self.p_dims[:-1], self.p_dims[1:])]
         )
         self.drop = nn.Dropout(q)
-        self._init_weights()
+        self._init_weights(initializer)
 
         self.prediction = None
 
-    def _init_weights(self):
+    def _init_weights(self, initializer):
         for layer in self.q_layers:
             # Xavier Initialization for weights
-            size = layer.weight.size()
-            fan_out = size[0]
-            fan_in = size[1]
-            std = np.sqrt(2.0/(fan_in + fan_out))
-            layer.weight.data.normal_(0.0, std)
+            initializer_config[initializer](layer.weight)
+
+            # size = layer.weight.size()
+            # fan_out = size[0]
+            # fan_in = size[1]
+            # std = np.sqrt(2.0/(fan_in + fan_out))
+            # layer.weight.data.normal_(0.0, std)
 
             # Normal Initialization for Biases
             layer.bias.data.normal_(0.0, 0.001)
         
         for layer in self.p_layers:
             # Xavier Initialization for weights
-            size = layer.weight.size()
-            fan_out = size[0]
-            fan_in = size[1]
-            std = np.sqrt(2.0/(fan_in + fan_out))
-            layer.weight.data.normal_(0.0, std)
+            initializer_config[initializer](layer.weight)
+            # size = layer.weight.size()
+            # fan_out = size[0]
+            # fan_in = size[1]
+            # std = np.sqrt(2.0/(fan_in + fan_out))
+            # layer.weight.data.normal_(0.0, std)
 
             # Normal Initialization for Biases
             layer.bias.data.normal_(0.0, 0.001)
@@ -150,7 +157,7 @@ class VAE(nn.Module):
         else:
             raise ValueError('Invalid loss type')
 
-        optimizer = optim.Adam(self.parameters(), lr=self.lr)
+        optimizer = optimizer_config[self.optimizer](self.parameters(), lr=self.lr)
 
         last_loss = 0.
         for epoch in range(1, self.epochs + 1):

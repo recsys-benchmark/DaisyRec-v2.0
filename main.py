@@ -13,8 +13,9 @@ from daisy.utils.sampler import Sampler
 from daisy.utils.parser import parse_args
 from daisy.utils.splitter import split_test
 from daisy.utils.data import PointData, PairData, UAEData
-from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, build_candidates_set
+from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
+
 
 
 if __name__ == '__main__':
@@ -80,7 +81,10 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                optimizer=args.optimizer,
+                initializer = args.initializer,
+                gpuid=args.gpu,
+                early_stop=args.early_stop
             )
         elif args.algo_name == 'fm':
             from daisy.model.point.FMRecommender import PointFM
@@ -93,7 +97,10 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                optimizer=args.optimizer,
+                initializer = args.initializer,
+                gpuid=args.gpu,
+                early_stop=args.early_stop
             )
         elif args.algo_name == 'neumf':
             from daisy.model.point.NeuMFRecommender import PointNeuMF
@@ -108,7 +115,10 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                optimizer=args.optimizer,
+                initializer = args.initializer,
+                gpuid=args.gpu,
+                early_stop=args.early_stop
             )
         elif args.algo_name == 'nfm':
             from daisy.model.point.NFMRecommender import PointNFM
@@ -125,22 +135,10 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
-            )
-        elif args.algo_name == 'cdae':
-            from daisy.model.CDAERecommender import CDAE
-            model = CDAE(
-                rating_mat=training_mat,
-                factors=args.factors,
-                act_activation=args.act_func,
-                out_activation=args.out_func,
-                epochs=args.epochs,
-                lr=args.lr,
-                q=args.dropout,
-                reg_1=args.reg_1,
-                reg_2=args.reg_2,
-                loss_type=args.loss_type,
-                gpuid=args.gpu
+                optimizer=args.optimizer,
+                initializer = args.initializer,
+                gpuid=args.gpu,
+                early_stop=args.early_stop
             )
         elif args.algo_name == 'vae':
             from daisy.model.VAERecommender import VAE
@@ -153,7 +151,58 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 beta=args.kl_reg,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                optimizer=args.optimizer,
+                initializer = args.initializer,
+                gpuid=args.gpu,
+                early_stop=args.early_stop
+            )
+        elif args.algo_name == 'ngcf':
+            from daisy.model.point.NGCFRecommender import PointNGCF
+            _, norm_adj, _ = get_adj_mat(user_num,item_num)
+            model = PointNGCF(
+                    user_num,
+                    item_num,
+                    norm_adj=norm_adj,
+                    factors=args.factors,
+                    batch_size=args.batch_size,
+                    node_dropout=args.node_dropout,
+                    mess_dropout=args.mess_dropout,
+                    lr=args.lr,
+                    reg_2=args.reg_2,
+                    epochs=args.epochs,
+                    node_dropout_flag=args.node_dropout_flag,
+                    loss_type=args.loss_type,
+                    optimizer=args.optimizer,
+                    initializer = args.initializer,
+                    gpuid=args.gpu,
+                    early_stop=args.early_stop
+                )
+        elif args.algo_name == 'itemknn':
+            from daisy.model.KNNCFRecommender import ItemKNNCF
+            model = ItemKNNCF(
+                user_num,
+                item_num,
+                maxk= args.maxk
+            )
+        elif args.algo_name == 'puresvd':
+            from daisy.model.PureSVDRecommender import PureSVD
+            model = PureSVD(
+                user_num,
+                item_num,
+                factors=args.factors
+            )
+        elif args.algo_name == 'slim':
+            from daisy.model.SLiMRecommender import SLIM
+            model = SLIM(
+                user_num,
+                item_num,
+                l1_ratio=args.elastic,
+                alpha=args.alpha
+            )
+        elif args.algo_name == 'mostpop':
+            from daisy.model.PopRecommender import MostPop
+            model = MostPop(
+                n = args.pop_n
             )
         else:
             raise ValueError('Invalid algorithm name')
@@ -169,7 +218,10 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                optimizer=args.optimizer,
+                initializer = args.initializer,
+                gpuid=args.gpu,
+                early_stop=args.early_stop
             )
         elif args.algo_name == 'fm':
             from daisy.model.pair.FMRecommender import PairFM
@@ -182,7 +234,10 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                optimizer=args.optimizer,
+                initializer = args.initializer,
+                gpuid=args.gpu,
+                early_stop=args.early_stop
             )
         elif args.algo_name == 'neumf':
             from daisy.model.pair.NeuMFRecommender import PairNeuMF
@@ -197,7 +252,10 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                optimizer=args.optimizer,
+                initializer = args.initializer,
+                gpuid=args.gpu,
+                early_stop=args.early_stop
             )
         elif args.algo_name == 'nfm':
             from daisy.model.pair.NFMRecommender import PairNFM
@@ -214,8 +272,32 @@ if __name__ == '__main__':
                 reg_1=args.reg_1,
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
-                gpuid=args.gpu
+                optimizer=args.optimizer,
+                initializer = args.initializer,
+                gpuid=args.gpu,
+                early_stop=args.early_stop
             )
+        elif args.algo_name == 'ngcf':
+            from daisy.model.pair.NGCFRecommender import PairNGCF
+            _, norm_adj, _ = get_adj_mat(user_num,item_num)
+            model = PairNGCF(
+                    user_num,
+                    item_num,
+                    norm_adj=norm_adj,
+                    factors=args.factors,
+                    batch_size=args.batch_size,
+                    node_dropout=args.node_dropout,
+                    mess_dropout=args.mess_dropout,
+                    lr=args.lr,
+                    reg_2=args.reg_2,
+                    epochs=args.epochs,
+                    node_dropout_flag=args.node_dropout_flag,
+                    loss_type=args.loss_type,
+                    optimizer=args.optimizer,
+                    initializer = args.initializer,
+                    gpuid=args.gpu,
+                    early_stop=args.early_stop
+                )
         else:
             raise ValueError('Invalid algorithm name')
     else:
@@ -230,7 +312,17 @@ if __name__ == '__main__':
 
     # build recommender model
     s_time = time.time()
-    model.fit(train_loader)
+    if args.algo_name in ['itemknn', 'puresvd', 'slim', 'mostpop']:
+        model.fit(train_set)
+    else:
+        train_loader = data.DataLoader(
+        train_dataset, 
+        batch_size=args.batch_size, 
+        shuffle=True, 
+        num_workers=4,
+        pin_memory=True,)
+
+        model.fit(train_loader)
     elapsed_time = time.time() - s_time
     time_log.write(f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}{args.algo_name}_{args.loss_type}_{args.sample_method},{elapsed_time:.4f}' + '\n')
     time_log.close()
@@ -243,12 +335,14 @@ if __name__ == '__main__':
     print('Generate recommend list...')
     print('')
     preds = {}
-    if args.algo_name in ['vae', 'cdae'] and args.problem_type == 'point':
+    if args.algo_name in ['vae', 'cdae', 'itemknn', 'puresvd', 'slim'] and args.problem_type == 'point':
         for u in tqdm(test_ucands.keys()):
             pred_rates = [model.predict(u, i) for i in test_ucands[u]]
             rec_idx = np.argsort(pred_rates)[::-1][:args.topk]
             top_n = np.array(test_ucands[u])[rec_idx]
             preds[u] = top_n
+    elif args.algo_name in ['mostpop']:
+        preds = model.predict(test_ur, total_train_ur, args.topk)
     else:
         for u in tqdm(test_ucands.keys()):
             # build a test MF dataset for certain user u to accelerate

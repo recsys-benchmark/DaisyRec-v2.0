@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
+from daisy.utils.config import model_config, initializer_config, optimizer_config
 
 class PointFM(nn.Module):
     def __init__(self, 
@@ -17,7 +18,9 @@ class PointFM(nn.Module):
                  lr=0.001,
                  reg_1 = 0.001,
                  reg_2 = 0.001,
-                 loss_type='SL',
+                 loss_type='CL',
+                 optimizer='sgd',
+                 initializer='normal',
                  gpuid='0', 
                  early_stop=True):
         """
@@ -54,12 +57,13 @@ class PointFM(nn.Module):
         self.bias_ = nn.Parameter(torch.tensor([0.0]))
 
         # init weight
-        nn.init.normal_(self.embed_user.weight, std=0.01)
-        nn.init.normal_(self.embed_item.weight, std=0.01)
+        initializer_config[initializer](self.embed_user.weight, **model_config['initializer'][initializer])
+        initializer_config[initializer](self.embed_item.weight, **model_config['initializer'][initializer])
         nn.init.constant_(self.u_bias.weight, 0.0)
         nn.init.constant_(self.i_bias.weight, 0.0)
 
         self.loss_type = loss_type
+        self.optimizer = optimizer
         self.early_stop = early_stop
 
     def forward(self, user, item):
@@ -77,7 +81,7 @@ class PointFM(nn.Module):
         else:
             self.cpu()
 
-        optimizer = optim.SGD(self.parameters(), lr=self.lr)
+        optimizer = optimizer_config[self.optimizer](self.parameters(), lr=self.lr)
 
         if self.loss_type == 'CL':
             criterion = nn.BCEWithLogitsLoss(reduction='sum')
