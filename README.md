@@ -6,12 +6,12 @@
 
 <!-- ![daisyRec's structure](pics/framework.png) -->
 
-DaisyRec is a Python toolkit dealing with rating prediction and item ranking issue.
+DaisyRec is a Python toolkit developed for benchmarking top-N recommendation task. 
 
-The name DAISY (roughly :) ) stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem.
+The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem.
 
 <p align="center">
-<img src="pics/framework.png" align="center" width="100%" style="margin: 0 auto">
+<img src="pics/framework.png" align="center" width="75%" style="margin: 0 auto">
 </p>
 
 To get all dependencies, run:
@@ -58,10 +58,10 @@ All data are available in links below:
 
 ## TODO list
 
-- [ ] optimize code for effiency
+- [ ] optimize code for performance
 - [ ] weight initialization interface
 - [ ] optimizer initialization interface
-- [ ] a more friendly tuner gui
+- [ ] a more friendly tuner
 - [ ] make sure Item2vec work as expected
 
 ## Cite
