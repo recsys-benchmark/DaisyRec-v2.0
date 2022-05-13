@@ -26,11 +26,11 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 <!--<img src="pics/algos.png" width="40%" height="30%" style="margin: auto; cursor:default" />-->
 
-### Tutorial - How to use DaisyRec 2.0
+## Tutorial - How to use DaisyRec 2.0
 
-### Documentation 
+## Documentation 
 
-### Implemented Algorithms
+## Implemented Algorithms
 - Memory-based Methods
     - MostPop
     - ItemKNN
