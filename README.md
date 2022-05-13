@@ -22,9 +22,7 @@ Before running, you need first run:
 
 to generate `.so` or `.pyd` file used for further import.
 
-Make sure you have a **CUDA** enviroment to accelarate since these deep-learning models could be based on it. We will consistently update this repo.
-
-DaisyRec handled ranking issue mainly and split recommendation problem into point-wise ones and pair-wise ones so that different loss function are constructed such as BPR, Top-1, Hinge and Cross Entropy. <!--All algorithms already implemented are exhibited below:-->
+Make sure you have a **CUDA** enviroment to accelarate since the deep-learning models could be based on it. 
 
 <!--<img src="pics/algos.png" width="40%" height="30%" style="margin: auto; cursor:default" />-->
 
@@ -32,7 +30,17 @@ Use `main.py` to achieve KPI results calculated by certain algorithm above. For 
 
     python main.py --problem_type=pair --algo_name=mf --loss_type=BPR --num_ng=2
 
-
+### Implemented Algorithms
+- MostPop
+- ItemKNN
+- PureSVD
+- MF
+- FM
+- SLIM
+- NeuMF
+- NFM
+- NGCF
+- Multi-VAE
 
 ## Datasets
 
