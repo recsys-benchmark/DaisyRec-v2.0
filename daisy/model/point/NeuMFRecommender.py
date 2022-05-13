@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
-
+from daisy.utils.config import model_config, initializer_config, optimizer_config
 
 class PointNeuMF(nn.Module):
     def __init__(self,
@@ -20,6 +20,8 @@ class PointNeuMF(nn.Module):
                  reg_2=0.001, 
                  loss_type='CL', 
                  model_name='NeuMF-end',
+                 optimizer='adam',
+                 initializer='normal',
                  GMF_model=None, 
                  MLP_model=None, 
                  gpuid='0', 
@@ -79,28 +81,37 @@ class PointNeuMF(nn.Module):
 
         self.predict_layer = nn.Linear(predict_size, 1)
 
-        self._init_weight_()
+        self._init_weight_(initializer)
 
         self.loss_type = loss_type
+        self.optimizer = optimizer
         self.early_stop = early_stop
 
-    def _init_weight_(self):
+    def _init_weight_(self, initializer):
         '''weights initialization'''
         if not self.model == 'NeuMF-pre':
-            nn.init.normal_(self.embed_user_GMF.weight, std=0.01)
-            nn.init.normal_(self.embed_item_GMF.weight, std=0.01)
-            nn.init.normal_(self.embed_user_MLP.weight, std=0.01)
-            nn.init.normal_(self.embed_item_MLP.weight, std=0.01)
-
-            for m in self.MLP_layers:
-                if isinstance(m, nn.Linear):
-                    nn.init.xavier_uniform_(m.weight)
-            nn.init.kaiming_uniform_(self.predict_layer.weight, 
-                                     a=1, nonlinearity='sigmoid')
-            for m in self.modules():
-                if isinstance(m, nn.Linear) and m.bias is not None:
-                    m.bias.data.zero_()
-
+            initializer_config[initializer](self.embed_user_GMF.weight, **model_config['initializer'][initializer])
+            initializer_config[initializer](self.embed_item_GMF.weight, **model_config['initializer'][initializer])
+            initializer_config[initializer](self.embed_user_MLP.weight, **model_config['initializer'][initializer])
+            initializer_config[initializer](self.embed_item_MLP.weight, **model_config['initializer'][initializer])
+            if initializer == 'normal':
+                for m in self.MLP_layers:
+                    if isinstance(m, nn.Linear):
+                        nn.init.xavier_uniform_(m.weight)
+                nn.init.kaiming_uniform_(self.predict_layer.weight, 
+                                        a=1, nonlinearity='sigmoid')
+                for m in self.modules():
+                    if isinstance(m, nn.Linear) and m.bias is not None:
+                        m.bias.data.zero_()
+            else:
+                for m in self.MLP_layers:
+                    if isinstance(m, nn.Linear):
+                        initializer_config[initializer](m.weight)
+                initializer_config[initializer](self.predict_layer.weight, 
+                                        a=1, nonlinearity='sigmoid')
+                for m in self.modules():
+                    if isinstance(m, nn.Linear) and m.bias is not None:
+                        m.bias.data.zero_()
         else:
             # embedding layers
             self.embed_user_GMF.weight.data.copy_(self.GMF_model.embed_user_GMF.weight)
@@ -156,10 +167,11 @@ class PointNeuMF(nn.Module):
         else:
             raise ValueError(f'Invalid loss type: {self.loss_type}')
 
-        if self.model == 'NeuMF-pre':
-            optimizer = optim.SGD(self.parameters(), lr=self.lr)
-        else:
-            optimizer = optim.Adam(self.parameters(), lr=self.lr)
+        # if self.model == 'NeuMF-pre':
+        #     optimizer = optim.SGD(self.parameters(), lr=self.lr)
+        # else:
+        #     optimizer = optim.Adam(self.parameters(), lr=self.lr)
+        optimizer = optimizer_config[self.optimizer](self.parameters(), lr=self.lr)
 
         last_loss = 0.
         for epoch in range(1, self.epochs + 1):

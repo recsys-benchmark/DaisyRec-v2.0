@@ -84,6 +84,14 @@ def parse_args():
                         type=str, 
                         default='CL', 
                         help='loss function type')
+    parser.add_argument('--optimizer', 
+                        type=str, 
+                        default='sgd', 
+                        help='optimize method')
+    parser.add_argument('--initializer', 
+                        type=str, 
+                        default='normal', 
+                        help='parameter initialization method: normal, uniform, xavier_normal, xavier_uniform')
     # algo settings
     parser.add_argument('--factors', 
                         type=int, 
@@ -109,6 +117,10 @@ def parse_args():
                         type=float, 
                         default=0.5, 
                         help='ratio if lasso result, 0 for ridge-regression, 1 for lasso-regression')
+    parser.add_argument('--pop_n', 
+                        type=int, 
+                        default=100, 
+                        help='Initial selected number of Most-popular')
     parser.add_argument('--maxk', 
                         type=int, 
                         default=40, 
@@ -161,7 +173,12 @@ def parse_args():
                         help='whether do batch normalization in interior layers')
     parser.add_argument("--tune_testset",
                         action="store_true",
-                        help="whether directly tune on testset")
+                        default=False,
+                        help="whether to directly tune on testset")
+    parser.add_argument("--early_stop",
+                        action="store_false",
+                        default=True,
+                        help="whether to activate early stop mechanism")
     args = parser.parse_args()
 
     return args

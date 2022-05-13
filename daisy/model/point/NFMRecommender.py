@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
+from daisy.utils.config import model_config, initializer_config, optimizer_config
+
 
 class PointNFM(nn.Module):
     def __init__(self,
@@ -19,7 +21,9 @@ class PointNFM(nn.Module):
                  lr, 
                  reg_1=0., 
                  reg_2=0., 
-                 loss_type='CL', 
+                 loss_type='CL',
+                 optimizer='sgd',
+                 initializer='normal', 
                  gpuid='0', 
                  early_stop=True):
         """
@@ -54,6 +58,7 @@ class PointNFM(nn.Module):
         self.reg_2 = reg_2
         self.epochs = epochs
         self.loss_type = loss_type
+        self.optimizer = optimizer
         self.early_stop = early_stop
 
         os.environ['CUDA_VISIBLE_DEVICES'] = gpuid
@@ -93,22 +98,31 @@ class PointNFM(nn.Module):
 
         self.prediction = nn.Linear(predict_size, 1, bias=False)
 
-        self._init_weight()
+        self._init_weight(initializer)
 
-    def _init_weight(self):
-        nn.init.normal_(self.embed_item.weight, std=0.01)
-        nn.init.normal_(self.embed_user.weight, std=0.01)
+    def _init_weight(self, initializer):
+        initializer_config[initializer](self.embed_user.weight, **model_config['initializer'][initializer])
+        initializer_config[initializer](self.embed_item.weight, **model_config['initializer'][initializer])
         nn.init.constant_(self.u_bias.weight, 0.0)
         nn.init.constant_(self.i_bias.weight, 0.0)
 
         # for deep layers
-        if self.num_layers > 0:  # len(self.layers)
-            for m in self.deep_layers:
-                if isinstance(m, nn.Linear):
-                    nn.init.xavier_normal_(m.weight)
-            nn.init.xavier_normal_(self.prediction.weight)
+        if initializer == 'normal':
+            if self.num_layers > 0:  # len(self.layers)
+                for m in self.deep_layers:
+                    if isinstance(m, nn.Linear):
+                        nn.init.xavier_normal_(m.weight)
+                nn.init.xavier_normal_(self.prediction.weight)
+            else:
+                nn.init.constant_(self.prediction.weight, 1.0)
         else:
-            nn.init.constant_(self.prediction.weight, 1.0)
+            if self.num_layers > 0:  # len(self.layers)
+                for m in self.deep_layers:
+                    if isinstance(m, nn.Linear):
+                        initializer_config[initializer](m.weight)
+                initializer_config[initializer](self.prediction.weight)
+            else:
+                nn.init.constant_(self.prediction.weight, 1.0)
 
     def forward(self, user, item):
         embed_user = self.embed_user(user)
@@ -131,7 +145,7 @@ class PointNFM(nn.Module):
         else:
             self.cpu()
 
-        optimizer = optim.SGD(self.parameters(), lr=self.lr)
+        optimizer = optimizer_config[self.optimizer](self.parameters(), lr=self.lr)
         if self.loss_type == 'CL':
             criterion = nn.BCEWithLogitsLoss(reduction='sum')
         elif self.loss_type == 'SL':
