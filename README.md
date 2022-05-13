@@ -11,7 +11,7 @@ DaisyRec is a Python toolkit dealing with rating prediction and item ranking iss
 The name DAISY (roughly :) ) stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem.
 
 <p align="center">
-<img src="pics/framework.png" align="center" width="75%" style="margin: 0 auto">
+<img src="pics/framework.png" align="center" width="100%" style="margin: 0 auto">
 </p>
 
 To get all dependencies, run:
@@ -58,10 +58,10 @@ All data are available in links below:
 
 ## TODO list
 
-- [ ] optimize code for performance
+- [ ] optimize code for effiency
 - [ ] weight initialization interface
 - [ ] optimizer initialization interface
-- [ ] a more friendly tuner
+- [ ] a more friendly tuner gui
 - [ ] make sure Item2vec work as expected
 
 ## Cite
