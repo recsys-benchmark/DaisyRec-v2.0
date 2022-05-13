@@ -35,6 +35,9 @@ Please refer to 'DaisyRec-2.0-Tutorial.ipynb'.
 Please refer to 'Wiki' for detailed documentation.
 
 ## Implemented Algorithms
+
+Below are the algorithms implemented in DaisyRec 2.0. More baselines will be added later.
+
 - Memory-based Methods
     - MostPop
     - ItemKNN
