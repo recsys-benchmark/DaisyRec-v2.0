@@ -28,7 +28,11 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 ## Tutorial - How to use DaisyRec 2.0
 
+Please refer to 'DaisyRec-2.0-Tutorial.ipynb'.
+
 ## Documentation 
+
+Please refer to 'Wiki' for detailed documentation.
 
 ## Implemented Algorithms
 - Memory-based Methods
@@ -66,6 +70,9 @@ All data are available in links below:
   - [Yelp Challenge](https://kaggle.com/yelp-dataset/yelp-dataset)
 
 ## Ranking Perofmrance for Reference
+
+Please refer to 'ranking_results' folder for the ranking performance of different baselines across various datasets.
+
 
 ## TODO list
 
