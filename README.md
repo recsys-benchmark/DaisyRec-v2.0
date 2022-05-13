@@ -26,21 +26,24 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 <!--<img src="pics/algos.png" width="40%" height="30%" style="margin: auto; cursor:default" />-->
 
-Use `main.py` to achieve KPI results calculated by certain algorithm above. For example, you can implement this program to implement BPR-MF:
+### Tutorial - How to use DaisyRec 2.0
 
-    python main.py --problem_type=pair --algo_name=mf --loss_type=BPR --num_ng=2
+### Documentation 
 
 ### Implemented Algorithms
-- MostPop
-- ItemKNN
-- PureSVD
-- MF
-- FM
-- SLIM
-- NeuMF
-- NFM
-- NGCF
-- Multi-VAE
+- Memory-based Methods
+    - MostPop
+    - ItemKNN
+- Latent Factor Methods
+    - PureSVD
+    - MF
+    - FM
+    - SLIM
+- Deep Learning Methods
+    - NeuMF
+    - NFM
+    - NGCF
+    - Multi-VAE
 
 ## Datasets
 
