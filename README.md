@@ -1,6 +1,6 @@
 ![DaisyRec](pics/logo.png)
 
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/scikit-daisy) [![Version](https://img.shields.io/badge/version-v1.1.2-orange)](https://github.com/AmazingDD/daisyRec) ![GitHub repo size](https://img.shields.io/github/repo-size/amazingdd/daisyrec) ![GitHub](https://img.shields.io/github/license/amazingdd/daisyrec)
+![PyPI - Python Version](https://img.shields.io/badge/pyhton-3.5%2B-blue) [![Version](https://img.shields.io/badge/version-v2.0-orange)](https://github.com/recsys-benchmark/DaisyRec-v2.0) ![GitHub repo size](https://img.shields.io/github/repo-size/recsys-benchmark/DaisyRec-v2.0) ![GitHub](https://img.shields.io/github/license/recsys-benchmark/DaisyRec-v2.0)
 
 ## Overview
 
@@ -58,11 +58,10 @@ All data are available in links below:
 
 ## TODO list
 
-- [x] user-level time-aware fold-out method
-- [x] user-level/item-level/user-item-level N-core
-- [x] distinguish N-filter and N-core preprocess method
+- [ ] optimize code for performance
 - [ ] weight initialization interface
-- [x] a more friendly tuner
+- [ ] optimizer initialization interface
+- [ ] a more friendly tuner
 - [ ] make sure Item2vec work as expected
 
 ## Cite
@@ -85,3 +84,4 @@ We refer to the following repositories to improve our code:
 
  - SliM and KNN-CF parts with [RecSys2019_DeepLearning_Evaluation](https://github.com/MaurizioFD/RecSys2019_DeepLearning_Evaluation)
  - SVD++ part with [Surprise](https://github.com/NicolasHug/Surprise)
+ - NGCF part with [NGCF-PyTorch](https://github.com/huangtinglin/NGCF-PyTorch)
