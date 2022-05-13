@@ -6,10 +6,10 @@
 
 <!-- ![daisyRec's structure](pics/framework.png) -->
 
-DaisyRec 2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem. The figure below shows the overal framework of DaisyRec 2.0.
+DaisyRec 2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem. The figure below shows the overall framework of DaisyRec 2.0.
 
 <p align="center">
-<img src="pics/framework.png" align="center" width="100%" style="margin: 0 auto">
+<img src="pics/framework.png" align="center" width="90%" style="margin: 0 auto">
 </p>
 
 To get all dependencies, run:
@@ -56,11 +56,10 @@ All data are available in links below:
 
 ## TODO list
 
-- [ ] optimize code for performance
-- [ ] weight initialization interface
-- [ ] optimizer initialization interface
-- [ ] a more friendly tuner
-- [ ] make sure Item2vec work as expected
+- [ ] optimize code for execution effiency
+- [ ] improve the modularity and scalability of the code (e.g., initializer, optimizer)  
+- [ ] a more friendly GUI tuner
+- [ ] Check Item2vec 
 
 ## Cite
 
