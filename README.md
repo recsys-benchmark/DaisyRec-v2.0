@@ -77,7 +77,7 @@ All data are available in links below:
 Please refer to 'ranking_results' folder for the ranking performance of different baselines across various datasets.
 
 
-## TODO list
+## TODO List
 
 - [ ] optimize code for execution effiency
 - [ ] improve the modularity and scalability of the code (e.g., initializer, optimizer)  
@@ -86,7 +86,7 @@ Please refer to 'ranking_results' folder for the ranking performance of differen
 
 ## Cite
 
-Here is a Bibtex entry if you ever need to cite **DaisyRec** in a research paper (please keep us posted, we would love to know if Daisy was helpful to you)
+Here is a Bibtex entry if you ever need to cite **DaisyRec 2.0** in a research paper (please keep us posted, we would love to know if DaisyRec 2.0 is helpful to you)
 
 ```
 @inproceedings{sun2020are,
@@ -102,6 +102,6 @@ Here is a Bibtex entry if you ever need to cite **DaisyRec** in a research paper
 
 We refer to the following repositories to improve our code:
 
- - SliM and KNN-CF parts with [RecSys2019_DeepLearning_Evaluation](https://github.com/MaurizioFD/RecSys2019_DeepLearning_Evaluation)
+ - SLIM and KNN-CF parts with [RecSys2019_DeepLearning_Evaluation](https://github.com/MaurizioFD/RecSys2019_DeepLearning_Evaluation)
  - SVD++ part with [Surprise](https://github.com/NicolasHug/Surprise)
  - NGCF part with [NGCF-PyTorch](https://github.com/huangtinglin/NGCF-PyTorch)
