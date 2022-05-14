@@ -64,7 +64,7 @@ All data are available in links below:
 
 ## Ranking Perofmrance for Reference
 
-Please refer to 'ranking_results' folder for the ranking performance of different baselines across various datasets. ***Updating soon ...***
+Please refer to [ranking_results](https://github.com/recsys-benchmark/DaisyRec-v2.0/tree/main/ranking_results) folder for the ranking performance of different baselines across various datasets. ***Updating soon ...***
 
 
 ## TODO List
