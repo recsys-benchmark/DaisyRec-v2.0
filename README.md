@@ -72,14 +72,14 @@ Please refer to 'ranking_results' folder for the ranking performance of differen
 
 ## TODO List
 
-- [ ] optimize code for execution effiency
-- [ ] improve the modularity and scalability of the code (e.g., initializer, optimizer)  
-- [ ] a more friendly GUI tuner
+- [ ] Optimize code for execution effiency
+- [ ] Improve the modularity and scalability of the code (e.g., initializer, optimizer)  
+- [ ] A more friendly GUI tuner
 - [ ] Check Item2vec 
 
 ## Cite
 
-Here is a Bibtex entry if you ever need to cite **DaisyRec 2.0** in a research paper (please keep us posted, we would love to know if DaisyRec 2.0 is helpful to you)
+Here is a Bibtex entry if you ever need to cite **DaisyRec 2.0** in a research paper (please keep us posted, we would love to know if DaisyRec-2.0 is helpful to you)
 
 ```
 @inproceedings{sun2020are,
