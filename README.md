@@ -38,11 +38,11 @@ Please refer to 'Wiki' for detailed documentation.
 
 Below are the algorithms implemented in DaisyRec 2.0. More baselines will be added later.
 
-- Memory-based Methods
+- ***Memory-based Methods***
     - MostPop, ItemKNN
-- Latent Factor Methods
+- ***Latent Factor Methods***
     - PureSVD, SLIM, MF, FM
-- Deep Learning Methods
+- ***Deep Learning Methods***
     - NeuMF, NFM, NGCF, Multi-VAE
 
 ## Datasets
