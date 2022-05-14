@@ -59,10 +59,7 @@ All data are available in links below:
   - [Book Crossing](https://grouplens.org/datasets/book-crossing/)
   - [Epinions](http://www.cse.msu.edu/~tangjili/trust.html)
   - [CiteULike](https://github.com/js05212/citeulike-a)
-  - [Amazon-Book](http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/ratings_Books.csv)
-  - [Amazon-Electronic](http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/ratings_Electronics.csv)
-  - [Amazon-Cloth](http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/ratings_Clothing_Shoes_and_Jewelry.csv)
-  - [Amazon-Music](http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/ratings_Digital_Music.csv)
+  - [Amazon-Book/Electronic/Clothing/Music (ratings only)](http://jmcauley.ucsd.edu/data/amazon/links.html)
   - [Yelp Challenge](https://kaggle.com/yelp-dataset/yelp-dataset)
 
 ## Ranking Perofmrance for Reference
