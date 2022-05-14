@@ -28,11 +28,11 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 ## Tutorial - How to use DaisyRec 2.0
 
-Please refer to 'DaisyRec-2.0-Tutorial.ipynb'.
+Please refer to 'DaisyRec-2.0-Tutorial.ipynb'. ***Coming soon ...***
 
 ## Documentation 
 
-Please refer to 'Wiki' for detailed documentation.
+Please refer to 'Wiki' for detailed documentation. ***Coming soon ...***
 
 ## Implemented Algorithms
 
@@ -67,7 +67,7 @@ All data are available in links below:
 
 ## Ranking Perofmrance for Reference
 
-Please refer to 'ranking_results' folder for the ranking performance of different baselines across various datasets.
+Please refer to 'ranking_results' folder for the ranking performance of different baselines across various datasets. ***Updating soon ...***
 
 
 ## TODO List
