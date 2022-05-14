@@ -32,7 +32,7 @@ Please refer to 'DaisyRec-2.0-Tutorial.ipynb'. ***Coming soon ...***
 
 ## Documentation 
 
-Please refer to 'Wiki' for detailed documentation. ***Coming soon ...***
+Please refer to [Wiki](https://github.com/recsys-benchmark/DaisyRec-v2.0/wiki) for detailed documentation. ***Coming soon ...***
 
 ## Implemented Algorithms
 
