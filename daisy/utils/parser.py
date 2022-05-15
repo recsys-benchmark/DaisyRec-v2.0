@@ -31,20 +31,20 @@ def parse_args():
                         help='select dataset')
     parser.add_argument('--prepro', 
                         type=str, 
-                        default='10core', 
-                        help='dataset preprocess op.: origin/Ncore')
+                        default='10filter', 
+                        help='dataset preprocess op.: origin/Nfilter')
     parser.add_argument('--topk', 
                         type=int, 
                         default=50, 
                         help='top number of recommend list')
     parser.add_argument('--test_method', 
                         type=str, 
-                        default='tfo', 
-                        help='method for split test,options: ufo/loo/fo/tfo/tloo')
+                        default='tsbr', 
+                        help='method for split test,options: tsbr/rsbr/tloo/rloo')
     parser.add_argument('--val_method', 
                         type=str, 
-                        default='tfo', 
-                        help='validation method, options: cv, tfo, loo, tloo')
+                        default='tsbr', 
+                        help='validation method, options: tsbr/rsbr/tloo/rloo')
     parser.add_argument('--test_size', 
                         type=float, 
                         default=.2, 

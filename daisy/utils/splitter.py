@@ -3,17 +3,17 @@ import pandas as pd
 
 from sklearn.model_selection import KFold, train_test_split, GroupShuffleSplit
 
-def split_test(df, test_method='fo', test_size=.2):
+def split_test(df, test_method='rsbr', test_size=.2):
     """
     method of splitting data into training data and test data
     Parameters
     ----------
     df : pd.DataFrame raw data waiting for test set splitting
     test_method : str, way to split test set
-                    'fo': split by ratio
-                    'tfo': split by ratio with timestamp
-                    'tloo': leave one out with timestamp
-                    'loo': leave one out
+                    'rsbr': random split by ratio
+                    'tsbr': timestamp split by ratio  
+                    'tloo': timestamp leave one out 
+                    'rloo': random leave one out
                     'ufo': split by ratio in user level
                     'utfo': time-aware split by ratio in user level
     test_size : float, size of test set
@@ -52,13 +52,13 @@ def split_test(df, test_method='fo', test_size=.2):
         test_set = df.loc[test_index, :]
         train_set = df[~df.index.isin(test_index)]
 
-    elif test_method == 'tfo':
+    elif test_method == 'tsbr':
         # df = df.sample(frac=1)
         df = df.sort_values(['timestamp']).reset_index(drop=True)
         split_idx = int(np.ceil(len(df) * (1 - test_size)))
         train_set, test_set = df.iloc[:split_idx, :].copy(), df.iloc[split_idx:, :].copy()
 
-    elif test_method == 'fo':
+    elif test_method == 'rsbr':
         train_set, test_set = train_test_split(df, test_size=test_size, random_state=2019)
 
     elif test_method == 'tloo':
@@ -68,7 +68,7 @@ def split_test(df, test_method='fo', test_size=.2):
         train_set, test_set = df[df['rank_latest'] > 1].copy(), df[df['rank_latest'] == 1].copy()
         del train_set['rank_latest'], test_set['rank_latest']
 
-    elif test_method == 'loo':
+    elif test_method == 'rloo':
         # # slow method
         # test_set = df.groupby(['user']).apply(pd.DataFrame.sample, n=1).reset_index(drop=True)
         # test_key = test_set[['user', 'item']].copy()
@@ -80,14 +80,14 @@ def split_test(df, test_method='fo', test_size=.2):
         train_set = df[~df.index.isin(test_index)].copy()
 
     else:
-        raise ValueError('Invalid data_split value, expect: loo, fo, tloo, tfo')
+        raise ValueError('Invalid data_split value, expect: rloo, rsbr, tloo, tsbr')
 
     train_set, test_set = train_set.reset_index(drop=True), test_set.reset_index(drop=True)
 
     return train_set, test_set
 
 
-def split_validation(train_set, val_method='fo', fold_num=1, val_size=.1):
+def split_validation(train_set, val_method='rsbr', fold_num=1, val_size=.1):
     """
     method of split data into training data and validation data.
     (Currently, this method returns list of train & validation set, but I'll change 
@@ -98,13 +98,13 @@ def split_validation(train_set, val_method='fo', fold_num=1, val_size=.1):
     train_set : pd.DataFrame train set waiting for split validation
     val_method : str, way to split validation
                     'cv': combine with fold_num => fold_num-CV
-                    'fo': combine with fold_num & val_size => fold_num-Split by ratio(9:1)
-                    'tfo': Split by ratio with timestamp, combine with val_size => 1-Split by ratio(9:1)
+                    'rsbr': combine with fold_num & val_size => fold_num-Split by ratio(9:1)
+                    'tsbr': Split by ratio with timestamp, combine with val_size => 1-Split by ratio(9:1)
                     'tloo': Leave one out with timestamp => 1-Leave one out
-                    'loo': combine with fold_num => fold_num-Leave one out
+                    'rloo': combine with fold_num => fold_num-Leave one out
                     'ufo': split by ratio in user level with K-fold
                     'utfo': time-aware split by ratio in user level
-    fold_num : int, the number of folder need to be validated, only work when val_method is 'cv', 'loo', or 'fo'
+    fold_num : int, the number of folder need to be validated, only work when val_method is 'cv', 'rloo', or 'rsbr'
     val_size: float, the size of validation dataset
 
     Returns
@@ -114,12 +114,12 @@ def split_validation(train_set, val_method='fo', fold_num=1, val_size=.1):
     cnt : cnt: int, the number of train-validation pair
 
     """
-    if val_method in ['tloo', 'tfo', 'utfo']:
+    if val_method in ['tloo', 'tsbr', 'utfo']:
         cnt = 1
-    elif val_method in ['cv', 'loo', 'fo', 'ufo']:
+    elif val_method in ['cv', 'rloo', 'rsbr', 'ufo']:
         cnt = fold_num
     else:
-        raise ValueError('Invalid val_method value, expect: cv, loo, tloo, tfo')
+        raise ValueError('Invalid val_method value, expect: cv, rloo, tloo, tsbr')
     
     train_set_list, val_set_list = [], []
     if val_method == 'ufo':
@@ -151,18 +151,18 @@ def split_validation(train_set, val_method='fo', fold_num=1, val_size=.1):
         for train_index, val_index in kf.split(train_set):
             train_set_list.append(train_set.loc[train_index, :])
             val_set_list.append(train_set.loc[val_index, :])
-    if val_method == 'fo':
+    if val_method == 'rsbr':
         for _ in range(fold_num):
             train, validation = train_test_split(train_set, test_size=val_size)
             train_set_list.append(train)
             val_set_list.append(validation)
-    elif val_method == 'tfo':
+    elif val_method == 'tsbr':
         # train_set = train_set.sample(frac=1)
         train_set = train_set.sort_values(['timestamp']).reset_index(drop=True)
         split_idx = int(np.ceil(len(train_set) * (1 - val_size)))
         train_set_list.append(train_set.iloc[:split_idx, :])
         val_set_list.append(train_set.iloc[split_idx:, :])
-    elif val_method == 'loo':
+    elif val_method == 'rloo':
         for _ in range(fold_num):
             val_index = train_set.groupby(['user']).apply(lambda grp: np.random.choice(grp.index))
             val_set = train_set.loc[val_index, :].reset_index(drop=True).copy()

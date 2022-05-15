@@ -11,8 +11,8 @@ def generate_experiment_data(dataset, prepro, test_method):
     dataset : str, dataset name, available options: 'netflix', 'ml-100k', 'ml-1m', 'ml-10m', 'ml-20m', 'lastfm', 'bx',
                                                     'amazon-cloth', 'amazon-electronic', 'amazon-book', 'amazon-music',
                                                     'epinions', 'yelp', 'citeulike'
-    prepro : str, way to pre-process data, available options: 'origin', '5core', '10core'
-    test_method : str, way to get test dataset, available options: 'fo', 'loo', 'tloo', 'tfo'
+    prepro : str, way to pre-process data, available options: 'origin', '5filter', '10filter'
+    test_method : str, way to get test dataset, available options: 'tsbr', 'rsbr', 'tloo', 'rloo'
 
     Returns
     -------
