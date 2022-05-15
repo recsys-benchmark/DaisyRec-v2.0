@@ -6,7 +6,7 @@
 
 <!-- ![daisyRec's structure](pics/framework.png) -->
 
-DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem. The figure below shows the overall framework of DaisyRec-v2.0.
+DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem. Note that the preliminary version of DaisyRec is available [here.](https://github.com/AmazingDD/daisyRec), which will not be updated anymore. Please refer to DaisyRec-v2.0 for the latest version. The figure below shows the overall framework of DaisyRec-v2.0. 
 
 <p align="center">
 <img src="pics/framework.png" align="center" width="90%" style="margin: 0 auto">
@@ -40,11 +40,11 @@ Please refer to [Wiki](https://github.com/recsys-benchmark/DaisyRec-v2.0/wiki) f
 
 Below are the algorithms implemented in DaisyRec 2.0. More baselines will be added later.
 
-- ***Memory-based Methods***
+- **Memory-based Methods**
     - MostPop, ItemKNN
-- ***Latent Factor Methods***
+- **Latent Factor Methods**
     - PureSVD, SLIM, MF, FM
-- ***Deep Learning Methods***
+- **Deep Learning Methods**
     - NeuMF, NFM, NGCF, Multi-VAE
 
 ## Datasets
