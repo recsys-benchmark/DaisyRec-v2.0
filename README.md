@@ -6,7 +6,7 @@
 
 <!-- ![daisyRec's structure](pics/framework.png) -->
 
-DaisyRec 2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem. The figure below shows the overall framework of DaisyRec 2.0.
+DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem. The figure below shows the overall framework of DaisyRec-v2.0.
 
 <p align="center">
 <img src="pics/framework.png" align="center" width="90%" style="margin: 0 auto">
@@ -28,7 +28,7 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 ## Tutorial - How to use DaisyRec 2.0
 
-Please refer to 'DaisyRec-2.0-Tutorial.ipynb'. ***Coming soon ...***
+Please refer to 'DaisyRec-v2.0-Tutorial.ipynb'. ***Coming soon ...***
 
 ## Documentation 
 
@@ -76,7 +76,7 @@ Please refer to [ranking_results](https://github.com/recsys-benchmark/DaisyRec-v
 
 ## Cite
 
-Here is a Bibtex entry if you ever need to cite **DaisyRec 2.0** in a research paper (please keep us posted, we would love to know if DaisyRec-2.0 is helpful to you)
+Here is a Bibtex entry if you ever need to cite **DaisyRec-v2.0** in a research paper (please keep us posted, we would love to know if DaisyRec-v2.0 is helpful to you)
 
 ```
 @inproceedings{sun2020are,
