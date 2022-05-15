@@ -13,6 +13,7 @@ DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendatio
 </p>
 
 
+
 ## Tutorial - How to use DaisyRec-v2.0
 
 ### Pre-requisits
@@ -37,9 +38,11 @@ The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator
 
 Please refer to 'DaisyRec-v2.0-Tutorial.ipynb'. ***Coming soon ...***
 
+
 ## Documentation 
 
 Please refer to [Wiki](https://github.com/recsys-benchmark/DaisyRec-v2.0/wiki) for detailed documentation. ***Coming soon ...***
+
 
 ## Implemented Algorithms
 
@@ -51,6 +54,7 @@ Below are the algorithms implemented in DaisyRec 2.0. More baselines will be add
     - PureSVD, SLIM, MF, FM
 - **Deep Learning Methods**
     - NeuMF, NFM, NGCF, Multi-VAE
+    
 
 ## Datasets
 
@@ -68,6 +72,7 @@ All data are available in links below:
   - [CiteULike](https://github.com/js05212/citeulike-a)
   - [Amazon-Book/Electronic/Clothing/Music (ratings only)](http://jmcauley.ucsd.edu/data/amazon/links.html)
   - [Yelp Challenge](https://kaggle.com/yelp-dataset/yelp-dataset)
+
 
 ## Ranking Perofmrance for Reference
 
