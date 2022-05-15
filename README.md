@@ -74,13 +74,13 @@ All data are available in links below:
   - [Yelp Challenge](https://kaggle.com/yelp-dataset/yelp-dataset)
 
 
-## Ranking Perofmrance for Reference
+## Ranking Perofmrance for Reference (***Updating soon ...***)
 
-Please refer to [ranking_results](https://github.com/recsys-benchmark/DaisyRec-v2.0/tree/main/ranking_results) folder for the ranking performance of different baselines across various datasets.
+- Please refer to [ranking_results](https://github.com/recsys-benchmark/DaisyRec-v2.0/tree/main/ranking_results) folder for the ranking performance of different baselines across various datasets.
 
-Please refer to [additional_material](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/Additional%20Material.pdf) folder for the optimal parameter settings and other information.
+- Please refer to [additional_material](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/Additional%20Material.pdf) folder for the optimal parameter settings and other information.
 
-***Updating soon ...***
+
 
 
 ## TODO List
