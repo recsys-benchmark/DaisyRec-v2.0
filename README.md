@@ -16,7 +16,7 @@ DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendatio
 
 ## Tutorial - How to use DaisyRec-v2.0
 
-- ### Pre-requisits
+### Pre-requisits
 
 To get all dependencies, run:
 
@@ -32,7 +32,7 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 <!--<img src="pics/algos.png" width="40%" height="30%" style="margin: auto; cursor:default" />-->
 
-- ### How to Run
+### How to Run
 
 - The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator.pythonanywhere.com).
 
