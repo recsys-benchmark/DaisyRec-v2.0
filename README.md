@@ -87,7 +87,7 @@ All data are available in links below:
 
 - [ ] Optimize code for execution effiency
 - [ ] Improve the modularity and scalability of the code (e.g., initializer, optimizer)  
-- [ ] A more friendly GUI tuner
+- [ ] A more friendly GUI command generator
 - [ ] Check Item2vec 
 
 ## Cite
