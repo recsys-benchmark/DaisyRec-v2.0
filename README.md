@@ -6,12 +6,10 @@
 
 <!-- ![daisyRec's structure](pics/framework.png) -->
 
-DaisyRec is a Python toolkit dealing with rating prediction and item ranking issue.
-
-The name DAISY (roughly :) ) stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem.
+DaisyRec 2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem. The figure below shows the overall framework of DaisyRec 2.0.
 
 <p align="center">
-<img src="pics/framework.png" align="center" width="75%" style="margin: 0 auto">
+<img src="pics/framework.png" align="center" width="90%" style="margin: 0 auto">
 </p>
 
 To get all dependencies, run:
@@ -24,17 +22,28 @@ Before running, you need first run:
 
 to generate `.so` or `.pyd` file used for further import.
 
-Make sure you have a **CUDA** enviroment to accelarate since these deep-learning models could be based on it. We will consistently update this repo.
-
-DaisyRec handled ranking issue mainly and split recommendation problem into point-wise ones and pair-wise ones so that different loss function are constructed such as BPR, Top-1, Hinge and Cross Entropy. <!--All algorithms already implemented are exhibited below:-->
+Make sure you have a **CUDA** enviroment to accelarate since the deep-learning models could be based on it. 
 
 <!--<img src="pics/algos.png" width="40%" height="30%" style="margin: auto; cursor:default" />-->
 
-Use `main.py` to achieve KPI results calculated by certain algorithm above. For example, you can implement this program to implement BPR-MF:
+## Tutorial - How to use DaisyRec 2.0
 
-    python main.py --problem_type=pair --algo_name=mf --loss_type=BPR --num_ng=2
+Please refer to 'DaisyRec-2.0-Tutorial.ipynb'. ***Coming soon ...***
 
+## Documentation 
 
+Please refer to [Wiki](https://github.com/recsys-benchmark/DaisyRec-v2.0/wiki) for detailed documentation. ***Coming soon ...***
+
+## Implemented Algorithms
+
+Below are the algorithms implemented in DaisyRec 2.0. More baselines will be added later.
+
+- ***Memory-based Methods***
+    - MostPop, ItemKNN
+- ***Latent Factor Methods***
+    - PureSVD, SLIM, MF, FM
+- ***Deep Learning Methods***
+    - NeuMF, NFM, NGCF, Multi-VAE
 
 ## Datasets
 
@@ -50,23 +59,24 @@ All data are available in links below:
   - [Book Crossing](https://grouplens.org/datasets/book-crossing/)
   - [Epinions](http://www.cse.msu.edu/~tangjili/trust.html)
   - [CiteULike](https://github.com/js05212/citeulike-a)
-  - [Amazon-Book](http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/ratings_Books.csv)
-  - [Amazon-Electronic](http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/ratings_Electronics.csv)
-  - [Amazon-Cloth](http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/ratings_Clothing_Shoes_and_Jewelry.csv)
-  - [Amazon-Music](http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/ratings_Digital_Music.csv)
+  - [Amazon-Book/Electronic/Clothing/Music (ratings only)](http://jmcauley.ucsd.edu/data/amazon/links.html)
   - [Yelp Challenge](https://kaggle.com/yelp-dataset/yelp-dataset)
 
-## TODO list
+## Ranking Perofmrance for Reference
 
-- [ ] optimize code for performance
-- [ ] weight initialization interface
-- [ ] optimizer initialization interface
-- [ ] a more friendly tuner
-- [ ] make sure Item2vec work as expected
+Please refer to [ranking_results](https://github.com/recsys-benchmark/DaisyRec-v2.0/tree/main/ranking_results) folder for the ranking performance of different baselines across various datasets. ***Updating soon ...***
+
+
+## TODO List
+
+- [ ] Optimize code for execution effiency
+- [ ] Improve the modularity and scalability of the code (e.g., initializer, optimizer)  
+- [ ] A more friendly GUI tuner
+- [ ] Check Item2vec 
 
 ## Cite
 
-Here is a Bibtex entry if you ever need to cite **DaisyRec** in a research paper (please keep us posted, we would love to know if Daisy was helpful to you)
+Here is a Bibtex entry if you ever need to cite **DaisyRec 2.0** in a research paper (please keep us posted, we would love to know if DaisyRec-2.0 is helpful to you)
 
 ```
 @inproceedings{sun2020are,
@@ -82,6 +92,6 @@ Here is a Bibtex entry if you ever need to cite **DaisyRec** in a research paper
 
 We refer to the following repositories to improve our code:
 
- - SliM and KNN-CF parts with [RecSys2019_DeepLearning_Evaluation](https://github.com/MaurizioFD/RecSys2019_DeepLearning_Evaluation)
+ - SLIM and KNN-CF parts with [RecSys2019_DeepLearning_Evaluation](https://github.com/MaurizioFD/RecSys2019_DeepLearning_Evaluation)
  - SVD++ part with [Surprise](https://github.com/NicolasHug/Surprise)
  - NGCF part with [NGCF-PyTorch](https://github.com/huangtinglin/NGCF-PyTorch)
