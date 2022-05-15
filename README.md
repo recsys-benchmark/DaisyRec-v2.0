@@ -28,6 +28,7 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 ## Tutorial - How to use DaisyRec-v2.0
 
+The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator.pythonanywhere.com)
 Please refer to 'DaisyRec-v2.0-Tutorial.ipynb'. ***Coming soon ...***
 
 ## Documentation 
