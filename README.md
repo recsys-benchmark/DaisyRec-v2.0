@@ -6,7 +6,7 @@
 
 <!-- ![daisyRec's structure](pics/framework.png) -->
 
-DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem. Note that the preliminary version of DaisyRec is available [here.](https://github.com/AmazingDD/daisyRec), which will not be updated anymore. Please refer to DaisyRec-v2.0 for the latest version. The figure below shows the overall framework of DaisyRec-v2.0. 
+DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem. Note that the preliminary version of DaisyRec is available [here](https://github.com/AmazingDD/daisyRec), which will not be updated anymore. Please refer to DaisyRec-v2.0 for the latest version. The figure below shows the overall framework of DaisyRec-v2.0. 
 
 <p align="center">
 <img src="pics/framework.png" align="center" width="90%" style="margin: 0 auto">
@@ -28,7 +28,7 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 ## Tutorial - How to use DaisyRec-v2.0
 
-The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator.pythonanywhere.com)
+The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator.pythonanywhere.com).
 
 Please refer to 'DaisyRec-v2.0-Tutorial.ipynb'. ***Coming soon ...***
 
