@@ -26,7 +26,7 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 <!--<img src="pics/algos.png" width="40%" height="30%" style="margin: auto; cursor:default" />-->
 
-## Tutorial - How to use DaisyRec 2.0
+## Tutorial - How to use DaisyRec-v2.0
 
 Please refer to 'DaisyRec-v2.0-Tutorial.ipynb'. ***Coming soon ...***
 
