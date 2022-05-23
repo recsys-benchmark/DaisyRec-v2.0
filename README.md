@@ -32,7 +32,7 @@ Please refer to 'DaisyRec-2.0-Tutorial.ipynb'. ***Coming soon ...***
 
 ## Documentation 
 
-Please refer to [Wiki](https://github.com/recsys-benchmark/DaisyRec-v2.0/wiki) for detailed documentation. ***Coming soon ...***
+Please refer to [here](https://daisyrec.readthedocs.io/en/latest/) for detailed documentation.
 
 ## Implemented Algorithms
 
@@ -64,8 +64,7 @@ All data are available in links below:
 
 ## Ranking Perofmrance for Reference
 
-Please refer to [ranking_results](https://github.com/recsys-benchmark/DaisyRec-v2.0/tree/main/ranking_results) folder for the ranking performance of different baselines across various datasets. ***Updating soon ...***
-
+Please refer to [ranking_results](https://daisyrec-ranking-results.readthedocs.io/en/latest/) for the ranking performance of different baselines across various datasets. 
 
 ## TODO List
 
