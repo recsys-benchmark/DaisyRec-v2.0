@@ -6,11 +6,17 @@
 
 <!-- ![daisyRec's structure](pics/framework.png) -->
 
-DaisyRec 2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem. The figure below shows the overall framework of DaisyRec 2.0.
+DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compAr**I**son for recommender **SY**stem. Note that the preliminary version of DaisyRec is available [here](https://github.com/AmazingDD/daisyRec), which will not be updated anymore. Please refer to DaisyRec-v2.0 for the latest version. The figure below shows the overall framework of DaisyRec-v2.0. 
 
 <p align="center">
 <img src="pics/framework.png" align="center" width="90%" style="margin: 0 auto">
 </p>
+
+
+
+## Tutorial - How to use DaisyRec-v2.0
+
+### Pre-requisits
 
 To get all dependencies, run:
 
@@ -26,9 +32,12 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 <!--<img src="pics/algos.png" width="40%" height="30%" style="margin: auto; cursor:default" />-->
 
-## Tutorial - How to use DaisyRec 2.0
+### How to Run
 
-Please refer to 'DaisyRec-2.0-Tutorial.ipynb'. ***Coming soon ...***
+- The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator.pythonanywhere.com).
+
+- Please refer to 'DaisyRec-v2.0-Tutorial.ipynb'. ***Coming soon ...***
+
 
 ## Documentation 
 
@@ -38,12 +47,13 @@ Please refer to [here](https://daisyrec.readthedocs.io/en/latest/) for detailed 
 
 Below are the algorithms implemented in DaisyRec 2.0. More baselines will be added later.
 
-- ***Memory-based Methods***
+- **Memory-based Methods**
     - MostPop, ItemKNN
-- ***Latent Factor Methods***
+- **Latent Factor Methods**
     - PureSVD, SLIM, MF, FM
-- ***Deep Learning Methods***
+- **Deep Learning Methods**
     - NeuMF, NFM, NGCF, Multi-VAE
+    
 
 ## Datasets
 
@@ -62,20 +72,26 @@ All data are available in links below:
   - [Amazon-Book/Electronic/Clothing/Music (ratings only)](http://jmcauley.ucsd.edu/data/amazon/links.html)
   - [Yelp Challenge](https://kaggle.com/yelp-dataset/yelp-dataset)
 
-## Ranking Perofmrance for Reference
 
-Please refer to [ranking_results](https://daisyrec-ranking-results.readthedocs.io/en/latest/) for the ranking performance of different baselines across various datasets. 
+
+## Ranking Results (***Updating soon ...***)
+
+- Please refer to [ranking_results](https://daisyrec-ranking-results.readthedocs.io/en/latest/) for the ranking performance of different baselines across various datasets. 
+
+- Please refer to [additional_material](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/Additional%20Material.pdf) folder for the optimal parameter settings and other information.
+
+
 
 ## TODO List
 
 - [ ] Optimize code for execution effiency
 - [ ] Improve the modularity and scalability of the code (e.g., initializer, optimizer)  
-- [ ] A more friendly GUI tuner
+- [ ] A more friendly GUI command generator
 - [ ] Check Item2vec 
 
 ## Cite
 
-Here is a Bibtex entry if you ever need to cite **DaisyRec 2.0** in a research paper (please keep us posted, we would love to know if DaisyRec-2.0 is helpful to you)
+Here is a Bibtex entry if you ever need to cite **DaisyRec-v2.0** in a research paper (please keep us posted, we would love to know if DaisyRec-v2.0 is helpful to you)
 
 ```
 @inproceedings{sun2020are,
