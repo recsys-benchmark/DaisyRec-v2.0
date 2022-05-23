@@ -41,8 +41,7 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 ## Documentation 
 
-- Please refer to [Wiki](https://github.com/recsys-benchmark/DaisyRec-v2.0/wiki) for detailed documentation. ***Coming soon ...***
-
+Please refer to [here](https://daisyrec.readthedocs.io/en/latest/) for detailed documentation.
 
 ## Implemented Algorithms
 
@@ -74,12 +73,12 @@ All data are available in links below:
   - [Yelp Challenge](https://kaggle.com/yelp-dataset/yelp-dataset)
 
 
+
 ## Ranking Results (***Updating soon ...***)
 
-- Please refer to [ranking_results](https://github.com/recsys-benchmark/DaisyRec-v2.0/tree/main/ranking_results) folder for the ranking performance of different baselines across various datasets.
+- Please refer to [ranking_results](https://daisyrec-ranking-results.readthedocs.io/en/latest/) for the ranking performance of different baselines across various datasets. 
 
 - Please refer to [additional_material](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/Additional%20Material.pdf) folder for the optimal parameter settings and other information.
-
 
 
 
