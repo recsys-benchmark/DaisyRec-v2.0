@@ -60,10 +60,7 @@ Below are the algorithms implemented in DaisyRec 2.0. More baselines will be add
 You can download experiment data, and put them into the `data` folder.
 All data are available in links below: 
 
-  - [MovieLens 100K](https://grouplens.org/datasets/movielens/100k/)
-  - [MovieLens 1M](https://grouplens.org/datasets/movielens/1m/)
-  - [MovieLens 10M](https://grouplens.org/datasets/movielens/10m/)
-  - [MovieLens 20M](https://grouplens.org/datasets/movielens/20m/)
+  - [MovieLens 100K](https://grouplens.org/datasets/movielens/100k/), [MovieLens 1M](https://grouplens.org/datasets/movielens/1m/), [MovieLens 10M](https://grouplens.org/datasets/movielens/10m/), [MovieLens 20M](https://grouplens.org/datasets/movielens/20m/)
   - [Netflix Prize Data](https://archive.org/download/nf_prize_dataset.tar)
   - [Last.fm](https://grouplens.org/datasets/hetrec-2011/)
   - [Book Crossing](https://grouplens.org/datasets/book-crossing/)
