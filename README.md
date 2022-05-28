@@ -88,6 +88,7 @@ All data are available in links below:
 - [ ] reconstruct daisyRec with a new framework (YD's team to do)
 - [ ] simplify SLIM and KNN-CF (YD's team to do)
 - [ ] A new GUI to generate results without any command (YD's team to do)
+- [ ] Update SVDpp with torch
 
 ## Cite
 
