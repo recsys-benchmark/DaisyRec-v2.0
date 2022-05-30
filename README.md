@@ -85,10 +85,11 @@ All data are available in links below:
 - [ ] Improve the modularity and scalability of the code (e.g., initializer, optimizer)  
 - [ ] A more friendly GUI command generator
 - [ ] Check [Item2vec](https://github.com/AmazingDD/item2vec-pytorch) (add predict interface)
-- [ ] reconstruct daisyRec with a new framework (YD's team to do)
-- [ ] simplify SLIM and KNN-CF (YD's team to do)
+- [ ] Reconstruct DaisyRec with a new framework (YD's team to do)
+- [ ] Simplify SLIM and KNN-CF (YD's team to do)
 - [ ] A new GUI to generate results without any command (YD's team to do)
 - [ ] Update SVDpp with torch
+- [ ] Implement 5-core and 10-core
 
 ## Cite
 
