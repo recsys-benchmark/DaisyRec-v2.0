@@ -90,7 +90,7 @@ All data are available in links below:
 - [ ] Reconstruct DaisyRec with a new framework (YD's team to do)
 - [ ] Simplify SLIM and KNN-CF (YD's team to do)
 - [ ] A new GUI to generate results without any command (YD's team to do)
-- [ ] Update SVDpp with torch
+- [ ] Update SVDpp, WRMF with torch, torch.linalg.solve
 - [ ] Implement 5-core and 10-core
 
 ## Cite
