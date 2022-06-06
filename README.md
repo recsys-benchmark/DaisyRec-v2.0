@@ -77,7 +77,7 @@ All data are available in links below:
 
 - Please refer to [ranking_results](https://daisyrec-ranking-results.readthedocs.io/en/latest/) for the ranking performance of different baselines across various datasets. 
 
-- Please refer to [additional_material](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/Additional%20Material.pdf) folder for the optimal parameter settings and other information.
+- Please refer to [appendix](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/appendix.pdf) folder for the optimal parameter settings and other information.
 
 
 
