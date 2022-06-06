@@ -43,7 +43,7 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 ## Documentation 
 
-Please refer to [here](https://daisyrec.readthedocs.io/en/latest/) for detailed documentation.
+The detailed documentation is available [here](https://daisyrec.readthedocs.io/en/latest/).
 
 ## Implemented Algorithms
 
