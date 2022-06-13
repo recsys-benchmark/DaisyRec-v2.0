@@ -86,6 +86,8 @@ All data are available in links below:
         - Note that we only have the 10-fiter results for all the methods across the six datasets.
 
 - Please refer to [appendix](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/appendix.pdf) folder for the optimal parameter settings and other information.
+    - Tables 16-18 show the best parameter settings for TSBR
+    
 
 
 
