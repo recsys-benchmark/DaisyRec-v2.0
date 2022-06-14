@@ -38,16 +38,16 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 - The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator.pythonanywhere.com).
 
-- Please refer to [DaisyRec-v2.0-Tutorial.ipynb](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/DaisyRec-v2.0-Tutorial.ipynb)
+- Please refer to [DaisyRec-v2.0-Tutorial.ipynb](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/DaisyRec-v2.0-Tutorial.ipynb), which demontrates how to use DaisyRec-v2.0 to tune hyper-parameters and test the algorithms step by step.
 
 
 ## Documentation 
 
-The detailed documentation is available [here](https://daisyrec.readthedocs.io/en/latest/).
+The documentation of DaisyRec-v2.0 is available [here](https://daisyrec.readthedocs.io/en/latest/), which provides detailed explainations for all commands.
 
 ## Implemented Algorithms
 
-Below are the algorithms implemented in DaisyRec 2.0. More baselines will be added later.
+Below are the algorithms implemented in DaisyRec-v2.0. More baselines will be added later.
 
 - **Memory-based Methods**
     - MostPop, ItemKNN
