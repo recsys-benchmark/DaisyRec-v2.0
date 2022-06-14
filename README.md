@@ -85,7 +85,7 @@ All data are available in links below:
         - We keep original objective functions for each baseline (bpr loss for MF, FM, NFM and NGCF; squre error loss for SLIM; cross-entropy loss for NeuMF and Multi-VAE), employ the uniform sampler, and adopt time-aware leave-one-out (i.e., TLOO) as the data splitting method. In particular, for each user, his last interaction is kept as the test set, and the second last interaction is used as the validation set; and the rest intereactions are treated as training set. 
         - Note that we only have the 10-fiter results for all the methods across the six datasets.
 
-- Please refer to [appendix](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/appendix.pdf) folder for the optimal parameter settings and other information.
+- Please refer to [appendix.pdf](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/appendix.pdf) file for the optimal parameter settings and other information.
     - Tables 16-18 show the best hyper-parameter settings for TSBR
     - Table 19 shows the best hyper-parameter settings for TLOO
     
