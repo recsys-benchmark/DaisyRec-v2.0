@@ -80,7 +80,7 @@ def load_rate(src='ml-100k', prepro='origin', binary=True, pos_threshold=None, l
         # fake timestamp column
         df['timestamp'] = 1
 
-    elif src == 'bx':
+    elif src == 'book-x':
         df = pd.read_csv(f'./data/{src}/BX-Book-Ratings.csv', delimiter=";", encoding="latin1")
         df.rename(columns={'User-ID': 'user', 'ISBN': 'item', 'Book-Rating': 'rating'}, inplace=True)
         # fake timestamp column

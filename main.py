@@ -60,16 +60,16 @@ if __name__ == '__main__':
     )
     neg_set = sampler.transform(train_set, is_training=True)
 
-    if args.algo_name in ['cdae', 'vae']:
+    if args.algo_name in ['cdae', 'multi-vae']:
         train_dataset = UAEData(user_num, item_num, train_set, test_set)
         training_mat = convert_npy_mat(user_num, item_num, train_set)
     else:
-        if args.problem_type == 'pair':
+        if args.problem_type == 'pair-wise':
             train_dataset = PairData(neg_set, is_training=True)
         else:
             train_dataset = PointData(neg_set, is_training=True)
 
-    if args.problem_type == 'point':
+    if args.problem_type == 'point-wise':
         if args.algo_name == 'mf':
             from daisy.model.point.MFRecommender import PointMF
             model = PointMF(
@@ -82,9 +82,11 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer = args.initializer,
+                initializer=args.initializer,
                 gpuid=args.gpu,
-                early_stop=args.early_stop
+                early_stop=args.early_stop,
+                initializer=args.init_method,
+                optimizer=args.optimizer
             )
         elif args.algo_name == 'fm':
             from daisy.model.point.FMRecommender import PointFM
@@ -136,11 +138,11 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer = args.initializer,
+                initializer=args.initializer,
                 gpuid=args.gpu,
                 early_stop=args.early_stop
             )
-        elif args.algo_name == 'vae':
+        elif args.algo_name == 'multi-vae':
             from daisy.model.VAERecommender import VAE
             model = VAE(
                 rating_mat=training_mat,
@@ -152,7 +154,7 @@ if __name__ == '__main__':
                 beta=args.kl_reg,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer = args.initializer,
+                initializer=args.initializer,
                 gpuid=args.gpu,
                 early_stop=args.early_stop
             )
@@ -173,7 +175,7 @@ if __name__ == '__main__':
                     node_dropout_flag=args.node_dropout_flag,
                     loss_type=args.loss_type,
                     optimizer=args.optimizer,
-                    initializer = args.initializer,
+                    initializer=args.initializer,
                     gpuid=args.gpu,
                     early_stop=args.early_stop
                 )
@@ -206,7 +208,7 @@ if __name__ == '__main__':
             )
         else:
             raise ValueError('Invalid algorithm name')
-    elif args.problem_type == 'pair':
+    elif args.problem_type == 'pair-wise':
         if args.algo_name == 'mf':
             from daisy.model.pair.MFRecommender import PairMF
             model = PairMF(
@@ -335,7 +337,7 @@ if __name__ == '__main__':
     print('Generate recommend list...')
     print('')
     preds = {}
-    if args.algo_name in ['vae', 'cdae', 'itemknn', 'puresvd', 'slim'] and args.problem_type == 'point':
+    if args.algo_name in ['multi-vae', 'cdae', 'itemknn', 'puresvd', 'slim'] and args.problem_type == 'point-wise':
         for u in tqdm(test_ucands.keys()):
             pred_rates = [model.predict(u, i) for i in test_ucands[u]]
             rec_idx = np.argsort(pred_rates)[::-1][:args.topk]

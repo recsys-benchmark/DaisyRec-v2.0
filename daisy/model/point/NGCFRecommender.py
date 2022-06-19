@@ -48,6 +48,8 @@ class PointNGCF(nn.Module):
         epochs : int, number of training epochs
         node_dropout_flag: int, NGCF: 0: Disable node dropout, 1: Activate node dropout
         loss_type : str, loss function type
+        optimizer : str, optimization method for training the algorithms
+        initializer: str, parameter initializer
         early_stop : bool, whether to activate early stop mechanism
         gpuid : str, GPU ID
         """
@@ -71,6 +73,10 @@ class PointNGCF(nn.Module):
         self.node_dropout_flag=node_dropout_flag
 
         self.loss_type = loss_type
+        if initializer == 'default':
+            initializer = 'xavier_uniform'
+        if optimizer == 'default':
+            optimizer = 'adam'
         self.optimizer = optimizer
         self.early_stop=early_stop
 

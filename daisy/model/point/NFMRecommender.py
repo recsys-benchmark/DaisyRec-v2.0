@@ -23,7 +23,7 @@ class PointNFM(nn.Module):
                  reg_2=0., 
                  loss_type='CL',
                  optimizer='sgd',
-                 initializer='normal', 
+                 initializer='default', 
                  gpuid='0', 
                  early_stop=True):
         """
@@ -42,6 +42,8 @@ class PointNFM(nn.Module):
         reg_1 : float, first-order regularization term
         reg_2 : float, second-order regularization term
         loss_type : str, loss function type
+        optimizer : str, optimization method for training the algorithms
+        initializer: str, parameter initializer
         gpuid : str, GPU ID
         early_stop : bool, whether to activate early stop mechanism
         """
@@ -58,6 +60,8 @@ class PointNFM(nn.Module):
         self.reg_2 = reg_2
         self.epochs = epochs
         self.loss_type = loss_type
+        if optimizer == 'default':
+            optimizer = 'sgd'
         self.optimizer = optimizer
         self.early_stop = early_stop
 
@@ -107,7 +111,7 @@ class PointNFM(nn.Module):
         nn.init.constant_(self.i_bias.weight, 0.0)
 
         # for deep layers
-        if initializer == 'normal':
+        if initializer == 'default':
             if self.num_layers > 0:  # len(self.layers)
                 for m in self.deep_layers:
                     if isinstance(m, nn.Linear):

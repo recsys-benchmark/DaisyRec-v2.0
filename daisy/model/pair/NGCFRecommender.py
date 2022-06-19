@@ -69,6 +69,10 @@ class PairNGCF(nn.Module):
         self.node_dropout_flag=node_dropout_flag
 
         self.loss_type = loss_type
+        if initializer == 'default':
+            initializer = 'xavier_uniform'
+        if optimizer == 'default':
+            optimizer = 'adam'
         self.optimizer = optimizer
         self.early_stop=early_stop
 

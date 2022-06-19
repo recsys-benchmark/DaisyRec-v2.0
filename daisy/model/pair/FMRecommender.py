@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
+from daisy.utils.config import model_config, initializer_config, optimizer_config
 
 
 class PairFM(nn.Module):
@@ -17,6 +18,8 @@ class PairFM(nn.Module):
                  reg_1=0.,
                  reg_2=0.,
                  loss_type='BPR',
+                 optimizer='sgd',
+                 initializer='normal', 
                  gpuid='0', 
                  early_stop=True):
         """
@@ -31,6 +34,8 @@ class PairFM(nn.Module):
         reg_1 : float, first-order regularization term
         reg_2 : float, second-order regularization term
         loss_type : str, loss function type
+        optimizer : str, optimization method for training the algorithms
+        initializer: str, parameter initializer
         gpuid : str, GPU ID
         early_stop : bool, whether to activate early stop mechanism
         """
@@ -53,12 +58,19 @@ class PairFM(nn.Module):
         self.bias_ = nn.Parameter(torch.tensor([0.0]))
 
         # init weight
-        nn.init.normal_(self.embed_user.weight, std=0.01)
-        nn.init.normal_(self.embed_item.weight, std=0.01)
+        if initializer == 'default':
+            initializer = 'normal'
+        if optimizer == 'default':
+            optimizer = 'sgd'
+
+        # init weight
+        initializer_config[initializer](self.embed_user.weight, **model_config['initializer'][initializer])
+        initializer_config[initializer](self.embed_item.weight, **model_config['initializer'][initializer])
         nn.init.constant_(self.u_bias.weight, 0.0)
         nn.init.constant_(self.i_bias.weight, 0.0)
 
         self.loss_type = loss_type
+        self.optimizer = optimizer
         self.early_stop = early_stop
 
     def forward(self, u, i, j):
@@ -82,7 +94,7 @@ class PairFM(nn.Module):
         else:
             self.cpu()
 
-        optimizer = optim.SGD(self.parameters(), lr=self.lr)
+        optimizer = optimizer_config[self.optimizer](self.parameters(), lr=self.lr)
 
         last_loss = 0.
         for epoch in range(1, self.epochs + 1):

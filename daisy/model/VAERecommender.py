@@ -37,6 +37,8 @@ class VAE(nn.Module):
         reg_1 : float, first-order regularization term
         reg_2 : float, second-order regularization term
         loss_type : str, loss function type
+        optimizer : str, optimization method for training the algorithms
+        initializer: str, parameter initializer
         gpuid : str, GPU ID
         early_stop : bool, whether to activate early stop mechanism
         """
@@ -48,6 +50,10 @@ class VAE(nn.Module):
         self.reg_2 = reg_2
         self.beta = beta
         self.loss_type = loss_type
+        if initializer == 'default':
+            initializer = 'xavier_normal'
+        if optimizer == 'default':
+            optimizer = 'adam'
         self.optimizer = optimizer
         self.early_stop = early_stop
 
