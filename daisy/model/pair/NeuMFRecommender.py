@@ -21,7 +21,7 @@ class PairNeuMF(nn.Module):
                  reg_2=0.001,
                  loss_type='BPR',
                  optimizer='adam',
-                 initializer='normal',
+                 initializer='default',
                  model_name='NeuMF-end', 
                  GMF_model=None, 
                  MLP_model=None, 
@@ -42,6 +42,8 @@ class PairNeuMF(nn.Module):
         reg_2 : float, second-order regularization term
         loss_type : str, loss function type
         model_name : str, model name
+        optimizer : str, optimization method for training the algorithms
+        initializer: str, parameter initializer
         GMF_model : Object, pre-trained GMF weights;
         MLP_model : Object, pre-trained MLP weights.
         gpuid : str, GPU ID
@@ -81,7 +83,8 @@ class PairNeuMF(nn.Module):
             predict_size = factors * 2
 
         self.predict_layer = nn.Linear(predict_size, 1)
-
+        if optimizer == 'default':
+            optimizer = 'adam'
         self._init_weight_(initializer)
 
         self.loss_type = loss_type
@@ -96,7 +99,7 @@ class PairNeuMF(nn.Module):
             initializer_config[initializer](self.embed_user_MLP.weight, **model_config['initializer'][initializer])
             initializer_config[initializer](self.embed_item_MLP.weight, **model_config['initializer'][initializer])
             
-            if initializer == 'normal':
+            if initializer == 'default':
                 for m in self.MLP_layers:
                     if isinstance(m, nn.Linear):
                         nn.init.xavier_uniform_(m.weight)

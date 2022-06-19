@@ -4,22 +4,22 @@ import argparse
 def parse_args():
     parser = argparse.ArgumentParser(description='test recommender')
     # tuner settings
-    parser.add_argument('--score_metric', 
+    parser.add_argument('--optimization_metric', 
                         type=str, 
                         default='ndcg', 
-                        help='use which metric to define hyperopt score')
-    parser.add_argument('--tune_epochs', 
+                        help='the metric to be optimized for hyper-parameter tuning via HyperOpt')
+    parser.add_argument('--hyperopt_trail', 
                         type=int, 
                         default=30, 
-                        help='tuning epochs')
-    parser.add_argument('--tune_pack', 
+                        help='the number of trails of HyperOpt')
+    parser.add_argument('--hyperopt_pack', 
                         type=str, 
                         default='{}', 
-                        help='Tuner parameter dictionary, type is JSON string')
+                        help='record the searching space of hyper-parameters for HyperOpt')
     # common settings
     parser.add_argument('--problem_type', 
                         type=str, 
-                        default='point', 
+                        default='point-wise', 
                         help='pair-wise or point-wise')
     parser.add_argument('--algo_name', 
                         type=str, 
@@ -59,15 +59,15 @@ def parse_args():
     parser.add_argument('--cand_num', 
                         type=int, 
                         default=1000, 
-                        help='No. of candidates item for predict')
+                        help='the number of candidate items used for ranking')
     parser.add_argument('--sample_method', 
                         type=str, 
                         default='uniform', 
-                        help='negative sampling method mixed with uniform, options: item-ascd, item-desc')
+                        help='negative sampling method mixed with uniform, options: high-pop, low-pop')
     parser.add_argument('--sample_ratio', 
                         type=float, 
                         default=0, 
-                        help='mix sample method ratio, 0 for all uniform')
+                        help='control the ratio of popularity sampling for the hybrid sampling strategy in the range of (0,1)')
     parser.add_argument('--init_method', 
                         type=str, 
                         default='', 
@@ -112,15 +112,15 @@ def parse_args():
     parser.add_argument('--alpha', 
                         type=float, 
                         default=0.02, 
-                        help='elastic net parameter')
+                        help='constant to multiply the penalty terms for SLIM')
     parser.add_argument('--elastic', 
                         type=float, 
                         default=0.5, 
-                        help='ratio if lasso result, 0 for ridge-regression, 1 for lasso-regression')
+                        help='the ElasticNet mixing parameter for SLIM in the range of (0,1)')
     parser.add_argument('--pop_n', 
                         type=int, 
                         default=100, 
-                        help='Initial selected number of Most-popular')
+                        help='the preliminary selected top-n popular candidate items to reduce the time complexity for MostPop')
     parser.add_argument('--maxk', 
                         type=int, 
                         default=40, 

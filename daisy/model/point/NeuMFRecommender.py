@@ -21,7 +21,7 @@ class PointNeuMF(nn.Module):
                  loss_type='CL', 
                  model_name='NeuMF-end',
                  optimizer='adam',
-                 initializer='normal',
+                 initializer='default',
                  GMF_model=None, 
                  MLP_model=None, 
                  gpuid='0', 
@@ -41,6 +41,8 @@ class PointNeuMF(nn.Module):
         reg_2 : float, second-order regularization term
         loss_type : str, loss function type
         model_name : str, model name
+        optimizer : str, optimization method for training the algorithms
+        initializer: str, parameter initializer
         GMF_model : Object, pre-trained GMF weights;
         MLP_model : Object, pre-trained MLP weights.
         gpuid : str, GPU ID
@@ -81,6 +83,8 @@ class PointNeuMF(nn.Module):
 
         self.predict_layer = nn.Linear(predict_size, 1)
 
+        if optimizer == 'default':
+            optimizer = 'adam'
         self._init_weight_(initializer)
 
         self.loss_type = loss_type
@@ -94,7 +98,7 @@ class PointNeuMF(nn.Module):
             initializer_config[initializer](self.embed_item_GMF.weight, **model_config['initializer'][initializer])
             initializer_config[initializer](self.embed_user_MLP.weight, **model_config['initializer'][initializer])
             initializer_config[initializer](self.embed_item_MLP.weight, **model_config['initializer'][initializer])
-            if initializer == 'normal':
+            if initializer == 'default':
                 for m in self.MLP_layers:
                     if isinstance(m, nn.Linear):
                         nn.init.xavier_uniform_(m.weight)

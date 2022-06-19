@@ -35,8 +35,11 @@ class PointFM(nn.Module):
         reg_1 : float, first-order regularization term
         reg_2 : float, second-order regularization term
         loss_type : str, loss function type
+        optimizer : str, optimization method for training the algorithms
+        initializer: str, parameter initializer
         gpuid : str, GPU ID
         early_stop : bool, whether to activate early stop mechanism
+
         """
         super(PointFM, self).__init__()
 
@@ -55,6 +58,11 @@ class PointFM(nn.Module):
         self.i_bias = nn.Embedding(item_num, 1)
 
         self.bias_ = nn.Parameter(torch.tensor([0.0]))
+        
+        if initializer == 'default':
+            initializer = 'normal'
+        if optimizer == 'default':
+            optimizer = 'sgd'
 
         # init weight
         initializer_config[initializer](self.embed_user.weight, **model_config['initializer'][initializer])

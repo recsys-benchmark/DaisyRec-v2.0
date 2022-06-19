@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 
 class Sampler(object):
-    def __init__(self, user_num, item_num, num_ng=4, sample_method='item-desc', sample_ratio=0):
+    def __init__(self, user_num, item_num, num_ng=4, sample_method='uniform', sample_ratio=0):
         """
         negative sampling class for some algorithms
         Parameters
@@ -12,8 +12,8 @@ class Sampler(object):
         num_ng : int, # of nagative sampling per sample
         sample_method : str, sampling method
                         'uniform' discrete uniform
-                        'item-desc' descending item popularity, high popularity means high probability to choose
-                        'item-ascd' ascending item popularity, low popularity means high probability to choose
+                        'high-pop' sample popular items with high rank
+                        'low-pop' sample popular items with low rank
         sample_ratio : float, scope [0, 1], it determines what extent the sample method except 'uniform' occupied
         """
         self.user_num = user_num
@@ -22,7 +22,7 @@ class Sampler(object):
         self.sample_method = sample_method
         self.sample_ratio = sample_ratio
 
-        assert sample_method in ['uniform', 'item-ascd', 'item-desc'], f'Invalid sampling method: {sample_method}'
+        assert sample_method in ['uniform', 'low-pop', 'high-pop'], f'Invalid sampling method: {sample_method}'
         assert 0 <= sample_ratio <= 1, 'Invalid sample ratio value'
 
     def transform(self, sampled_df, is_training=True):
@@ -56,9 +56,9 @@ class Sampler(object):
 
         neg_sample_pool = list(range(item_num))
         popularity_item_list = sampled_df['item'].value_counts().index.tolist()
-        if self.sample_method == 'item-desc':
+        if self.sample_method == 'high-pop':
             neg_sample_pool = popularity_item_list
-        elif self.sample_method == 'item-ascd':
+        elif self.sample_method == 'low-pop':
             neg_sample_pool = popularity_item_list[::-1]
         
         neg_set = []
@@ -76,7 +76,7 @@ class Sampler(object):
                     j = np.random.randint(item_num)
                 js.append(j)
             for _ in range(ex_num):
-                if self.sample_method in ['item-desc', 'item-ascd']:
+                if self.sample_method in ['high-pop', 'low-pop']:
                     idx = 0
                     j = int(neg_sample_pool[idx])
                     while (u, j) in pair_pos:

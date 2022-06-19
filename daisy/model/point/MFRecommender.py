@@ -34,6 +34,8 @@ class PointMF(nn.Module):
         reg_1 : float, first-order regularization term
         reg_2 : float, second-order regularization term
         loss_type : str, loss function type
+        optimizer : str, optimization method for training the algorithms
+        initializer: str, parameter initializer
         gpuid : str, GPU ID
         early_stop : bool, whether to activate early stop mechanism
         """
@@ -50,6 +52,10 @@ class PointMF(nn.Module):
         self.embed_user = nn.Embedding(user_num, factors)
         self.embed_item = nn.Embedding(item_num, factors)
 
+        if initializer == 'default':
+            initializer = 'normal'
+        if optimizer == 'default':
+            optimizer = 'sgd'
         initializer_config[initializer](self.embed_user.weight, **model_config['initializer'][initializer])
         initializer_config[initializer](self.embed_item.weight, **model_config['initializer'][initializer])
 
