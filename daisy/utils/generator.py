@@ -8,7 +8,7 @@ def generate_experiment_data(dataset, prepro, test_method):
     method of generating dataset for reproducing paper KPI
     Parameters
     ----------
-    dataset : str, dataset name, available options: 'netflix', 'ml-100k', 'ml-1m', 'ml-10m', 'ml-20m', 'lastfm', 'bx',
+    dataset : str, dataset name, available options: 'netflix', 'ml-100k', 'ml-1m', 'ml-10m', 'ml-20m', 'lastfm', 'book-x',
                                                     'amazon-cloth', 'amazon-electronic', 'amazon-book', 'amazon-music',
                                                     'epinions', 'yelp', 'citeulike'
     prepro : str, way to pre-process data, available options: 'origin', '5filter', '10filter'

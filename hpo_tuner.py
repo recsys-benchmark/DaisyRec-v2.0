@@ -15,7 +15,7 @@ from daisy.utils.sampler import Sampler
 from daisy.utils.parser import parse_args
 from daisy.utils.data import PointData, PairData, UAEData
 from daisy.utils.splitter import split_test, split_validation
-from daisy.utils.opt_toolkit import param_extract, confirm_space
+# from daisy.utils.opt_toolkit import param_extract, confirm_space
 from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
 from daisy.utils.config import algo_config
@@ -110,7 +110,7 @@ if __name__ == '__main__':
                         reg_2=reg_2,
                         loss_type=args.loss_type,
                         optimizer=args.optimizer,
-                        initializer = args.initializer,
+                        initializer = args.init_method,
                         gpuid=args.gpu,
                         early_stop=args.early_stop
                     )
@@ -128,7 +128,7 @@ if __name__ == '__main__':
                         reg_2=reg_2,
                         loss_type=args.loss_type,
                         optimizer=args.optimizer,
-                        initializer = args.initializer,
+                        initializer = args.init_method,
                         gpuid=args.gpu,
                         early_stop=args.early_stop
                     )
@@ -148,7 +148,7 @@ if __name__ == '__main__':
                         reg_2=reg_2,
                         loss_type=args.loss_type,
                         optimizer=args.optimizer,
-                        initializer=args.initializer,
+                        initializer=args.init_method,
                         gpuid=args.gpu,
                         early_stop=args.early_stop
                     )
@@ -164,7 +164,7 @@ if __name__ == '__main__':
                         beta=kl_reg,
                         loss_type=args.loss_type,
                         optimizer=args.optimizer,
-                        initializer=args.initializer,
+                        initializer=args.init_method,
                         gpuid=args.gpu,
                         early_stop=args.early_stop
                     )
@@ -175,17 +175,17 @@ if __name__ == '__main__':
                         user_num,
                         item_num,
                         norm_adj=norm_adj,
-                        factors=args.factors,
-                        batch_size=args.batch_size,
-                        node_dropout=args.node_dropout,
-                        mess_dropout=args.mess_dropout,
-                        lr=args.lr,
-                        reg_2=args.reg_2,
+                        factors=factors,
+                        batch_size=batch_size,
+                        node_dropout=node_dropout,
+                        mess_dropout=mess_dropout,
+                        lr=lr,
+                        reg_2=reg_2,
                         epochs=args.epochs,
                         node_dropout_flag=args.node_dropout_flag,
                         loss_type=args.loss_type,
                         optimizer=args.optimizer,
-                        initializer=args.initializer,
+                        initializer=args.init_method,
                         gpuid=args.gpu,
                         early_stop=args.early_stop
                 )
@@ -226,7 +226,7 @@ if __name__ == '__main__':
                         reg_2=reg_2,
                         loss_type=args.loss_type,
                         optimizer=args.optimizer,
-                        initializer = args.initializer,
+                        initializer = args.init_method,
                         gpuid=args.gpu,
                         early_stop=args.early_stop
                     )
@@ -242,7 +242,7 @@ if __name__ == '__main__':
                         reg_2=reg_2,
                         loss_type=args.loss_type,
                         optimizer=args.optimizer,
-                        initializer = args.initializer,
+                        initializer = args.init_method,
                         gpuid=args.gpu,
                         early_stop=args.early_stop
                     )
@@ -260,7 +260,7 @@ if __name__ == '__main__':
                         reg_2=reg_2,
                         loss_type=args.loss_type,
                         optimizer=args.optimizer,
-                        initializer = args.initializer,
+                        initializer = args.init_method,
                         gpuid=args.gpu,
                         early_stop=args.early_stop
                     )
@@ -280,7 +280,7 @@ if __name__ == '__main__':
                         reg_2=reg_2,
                         loss_type=args.loss_type,
                         optimizer=args.optimizer,
-                        initializer = args.initializer,
+                        initializer = args.init_method,
                         gpuid=args.gpu,
                         early_stop=args.early_stop
                     )
@@ -301,7 +301,7 @@ if __name__ == '__main__':
                         node_dropout_flag=args.node_dropout_flag,
                         loss_type=args.loss_type,
                         optimizer=args.optimizer,
-                        initializer = args.initializer,
+                        initializer = args.init_method,
                         gpuid=args.gpu,
                         early_stop=args.early_stop
                     )
@@ -329,7 +329,7 @@ if __name__ == '__main__':
             print('Generate recommend list...')
             print('')
             preds = {}
-            if args.algo_name in ['multi-vae', 'cdae'] and args.problem_type == 'point-wise':
+            if args.algo_name in ['multi-vae', 'cdae', 'itemknn', 'puresvd', 'slim'] and args.problem_type == 'point-wise':
                 for u in tqdm(val_ucands.keys()):
                     pred_rates = [model.predict(u, i) for i in val_ucands[u]]
                     rec_idx = np.argsort(pred_rates)[::-1][:topk]
@@ -467,7 +467,7 @@ if __name__ == '__main__':
         elif val[3] == 'float':
             print(key, 'loguniform', np.log(val[0]), np.log(val[1]))
             space[key] = hp.loguniform(key, np.log(val[0]), np.log(val[1]))
-        elif val[1] == 'choice':
+        elif val[3] == 'choice':
             print(key, 'choice', val[0])
             space[key] = hp.choice(key, val[0])
         else:

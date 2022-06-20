@@ -123,8 +123,8 @@ class PointNFM(nn.Module):
             if self.num_layers > 0:  # len(self.layers)
                 for m in self.deep_layers:
                     if isinstance(m, nn.Linear):
-                        initializer_config[initializer](m.weight)
-                initializer_config[initializer](self.prediction.weight)
+                        initializer_config[initializer](m.weight, **model_config['initializer'][initializer])
+                initializer_config[initializer](self.prediction.weight, **model_config['initializer'][initializer])
             else:
                 nn.init.constant_(self.prediction.weight, 1.0)
 

@@ -112,7 +112,7 @@ class PointNeuMF(nn.Module):
                     if isinstance(m, nn.Linear):
                         initializer_config[initializer](m.weight)
                 initializer_config[initializer](self.predict_layer.weight, 
-                                        a=1, nonlinearity='sigmoid')
+                                        **model_config['initializer'][initializer])
                 for m in self.modules():
                     if isinstance(m, nn.Linear) and m.bias is not None:
                         m.bias.data.zero_()
