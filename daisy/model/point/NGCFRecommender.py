@@ -25,6 +25,7 @@ class PointNGCF(nn.Module):
                 node_dropout,
                 mess_dropout,
                 lr,
+                reg_1,
                 reg_2,
                 epochs,
                 node_dropout_flag,
@@ -67,6 +68,7 @@ class PointNGCF(nn.Module):
         self.layers = [factors, factors, factors]
         self.norm_adj = norm_adj
         
+        self.reg_1 = reg_1
         self.reg_2 = reg_2
         self.epochs = epochs
         self.lr = lr
@@ -186,10 +188,10 @@ class PointNGCF(nn.Module):
         u_g_embeddings = u_g_embeddings[user, :]
         pos_i_g_embeddings = i_g_embeddings[item_i, :]
 
-        pos_scores = torch.sum(torch.mul(u_g_embeddings, pos_i_g_embeddings), dim=1)
-        reg = (torch.norm(u_g_embeddings) ** 2 + torch.norm(pos_i_g_embeddings) ** 2) / 2
+        # pos_scores = torch.sum(torch.mul(u_g_embeddings, pos_i_g_embeddings), dim=1)
+        # reg = (torch.norm(u_g_embeddings) ** 2 + torch.norm(pos_i_g_embeddings) ** 2) / 2
 
-        return pos_scores, reg
+        return u_g_embeddings, pos_i_g_embeddings
     
     def fit(self, train_loader):
         if torch.cuda.is_available():
@@ -225,10 +227,11 @@ class PointNGCF(nn.Module):
                     label = label.cpu()
 
                 self.zero_grad()
-                prediction, reg = self.forward(user, item)
+                emd_u, emd_i = self.forward(user, item)
+                prediction = torch.sum(torch.mul(emd_u, emd_i), dim=1)
                 loss = criterion(prediction, label)
-                
-                loss += self.reg_2 * reg / self.batch_size
+                loss += self.reg_1 * (torch.norm(emd_u, p=1)+ torch.norm(emd_i, p=1)) / self.batch_size
+                loss += self.reg_2 * (torch.norm(emd_u, p=2)+ torch.norm(emd_i, p=2)) / self.batch_size
 
                 if torch.isnan(loss):
                     raise ValueError(f'Loss=Nan or Infinity: current settings does not fit the recommender')

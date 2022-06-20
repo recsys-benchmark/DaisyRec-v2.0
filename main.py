@@ -82,7 +82,6 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer=args.initializer,
                 gpuid=args.gpu,
                 early_stop=args.early_stop,
                 initializer=args.init_method,
@@ -100,7 +99,7 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer = args.initializer,
+                initializer = args.init_method,
                 gpuid=args.gpu,
                 early_stop=args.early_stop
             )
@@ -118,7 +117,7 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer = args.initializer,
+                initializer = args.init_method,
                 gpuid=args.gpu,
                 early_stop=args.early_stop
             )
@@ -138,7 +137,7 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer=args.initializer,
+                initializer=args.init_method,
                 gpuid=args.gpu,
                 early_stop=args.early_stop
             )
@@ -154,7 +153,7 @@ if __name__ == '__main__':
                 beta=args.kl_reg,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer=args.initializer,
+                initializer=args.init_method,
                 gpuid=args.gpu,
                 early_stop=args.early_stop
             )
@@ -175,7 +174,7 @@ if __name__ == '__main__':
                     node_dropout_flag=args.node_dropout_flag,
                     loss_type=args.loss_type,
                     optimizer=args.optimizer,
-                    initializer=args.initializer,
+                    initializer=args.init_method,
                     gpuid=args.gpu,
                     early_stop=args.early_stop
                 )
@@ -221,7 +220,7 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer = args.initializer,
+                initializer = args.init_method,
                 gpuid=args.gpu,
                 early_stop=args.early_stop
             )
@@ -237,7 +236,7 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer = args.initializer,
+                initializer = args.init_method,
                 gpuid=args.gpu,
                 early_stop=args.early_stop
             )
@@ -255,7 +254,7 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer = args.initializer,
+                initializer = args.init_method,
                 gpuid=args.gpu,
                 early_stop=args.early_stop
             )
@@ -275,7 +274,7 @@ if __name__ == '__main__':
                 reg_2=args.reg_2,
                 loss_type=args.loss_type,
                 optimizer=args.optimizer,
-                initializer = args.initializer,
+                initializer = args.init_method,
                 gpuid=args.gpu,
                 early_stop=args.early_stop
             )
@@ -296,7 +295,7 @@ if __name__ == '__main__':
                     node_dropout_flag=args.node_dropout_flag,
                     loss_type=args.loss_type,
                     optimizer=args.optimizer,
-                    initializer = args.initializer,
+                    initializer = args.init_method,
                     gpuid=args.gpu,
                     early_stop=args.early_stop
                 )

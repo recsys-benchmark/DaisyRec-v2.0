@@ -71,7 +71,7 @@ def parse_args():
     parser.add_argument('--init_method', 
                         type=str, 
                         default='', 
-                        help='weight initialization method')
+                        help='weight initialization method: normal, uniform, xavier_normal, xavier_uniform')
     parser.add_argument('--gpu', 
                         type=str, 
                         default='0', 
@@ -88,10 +88,6 @@ def parse_args():
                         type=str, 
                         default='sgd', 
                         help='optimize method')
-    parser.add_argument('--initializer', 
-                        type=str, 
-                        default='normal', 
-                        help='parameter initialization method: normal, uniform, xavier_normal, xavier_uniform')
     # algo settings
     parser.add_argument('--factors', 
                         type=int, 
