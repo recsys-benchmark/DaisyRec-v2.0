@@ -461,9 +461,6 @@ if __name__ == '__main__':
         if val[3] == 'int':
             print(key, 'quniform', val[0], val[1], int(val[2]))
             space[key] = hp.quniform(key, val[0], val[1], int(val[2]))
-        elif val[3] == 'uint':
-            print(key, 'uniform', val[0], val[1])
-            space[key] = hp.uniform(key, val[0], val[1])
         elif val[3] == 'float':
             print(key, 'loguniform', np.log(val[0]), np.log(val[1]))
             space[key] = hp.loguniform(key, np.log(val[0]), np.log(val[1]))

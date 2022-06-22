@@ -53,12 +53,12 @@ class PairMF(nn.Module):
         self.embed_user = nn.Embedding(user_num, factors)
         self.embed_item = nn.Embedding(item_num, factors)
 
-        initializer_config[initializer](self.embed_user.weight, **model_config['initializer'][initializer])
-        initializer_config[initializer](self.embed_item.weight, **model_config['initializer'][initializer])
         if initializer == 'default':
             initializer = 'normal'
         if optimizer == 'default':
             optimizer = 'sgd'
+        initializer_config[initializer](self.embed_user.weight, **model_config['initializer'][initializer])
+        initializer_config[initializer](self.embed_item.weight, **model_config['initializer'][initializer])
         self.loss_type = loss_type
         self.optimizer = optimizer
         self.early_stop = early_stop

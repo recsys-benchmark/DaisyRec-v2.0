@@ -55,7 +55,7 @@ class PairNeuMF(nn.Module):
 
         self.lr = lr
         self.epochs = epochs
-        self.reg_1 = reg_2
+        self.reg_1 = reg_1
         self.reg_2 = reg_2
 
         self.dropout = q
