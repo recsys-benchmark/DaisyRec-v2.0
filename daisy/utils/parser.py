@@ -70,7 +70,7 @@ def parse_args():
                         help='control the ratio of popularity sampling for the hybrid sampling strategy in the range of (0,1)')
     parser.add_argument('--init_method', 
                         type=str, 
-                        default='', 
+                        default='default', 
                         help='weight initialization method: normal, uniform, xavier_normal, xavier_uniform')
     parser.add_argument('--gpu', 
                         type=str, 
@@ -86,7 +86,7 @@ def parse_args():
                         help='loss function type')
     parser.add_argument('--optimizer', 
                         type=str, 
-                        default='sgd', 
+                        default='default', 
                         help='optimize method')
     # algo settings
     parser.add_argument('--factors', 
