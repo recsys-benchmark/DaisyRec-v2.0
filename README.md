@@ -108,7 +108,7 @@ All data are available in links below:
 
 ## Cite
 
-Here is a Bibtex entry if you ever need to cite **DaisyRec-v2.0** in a research paper (please keep us posted, we would love to know if DaisyRec-v2.0 is helpful to you)
+Please cite both of the following papers if you use **DaisyRec-v2.0** in a research paper in any way (e.g., code and ranking results):
 
 ```
 @inproceedings{sun2020are,
@@ -118,6 +118,15 @@ Here is a Bibtex entry if you ever need to cite **DaisyRec-v2.0** in a research 
   year={2020}
 }
 
+```
+
+```
+@article{sun2022daisyrec,
+  title={DaisyRec 2.0: Benchmarking Recommendation for Rigorous Evaluation},
+  author={Sun, Zhu and Fang, Hui and Yang, Jie and Qu, Xinghua and Liu, Hongyang and Yu, Di and Ong, Yew-Soon and Zhang, Jie},
+  journal={arXiv preprint arXiv:2206.10848},
+  year={2022}
+}
 ```
 
 ## Acknowledgements
