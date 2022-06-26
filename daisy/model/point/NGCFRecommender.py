@@ -188,11 +188,11 @@ class PointNGCF(nn.Module):
         u_g_embeddings = u_g_embeddings[user, :]
         pos_i_g_embeddings = i_g_embeddings[item_i, :]
 
-        # pos_scores = torch.sum(torch.mul(u_g_embeddings, pos_i_g_embeddings), dim=1)
+        pos_scores = torch.sum(torch.mul(u_g_embeddings, pos_i_g_embeddings), dim=1)
         # reg = (torch.norm(u_g_embeddings) ** 2 + torch.norm(pos_i_g_embeddings) ** 2) / 2
 
-        return u_g_embeddings, pos_i_g_embeddings
-    
+        return u_g_embeddings, pos_i_g_embeddings, pos_scores
+
     def fit(self, train_loader):
         if torch.cuda.is_available():
             self.cuda()
@@ -227,8 +227,7 @@ class PointNGCF(nn.Module):
                     label = label.cpu()
 
                 self.zero_grad()
-                emd_u, emd_i = self.forward(user, item)
-                prediction = torch.sum(torch.mul(emd_u, emd_i), dim=1)
+                emd_u, emd_i, prediction = self.forward(user, item)
                 loss = criterion(prediction, label)
                 loss += self.reg_1 * (torch.norm(emd_u, p=1)+ torch.norm(emd_i, p=1)) / self.batch_size
                 loss += self.reg_2 * (torch.norm(emd_u, p=2)+ torch.norm(emd_i, p=2)) / self.batch_size
@@ -251,6 +250,6 @@ class PointNGCF(nn.Module):
                 last_loss = current_loss
 
     def predict(self, u, i):
-        pred_i, _ = self.forward(u, i)
+        _, _, pred_i = self.forward(u, i)
 
         return pred_i.cpu()
