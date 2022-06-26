@@ -24,6 +24,7 @@ class PairNGCF(nn.Module):
                 node_dropout,
                 mess_dropout,
                 lr,
+                reg_1,
                 reg_2,
                 epochs,
                 node_dropout_flag,
@@ -63,6 +64,7 @@ class PairNGCF(nn.Module):
         self.layers = [factors, factors, factors]
         self.norm_adj = norm_adj
         
+        self.reg_1 = reg_1
         self.reg_2 = reg_2
         self.epochs = epochs
         self.lr = lr

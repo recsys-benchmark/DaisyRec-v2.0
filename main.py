@@ -4,7 +4,6 @@ import argparse
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from collections import defaultdict
 
 import torch
 import torch.utils.data as data
@@ -37,7 +36,7 @@ if __name__ == '__main__':
     df = pd.concat([train_set, test_set], ignore_index=True)
     user_num = df['user'].nunique()
     item_num = df['item'].nunique()
-
+    
     train_set['rating'] = 1.0
     test_set['rating'] = 1.0
 
@@ -85,7 +84,6 @@ if __name__ == '__main__':
                 gpuid=args.gpu,
                 early_stop=args.early_stop,
                 initializer=args.init_method,
-                optimizer=args.optimizer
             )
         elif args.algo_name == 'fm':
             from daisy.model.point.FMRecommender import PointFM
@@ -169,6 +167,7 @@ if __name__ == '__main__':
                     node_dropout=args.node_dropout,
                     mess_dropout=args.mess_dropout,
                     lr=args.lr,
+                    reg_1=args.reg_1,
                     reg_2=args.reg_2,
                     epochs=args.epochs,
                     node_dropout_flag=args.node_dropout_flag,

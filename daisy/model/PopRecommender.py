@@ -20,7 +20,7 @@ class MostPop(object):
             candidates = self.rank_list
             candidates = [item for item in candidates if item not in train_ur[user]]
             if len(candidates) < topk:
-                raise Exception(f'parameter N is too small to get {topk} recommend items')
+                raise Exception(f'parameter pop_n is too small to get {topk} recommend items')
             res[user] = candidates[:topk]
 
         return res
