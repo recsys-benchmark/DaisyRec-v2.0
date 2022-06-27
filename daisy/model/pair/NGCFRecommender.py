@@ -244,8 +244,8 @@ class PairNGCF(nn.Module):
                 else:
                     raise ValueError(f'Invalid loss type: {self.loss_type}')
 
-                regularizer = (torch.norm(emd_u) ** 2 + torch.norm(emd_i) ** 2 + torch.norm(emd_j) ** 2) / 2
-                loss += self.reg_2 * regularizer / self.batch_size
+                loss += self.reg_1 * (torch.norm(emd_u, p=1) + torch.norm(emd_i, p=1) + torch.norm(emd_j, p=1)) / self.batch_size
+                loss += self.reg_2 * (torch.norm(emd_u, p=2) + torch.norm(emd_i, p=2) + torch.norm(emd_j, p=2)) / self.batch_size
 
                 if torch.isnan(loss):
                     raise ValueError(f'Loss=Nan or Infinity: current settings does not fit the recommender')
