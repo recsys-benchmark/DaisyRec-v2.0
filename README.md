@@ -22,16 +22,6 @@ The figure below shows the overall framework of DaisyRec-v2.0.
 
 ### Pre-requisits
 
-To get all dependencies, run:
-
-    pip install -r requirements.txt
-
-Before running, you need first run: 
-
-    python setup.py build_ext --inplace
-
-to generate `.so` or `.pyd` file used for further import.
-
 Make sure you have a **CUDA** enviroment to accelarate since the deep-learning models could be based on it. 
 
 <!--<img src="pics/algos.png" width="40%" height="30%" style="margin: auto; cursor:default" />-->
@@ -102,14 +92,14 @@ All data are available in links below:
 - [ ] Improve the modularity and scalability of the code (e.g., initializer, optimizer, loss function)  
 - [ ] Reconstruct convert_npy_mat() and UAEData class in Multi-VAE
 - [ ] A more flexible way to pass parameters
-- [ ] Implement 5-core and 10-core
+- [x] Implement 5-core and 10-core
 - [ ] Reduce too much CPU usage in dataloader
 - [ ] Check [Item2vec](https://github.com/AmazingDD/item2vec-pytorch) (add predict interface)
 - [ ] Add [∞-AE](https://arxiv.org/pdf/2206.02626.pdf) (with [code](https://github.com/noveens/infinite_ae_cf)) and [EASE](https://arxiv.org/abs/1905.03375) algorithms
 - [ ] Reconstruct DaisyRec with a new framework (YD's team to do)
 - [ ] Simplify SLIM and KNN-CF (YD's team to do)
 - [ ] A new GUI to generate results without any command (YD's team to do)
-- [ ] Update SVDpp, WRMF with torch, torch.linalg.solve
+- [x] ~~Update SVDpp, WRMF with torch, torch.linalg.solve~~
 
 ## Cite
 
@@ -139,5 +129,4 @@ Please cite both of the following papers if you use **DaisyRec-v2.0** in a resea
 We refer to the following repositories to improve our code:
 
  - SLIM and KNN-CF parts with [RecSys2019_DeepLearning_Evaluation](https://github.com/MaurizioFD/RecSys2019_DeepLearning_Evaluation)
- - SVD++ part with [Surprise](https://github.com/NicolasHug/Surprise)
  - NGCF part with [NGCF-PyTorch](https://github.com/huangtinglin/NGCF-PyTorch)

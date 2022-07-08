@@ -32,3 +32,28 @@ optimizer_config = {'sgd': optim.SGD,
                     'adam': optim.Adam,
                     'adagrad':optim.Adagrad
                    }
+
+
+import yaml
+import random
+import numpy as np
+
+config = yaml.load(open(), Loader=yaml.loader.SafeLoader)
+
+def init_seed(seed, reproducibility):
+    r""" init random seed for random functions in numpy, torch, cuda and cudnn
+    Args:
+        seed (int): random seed
+        reproducibility (bool): Whether to require reproducibility
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    if reproducibility:
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+    else:
+        torch.backends.cudnn.benchmark = True
+        torch.backends.cudnn.deterministic = False
