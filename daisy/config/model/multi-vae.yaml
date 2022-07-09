@@ -1,0 +1,7 @@
+q_dims: ~
+epochs: 10
+dropout: 0.5
+lr: 0.001
+reg_1: 0
+reg_2: 0
+beta: 0.5

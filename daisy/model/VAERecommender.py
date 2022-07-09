@@ -36,6 +36,7 @@ class VAE(nn.Module):
         lr : float, learning rate
         reg_1 : float, first-order regularization term
         reg_2 : float, second-order regularization term
+        beta : float, KLD regularization term
         loss_type : str, loss function type
         optimizer : str, optimization method for training the algorithms
         initializer: str, parameter initializer

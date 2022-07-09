@@ -3,6 +3,7 @@ seed: 2022
 reproducibility: True
 optimization_metric: ndcg
 tune_trials: 20
+tune_testset: False
 algo_name: mf
 val_method: rsbr
 test_method: rsbr
@@ -13,7 +14,12 @@ cand_num: 1000
 sample_method: uniform
 sample_ratio: 0.1
 num_ng: 4
+
+batch_size: 256
 loss_type: BPR
+init_method: 'default'
+optimizer: 'default'
+early_stop: True
 
 dataset: ml-100k
 prepro: 5core

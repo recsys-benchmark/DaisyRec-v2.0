@@ -12,6 +12,7 @@ from daisy.utils.sampler import Sampler
 from daisy.utils.parser import parse_args
 from daisy.utils.splitter import split_test
 from daisy.utils.data import PointData, PairData, UAEData
+from daisy.utils.config import init_seed
 from daisy.utils.loader import Interactions, get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
 
@@ -32,6 +33,9 @@ if __name__ == '__main__':
 
     args_conf = vars(args)
     config.update(args_conf)
+
+    ''' init seed for reproducibility '''
+    init_seed(config['seed'], config['reproducibility'])
     
     ''' Test Process for Metrics Exporting '''
     inter = Interactions(config)
