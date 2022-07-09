@@ -91,7 +91,7 @@ All data are available in links below:
 - [ ] Optimize the part of building candidate set
 - [ ] Improve the modularity and scalability of the code (e.g., initializer, optimizer, loss function)  
 - [ ] Reconstruct convert_npy_mat() and UAEData class in Multi-VAE
-- [ ] A more flexible way to pass parameters
+- [x] A more flexible way to pass parameters
 - [x] Implement 5-core and 10-core
 - [ ] Reduce too much CPU usage in dataloader
 - [ ] Check [Item2vec](https://github.com/AmazingDD/item2vec-pytorch) (add predict interface)
