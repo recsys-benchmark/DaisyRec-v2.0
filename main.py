@@ -1,6 +1,6 @@
 import os
 import time
-import argparse
+import yaml
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -12,33 +12,33 @@ from daisy.utils.sampler import Sampler
 from daisy.utils.parser import parse_args
 from daisy.utils.splitter import split_test
 from daisy.utils.data import PointData, PairData, UAEData
-from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
+from daisy.utils.loader import Interactions, get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
 
 
 
 if __name__ == '__main__':
-    ''' all parameter part '''
-    args = parse_args()
+    ''' summarize hyper-parameter part (basic yaml + args + model yaml) '''
+    config = dict()
+    basic_conf = yaml.load(open('./daisy/config/basic.yaml'), Loader=yaml.loader.SafeLoader)
+    config.update(basic_conf)
 
-    # store running time in time_log file
-    time_log = open('time_log.txt', 'a') 
+    args = parse_args()
+    algo_name = config['algo_name'] if args.algo_name is None else args.algo_name
+
+    model_conf = yaml.load(
+        open(f'./daisy/config/model/{algo_name}.yaml'), Loader=yaml.loader.SafeLoader)
+    config.update(model_conf)
+
+    args_conf = vars(args)
+    config.update(args_conf)
     
     ''' Test Process for Metrics Exporting '''
-    df, user_num, item_num = load_rate(args.dataset, args.prepro, binary=False)
+    inter = Interactions(config)
+    df = inter.get_data()
+    user_num, item_num = inter.user_num, inter.item_num
+
     train_set, test_set = split_test(df, args.test_method, args.test_size)
-    # temporary used for tuning test result
-    # train_set = pd.read_csv(f'./experiment_data/train_{args.dataset}_{args.prepro}_{args.test_method}.dat')
-    # test_set = pd.read_csv(f'./experiment_data/test_{args.dataset}_{args.prepro}_{args.test_method}.dat')
-    if args.dataset in ['yelp']:
-        train_set['timestamp'] = pd.to_datetime(train_set['timestamp'])
-        test_set['timestamp'] = pd.to_datetime(test_set['timestamp'])
-    df = pd.concat([train_set, test_set], ignore_index=True)
-    user_num = df['user'].nunique()
-    item_num = df['item'].nunique()
-    
-    train_set['rating'] = 1.0
-    test_set['rating'] = 1.0
 
     # get ground truth
     test_ur = get_ur(test_set)
@@ -324,10 +324,9 @@ if __name__ == '__main__':
 
         model.fit(train_loader)
     elapsed_time = time.time() - s_time
-    time_log.write(f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}{args.algo_name}_{args.loss_type}_{args.sample_method},{elapsed_time:.4f}' + '\n')
-    time_log.close()
+    print(f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}{args.algo_name}_{args.loss_type}_{args.sample_method}: {elapsed_time:.4f}')
 
-    print('Start Calculating Metrics......')
+    print('Start Calculating Metrics...')
     test_ucands = build_candidates_set(test_ur, total_train_ur, item_pool, candidates_num)
 
     # get predict result

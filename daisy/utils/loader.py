@@ -45,8 +45,8 @@ class Interactions(object):
         df = self.__core_filter(df)
         self.user_num, self.item_num = self.__get_stats(df)
         df = self.__category_encoding(df)
-
         print(f'Finish loading [{self.src}]-[{self.prepro}] dataset')
+
         return df
 
     def __category_encoding(self, df):
