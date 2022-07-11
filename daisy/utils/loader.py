@@ -40,6 +40,7 @@ class Interactions(object):
 
     def get_data(self):
         df = self.__get_raw_data()
+        df = self.__remove_duplication(df)
         df = self.__reserve_pos(df)
         df = self.__binary_inter(df)
         df = self.__core_filter(df)
@@ -48,6 +49,9 @@ class Interactions(object):
         print(f'Finish loading [{self.src}]-[{self.prepro}] dataset')
 
         return df
+
+    def __remove_duplication(self, df):
+        return df.drop_duplicates([self.uid_name, self.iid_name], keep='last', ignore_index=True)
 
     def __category_encoding(self, df):
         # encoding user_id and item_id

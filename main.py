@@ -41,6 +41,8 @@ if __name__ == '__main__':
     inter = Interactions(config)
     df = inter.get_data()
     user_num, item_num = inter.user_num, inter.item_num
+    config['user_num'] = user_num
+    config['item_num'] = item_num
 
     train_set, test_set = split_test(df, args.test_method, args.test_size)
 
