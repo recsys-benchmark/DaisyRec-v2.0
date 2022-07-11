@@ -13,7 +13,7 @@ topk: 50
 cand_num: 1000
 sample_method: uniform
 sample_ratio: 0.1
-num_ng: 4
+num_ng: 0
 
 batch_size: 256
 loss_type: BPR

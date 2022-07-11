@@ -87,7 +87,7 @@ All data are available in links below:
 ## TODO List
 
 - [ ] A more friendly GUI command generator
-- [ ] Improve the efficiency of the negative sample process
+- [x] Improve the efficiency of the negative sample process
 - [ ] Optimize the part of building candidate set
 - [ ] Improve the modularity and scalability of the code (e.g., initializer, optimizer, loss function)  
 - [ ] Reconstruct convert_npy_mat() and UAEData class in Multi-VAE

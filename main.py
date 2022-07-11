@@ -49,19 +49,12 @@ if __name__ == '__main__':
     total_train_ur = get_ur(train_set)
     # initial candidate item pool
     item_pool = set(range(item_num))
-    candidates_num = args.cand_num
-
+    candidates_num = config['cand_num']
     print('='*50, '\n')
     # retrain model by the whole train set
     # format training data
-    sampler = Sampler(
-        user_num, 
-        item_num, 
-        num_ng=args.num_ng, 
-        sample_method=args.sample_method, 
-        sample_ratio=args.sample_ratio
-    )
-    neg_set = sampler.transform(train_set, is_training=True)
+    sampler = Sampler(train_set, total_train_ur, user_num, item_num, config)
+    train_set = sampler.sampling()
 
     if args.algo_name in ['cdae', 'multi-vae']:
         train_dataset = UAEData(user_num, item_num, train_set, test_set)
