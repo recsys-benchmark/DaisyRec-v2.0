@@ -8,7 +8,7 @@ from tqdm import tqdm
 import torch
 import torch.utils.data as data
 
-from daisy.utils.sampler import Sampler
+from daisy.utils.sampler import BasicNegtiveSampler
 from daisy.utils.parser import parse_args
 from daisy.utils.splitter import split_test
 from daisy.utils.data import PointData, PairData, UAEData
@@ -49,13 +49,11 @@ if __name__ == '__main__':
     # get ground truth
     test_ur = get_ur(test_set)
     total_train_ur = get_ur(train_set)
-    # initial candidate item pool
-    item_pool = set(range(item_num))
-    candidates_num = config['cand_num']
+    config['train_ur'] = total_train_ur
+
     print('='*50, '\n')
-    # retrain model by the whole train set
-    # format training data
-    sampler = Sampler(train_set, total_train_ur, user_num, item_num, config)
+
+    sampler = BasicNegtiveSampler(train_set, total_train_ur, config)
     train_set = sampler.sampling()
 
 
