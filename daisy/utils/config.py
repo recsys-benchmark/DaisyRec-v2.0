@@ -16,14 +16,6 @@ algo_config = {
     'multi-vae': ['num_ng', 'factors', 'node_dropout', 'mess_dropout', 'batch_size', 'lr', 'reg_2', 'kl_reg', 'reg_1']
 }
 
-model_config = {
-    'initializer':{'normal': {'mean':0.0, 'std':0.01},
-                   'uniform': {'a':0.0, 'b':1.0},
-                   'xavier_normal': {'gain':1.0},
-                   'xavier_uniform': {'gain':1.0}
-                   }
-}
-
 initializer_param_config = {
     'normal': {'mean':0.0, 'std':0.01},
     'uniform': {'a':0.0, 'b':1.0},
