@@ -94,7 +94,7 @@ All data are available in links below:
 - [x] A more flexible way to pass parameters
 - [x] Implement 5-core and 10-core
 - [x] Reduce too much CPU usage in dataloader
-- [ ] Check [Item2vec](https://github.com/AmazingDD/item2vec-pytorch) (add predict interface)
+- [x] Check [Item2vec](https://github.com/AmazingDD/item2vec-pytorch) (add predict interface)
 - [ ] Add [∞-AE](https://arxiv.org/pdf/2206.02626.pdf) (with [code](https://github.com/noveens/infinite_ae_cf)) and [EASE](https://arxiv.org/abs/1905.03375) algorithms
 - [x] Reconstruct DaisyRec with a new framework (YD's team to do)
 - [x] Simplify SLIM and KNN-CF (YD's team to do)
