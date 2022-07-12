@@ -3,7 +3,7 @@ from sklearn.utils.extmath import randomized_svd
 
 
 class PureSVD(object):
-    def __init__(self, user_num, item_num, factors=150):
+    def __init__(self, config):
         """
         PureSVD Recommender
         Parameters
@@ -12,9 +12,9 @@ class PureSVD(object):
         item_num : int, the number of items
         factors : int, latent factor number
         """
-        self.user_num = user_num
-        self.item_num = item_num
-        self.factors = factors
+        self.user_num = config['user_num']
+        self.item_num = config['item_num']
+        self.factors = config['factors']
 
         self.user_vec = None
         self.item_vec = None
@@ -34,6 +34,9 @@ class PureSVD(object):
 
     def predict(self, u, i):
         return self.user_vec[u, :].dot(self.item_vec[i, :])
+
+    def rank(self, test_loader):
+        pass
 
     def _convert_df(self, user_num, item_num, df):
         """Process Data to make WRMF available"""

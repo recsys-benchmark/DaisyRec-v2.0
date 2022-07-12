@@ -1,13 +1,13 @@
 class MostPop(object):
-    def __init__(self, n=400):
+    def __init__(self, config):
         """
         Most Popular Recommender
         Parameters
         ----------
-        n : pre-selected popular item number
+        pop_n : pre-selected popular item number
         """
         self.rank_list = None
-        self.N = n
+        self.N = config['pop_n']
 
     def fit(self, train_set):
         res = train_set['item'].value_counts()
@@ -24,3 +24,6 @@ class MostPop(object):
             res[user] = candidates[:topk]
 
         return res
+
+    def rank(self, test_loader):
+        pass

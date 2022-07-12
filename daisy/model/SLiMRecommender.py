@@ -5,36 +5,35 @@ import scipy.sparse as sp
 from sklearn.linear_model import ElasticNet
 
 class SLIM(object):
-    def __init__(self, user_num, item_num, topk=100,
-                 l1_ratio=0.1, alpha=1.0, positive_only=True):
+    def __init__(self, config):
         """
         SLIM Recommender Class
         Parameters
         ----------
         user_num : int, the number of users
         item_num : int, the number of items
-        topk : int, Top-K number
-        l1_ratio : float, The ElasticNet mixing parameter, with `0 <= l1_ratio <= 1`
+        topk : int, Top-K number, this is used for improving speed
+        elastic : float, The ElasticNet mixing parameter, with `0 <= l1_ratio <= 1`
         alpha : float, Constant that multiplies the penalty terms
         positive_only : bool, When set to True, forces the coefficients to be positive
         """
-        self.md = ElasticNet(alpha=alpha, 
-                             l1_ratio=l1_ratio, 
-                             positive=positive_only, 
+        self.md = ElasticNet(alpha=config['alpha'], 
+                             l1_ratio=config['elastic'], 
+                             positive=True, 
                              fit_intercept=False,
                              copy_X=False,
                              precompute=True,
                              selection='random',
                              max_iter=100,
                              tol=1e-4)
-        self.item_num = item_num
-        self.user_num = user_num
-        self.topk = topk
+        self.item_num = config['item_num']
+        self.user_num = config['user_num']
+        self.topk = config['topk']
 
         self.w_sparse = None
         self.A_tilde = None
 
-        print(f'user num: {user_num}, item num: {item_num}')
+        print(f'user num: {self.user_num}, item num: {self.item_num}')
 
     def fit(self, df, verbose=True):
         train = self._convert_df(self.user_num, self.item_num, df)
@@ -66,7 +65,9 @@ class SLIM(object):
             nonzero_model_coef_index = self.md.sparse_coef_.indices
             nonzero_model_coef_value = self.md.sparse_coef_.data
 
-            local_topk = min(len(nonzero_model_coef_value) - 1, self.topk)
+            # local_topk = min(len(nonzero_model_coef_value) - 1, self.topk)
+            # just keep all nonzero coef value for ranking, if you want improve speed, use code above
+            local_topk = len(nonzero_model_coef_value) - 1
 
             relevant_items_partition = (-nonzero_model_coef_value).argpartition(local_topk)[0:local_topk]
             relevant_items_partition_sorting = np.argsort(-nonzero_model_coef_value[relevant_items_partition])
@@ -104,6 +105,9 @@ class SLIM(object):
     def predict(self, u, i):
 
         return self.A_tilde[u, i]
+
+    def rank(self, test_loader):
+        pass
 
     def _convert_df(self, user_num, item_num, df):
         """

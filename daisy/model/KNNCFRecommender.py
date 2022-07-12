@@ -140,7 +140,6 @@ class Similarity:
     def apply_adjusted_cosine(self):
         """
         Remove from every data point the average for the corresponding row
-        :return:
         """
 
         self.data_matrix = check_matrix(self.data_matrix, 'csr')
@@ -169,7 +168,6 @@ class Similarity:
     def apply_pearson_correlation(self):
         """
         Remove from every data point the average for the corresponding column
-        :return:
         """
 
         self.data_matrix = check_matrix(self.data_matrix, 'csc')
@@ -355,8 +353,7 @@ class Similarity:
 
 
 class ItemKNNCF(object):
-    def __init__(self, user_num, item_num, maxk=40, shrink=100, 
-                 similarity='cosine', normalize=True):
+    def __init__(self, config):
         """
         ItemKNN recommender
         Parameters
@@ -366,15 +363,24 @@ class ItemKNNCF(object):
         maxk : int, the max nearest similar items number
         shrink : float, shrink similarity value
         similarity : str, way to calculate similarity
+                    "cosine"        computes Cosine similarity
+                    "adjusted"      computes Adjusted Cosine, removing the average of the users
+                    "asymmetric"    computes Asymmetric Cosine
+                    "pearson"       computes Pearson Correlation, removing the average of the items
+                    "jaccard"       computes Jaccard similarity for binary interactions using Tanimoto
+                    "dice"          computes Dice similarity for binary interactions
+                    "tversky"       computes Tversky similarity for binary interactions
+                    "tanimoto"      computes Tanimoto coefficient for binary interactions, 
+                    by default "cosine"
         normalize : bool, whether calculate similarity with normalized value
         """
-        self.user_num = user_num
-        self.item_num = item_num
+        self.user_num = config['user_num']
+        self.item_num = config['item_num']
 
-        self.k = maxk
-        self.shrink = shrink
-        self.normalize = normalize
-        self.similarity = similarity
+        self.k = config['maxk']
+        self.shrink = config['shrink']
+        self.normalize = config['normalize']
+        self.similarity = config['similarity']
 
         self.pred_mat = None
 
@@ -402,9 +408,11 @@ class ItemKNNCF(object):
 
         return self.pred_mat[u, i]
 
+    def rank(self, test_loader):
+        pass
+
 class UserKNNCF(object):
-    def __init__(self, user_num, item_num, maxk=40, shrink=100, 
-                 similarity='cosine', normalize=True):
+    def __init__(self, config):
         """
         UserKNN recommender
         Parameters
@@ -414,15 +422,24 @@ class UserKNNCF(object):
         maxk : int, the max similar items number
         shrink : float, shrink similarity value
         similarity : str, way to calculate similarity
+                    "cosine"        computes Cosine similarity
+                    "adjusted"      computes Adjusted Cosine, removing the average of the users
+                    "asymmetric"    computes Asymmetric Cosine
+                    "pearson"       computes Pearson Correlation, removing the average of the items
+                    "jaccard"       computes Jaccard similarity for binary interactions using Tanimoto
+                    "dice"          computes Dice similarity for binary interactions
+                    "tversky"       computes Tversky similarity for binary interactions
+                    "tanimoto"      computes Tanimoto coefficient for binary interactions, 
+                    by default "cosine"
         normalize : bool, whether calculate similarity with normalized value
         """
-        self.user_num = user_num
-        self.item_num = item_num
+        self.user_num = config['user_num']
+        self.item_num = config['item_num']
 
-        self.k = maxk
-        self.shrink = shrink
-        self.normalize = normalize
-        self.similarity = similarity
+        self.k = config['maxk']
+        self.shrink = config['shrink']
+        self.normalize = config['normalize']
+        self.similarity = config['similarity']
 
         self.pred_mat = None
 
@@ -449,3 +466,6 @@ class UserKNNCF(object):
             raise ValueError('User and/or item is unkown.')
 
         return self.pred_mat[u, i]
+
+    def rank(self, test_loader):
+        pass
