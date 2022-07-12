@@ -1,6 +1,8 @@
+import random
+import numpy as np
+
 import torch
 import torch.nn as nn
-import torch.optim as optim
 
 algo_config = {
     'itemknn': ['maxk'],
@@ -15,37 +17,38 @@ algo_config = {
 }
 
 model_config = {
-    'initializer':{'normal':{'mean':0.0, 'std':0.01},
-                   'uniform':{'a':0.0, 'b':1.0},
-                   'xavier_normal':{'gain':1.0},
-                   'xavier_uniform':{'gain':1.0}
+    'initializer':{'normal': {'mean':0.0, 'std':0.01},
+                   'uniform': {'a':0.0, 'b':1.0},
+                   'xavier_normal': {'gain':1.0},
+                   'xavier_uniform': {'gain':1.0}
                    }
 }
 
-initializer_config = {'normal': nn.init.normal_,
-                     'uniform': nn.init.uniform_,
-                     'xavier_normal': nn.init.xavier_normal_,
-                     'xavier_uniform': nn.init.xavier_uniform_
-                     }
+initializer_param_config = {
+    'normal': {'mean':0.0, 'std':0.01},
+    'uniform': {'a':0.0, 'b':1.0},
+    'xavier_normal': {'gain':1.0},
+    'xavier_uniform': {'gain':1.0}
+}
 
-optimizer_config = {'sgd': optim.SGD,
-                    'adam': optim.Adam,
-                    'adagrad':optim.Adagrad
-                   }
-
-
-import yaml
-import random
-import numpy as np
-
-config = yaml.load(open(), Loader=yaml.loader.SafeLoader)
+initializer_config = {
+    'normal': nn.init.normal_,
+    'uniform': nn.init.uniform_,
+    'xavier_normal': nn.init.xavier_normal_,
+    'xavier_uniform': nn.init.xavier_uniform_
+}
 
 def init_seed(seed, reproducibility):
-    r""" init random seed for random functions in numpy, torch, cuda and cudnn
-    Args:
-        seed (int): random seed
-        reproducibility (bool): Whether to require reproducibility
-    """
+    '''
+    init random seed for random functions in numpy, torch, cuda and cudnn
+
+    Parameters
+    ----------
+    seed : int
+        random seed
+    reproducibility : bool
+        Whether to require reproducibility
+    '''
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
