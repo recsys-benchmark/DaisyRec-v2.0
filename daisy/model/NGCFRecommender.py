@@ -14,7 +14,6 @@ class NGCF(GeneralRecommender):
         user_num : int, the number of users
         item_num : int, the number of items
         factors : int, the number of latent factor
-        batch_size int, batch size for training
         node_dropout: float, node dropout ratio
         mess_dropout : float, messsage dropout rate
         lr : float, learning rate
@@ -30,7 +29,7 @@ class NGCF(GeneralRecommender):
         self.n_user = config['user_num']
         self.n_item = config['item_num']
         self.emb_size = config['factors']
-        self.batch_size = config['batch_size']
+
         self.node_dropout = config['node_dropout']
         self.mess_dropout = [config['mess_dropout'], config['mess_dropout'], config['mess_dropout']]
         self.layers = [config['factors'], config['factors'], config['factors']]
@@ -139,6 +138,7 @@ class NGCF(GeneralRecommender):
         return scores
 
     def calc_loss(self, batch):
+        len_batch = batch.shape[0]
         user = batch[0].to(self.device)
         pos_item = batch[1].to(self.device)
 
@@ -150,8 +150,8 @@ class NGCF(GeneralRecommender):
             label = batch[2].to(self.device)
             loss = self.criterion(pos_pred, label)
 
-            loss += self.reg_1 * torch.norm(emb_pos, p=1) / self.batch_size
-            loss += self.reg_2 * torch.norm(emb_pos, p=2) / self.batch_size
+            loss += self.reg_1 * torch.norm(emb_pos, p=1) / len_batch
+            loss += self.reg_2 * torch.norm(emb_pos, p=2) / len_batch
         elif self.loss_type.upper() in ['BPR', 'TL', 'HL']:
             neg_item = batch[2].to(self.device)
             emb_neg = self.embedding_dict['item_emb'][neg_item]
@@ -159,13 +159,13 @@ class NGCF(GeneralRecommender):
             neg_pred = self.forward(user, neg_item)
             loss = self.criterion(pos_pred, neg_pred)
 
-            loss += self.reg_1 * (torch.norm(emb_pos, p=1) + torch.norm(emb_neg, p=1)) / self.batch_size
-            loss += self.reg_2 * (torch.norm(emb_pos, p=2) + torch.norm(emb_neg, p=2)) / self.batch_size
+            loss += self.reg_1 * (torch.norm(emb_pos, p=1) + torch.norm(emb_neg, p=1)) / len_batch
+            loss += self.reg_2 * (torch.norm(emb_pos, p=2) + torch.norm(emb_neg, p=2)) / len_batch
         else:
             raise NotImplementedError(f'Invalid loss type: {self.loss_type}')
 
-        loss += self.reg_1 * torch.norm(emb_u, p=1) / self.batch_size
-        loss += self.reg_2 * torch.norm(emb_u, p=2) / self.batch_size
+        loss += self.reg_1 * torch.norm(emb_u, p=1) / len_batch
+        loss += self.reg_2 * torch.norm(emb_u, p=2) / len_batch
 
         return loss
 
