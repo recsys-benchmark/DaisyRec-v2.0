@@ -259,3 +259,6 @@ class VAE(nn.Module):
 
     def predict(self, u, i):
         return self.prediction[u, i]
+
+    def full_rank(self, u):
+        pass

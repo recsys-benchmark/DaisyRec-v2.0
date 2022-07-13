@@ -109,6 +109,9 @@ class SLiM(object):
     def rank(self, test_loader):
         pass
 
+    def full_rank(self, u):
+        pass
+
     def _convert_df(self, user_num, item_num, df):
         """
         Process Data to make WRMF available

@@ -24,6 +24,9 @@ class AbstractRecommender(nn.Module):
     def rank(self, test_loader):
         raise NotImplementedError
 
+    def full_rank(self, u):
+        raise NotImplementedError
+
     def predict(self, u, i):
         raise NotImplementedError
 

@@ -47,3 +47,6 @@ class PureSVD(object):
         mat = sp.csr_matrix((ratings, (rows, cols)), shape=(user_num, item_num))
 
         return mat
+
+    def full_rank(self, u):
+        pass

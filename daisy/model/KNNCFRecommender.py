@@ -411,6 +411,9 @@ class ItemKNNCF(object):
     def rank(self, test_loader):
         pass
 
+    def full_rank(self, u):
+        pass
+
 class UserKNNCF(object):
     def __init__(self, config):
         """
@@ -468,4 +471,7 @@ class UserKNNCF(object):
         return self.pred_mat[u, i]
 
     def rank(self, test_loader):
+        pass
+
+    def full_rank(self, u):
         pass

@@ -178,3 +178,6 @@ class NGCF(GeneralRecommender):
 
     def rank(self, test_loader):
         pass
+
+    def full_rank(self, u):
+        pass
