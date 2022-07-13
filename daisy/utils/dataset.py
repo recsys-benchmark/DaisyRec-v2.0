@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
+import torch
 from torch.utils.data import Dataset
 
 class BasicDataset(Dataset):
@@ -18,8 +19,19 @@ class BasicDataset(Dataset):
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, idx):
-        return self.data[idx][0], self.data[idx][1], self.data[idx][2]
+    def __getitem__(self, index):
+        return self.data[index][0], self.data[index][1], self.data[index][2]
+
+class CandidatesDataset(Dataset):
+    def __init__(self, ucands):
+        super(CandidatesDataset, self).__init__()
+        self.data = ucands
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, index):
+        return torch.tensor(self.data[index][0]), torch.tensor(self.data[index][1])
 
 class UAEData(Dataset):
     def __init__(self, user_num, item_num, train_set, test_set):

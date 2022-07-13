@@ -351,7 +351,7 @@ def build_candidates_set(test_ur, train_ur, config, drop_past_inter=True):
     item_num = config['item_num']
     candidates_num = config['cand_num']
 
-    test_ucands = []
+    test_ucands, test_u = [], []
     for u, r in test_ur.items():
         sample_num = candidates_num - len(r) if len(r) <= candidates_num else 0
         if sample_num == 0:
@@ -363,8 +363,9 @@ def build_candidates_set(test_ur, train_ur, config, drop_past_inter=True):
             samples = np.concatenate((samples, list(r)), axis=None)
 
         test_ucands.append([u, samples])
+        test_u.append(u)
     
-    return test_ucands
+    return test_u, test_ucands
 
 def get_adj_mat(n_users, n_items):
     """

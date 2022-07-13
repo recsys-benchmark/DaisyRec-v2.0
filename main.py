@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.parser import parse_args
 from daisy.utils.splitter import split_test
-from daisy.utils.dataset import BasicDataset, UAEData
+from daisy.utils.dataset import BasicDataset, CandidatesDataset, UAEData
 from daisy.utils.config import init_seed, model_config
 from daisy.utils.loader import Interactions, get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
@@ -85,55 +85,25 @@ if __name__ == '__main__':
 
     ''' build candidates set '''
     print('Start Calculating Metrics...')
-    test_ucands = build_candidates_set(test_ur, total_train_ur, config)
-    
+    test_u, test_ucands = build_candidates_set(test_ur, total_train_ur, config)
 
-
-
-    # get predict result
+    ''' get predict result '''
     print('')
     print('Generate recommend list...')
     print('')
-    preds = {}
-    if args.algo_name in ['multi-vae', 'cdae', 'itemknn', 'puresvd', 'slim'] and args.problem_type == 'point-wise':
-        for u in tqdm(test_ucands.keys()):
-            pred_rates = [model.predict(u, i) for i in test_ucands[u]]
-            rec_idx = np.argsort(pred_rates)[::-1][:args.topk]
-            top_n = np.array(test_ucands[u])[rec_idx]
-            preds[u] = top_n
-    elif args.algo_name in ['mostpop']:
-        preds = model.predict(test_ur, total_train_ur, args.topk)
-    else:
-        for u in tqdm(test_ucands.keys()):
-            # build a test MF dataset for certain user u to accelerate
-            tmp = pd.DataFrame({
-                'user': [u for _ in test_ucands[u]], 
-                'item': test_ucands[u], 
-                'rating': [0. for _ in test_ucands[u]], # fake label, make nonsense
-            })
-            tmp_neg_set = sampler.transform(tmp, is_training=False)
-            tmp_dataset = PairData(tmp_neg_set, is_training=False)
-            tmp_loader = DataLoader(
-                tmp_dataset,
-                batch_size=candidates_num, 
-                shuffle=False, 
-                num_workers=0
-            )
-            # get top-N list with torch method 
-            for items in tmp_loader:
-                user_u, item_i = items[0], items[1]
-                if torch.cuda.is_available():
-                    user_u = user_u.cuda()
-                    item_i = item_i.cuda()
-                else:
-                    user_u = user_u.cpu()
-                    item_i = item_i.cpu()
+    if config['algo_name'].lower() in ['itemknn', 'puresvd', 'slim', 'mostpop']:
+        pass
+    elif config['algo_name'].lower() in ['multi-vae']:
+        pass
+    elif config['algo_name'].lower() in ['mf', 'fm', 'neumf', 'nfm', 'ngcf', 'item2vec']:
+        test_dataset = CandidatesDataset(test_ucands)
+        test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=0)
+        preds = model.predict(test_loader)
 
-                prediction = model.predict(user_u, item_i)
-                _, indices = torch.topk(prediction, args.topk)
-                top_n = torch.take(torch.tensor(test_ucands[u]), indices).cpu().numpy()
+    ''' calculating KPIs '''
 
-            preds[u] = top_n
+
+
 
     # convert rank list to binary-interaction
     for u in preds.keys():
