@@ -13,7 +13,7 @@ import torch.utils.data as data
 
 from daisy.utils.sampler import Sampler
 from daisy.utils.parser import parse_args
-from daisy.utils.data import PointData, PairData, UAEData
+from daisy.utils.dataset import PointData, PairData, UAEData
 from daisy.utils.splitter import split_test, split_validation
 # from daisy.utils.opt_toolkit import param_extract, confirm_space
 from daisy.utils.loader import load_rate, get_ur, convert_npy_mat, build_candidates_set, get_adj_mat

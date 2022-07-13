@@ -4,7 +4,7 @@ import numpy as np
 import scipy.sparse as sp
 from sklearn.linear_model import ElasticNet
 
-class SLIM(object):
+class SLiM(object):
     def __init__(self, config):
         """
         SLIM Recommender Class
@@ -35,8 +35,8 @@ class SLIM(object):
 
         print(f'user num: {self.user_num}, item num: {self.item_num}')
 
-    def fit(self, df, verbose=True):
-        train = self._convert_df(self.user_num, self.item_num, df)
+    def fit(self, train_set, verbose=True):
+        train = self._convert_df(self.user_num, self.item_num, train_set)
 
         data_block = 10000000
 

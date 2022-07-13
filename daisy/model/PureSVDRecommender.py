@@ -19,9 +19,9 @@ class PureSVD(object):
         self.user_vec = None
         self.item_vec = None
 
-    def fit(self, df):
+    def fit(self, train_set):
         print(" Computing SVD decomposition...")
-        train_set = self._convert_df(self.user_num, self.item_num, df)
+        train_set = self._convert_df(self.user_num, self.item_num, train_set)
         print('Finish build train matrix for decomposition')
         U, sigma, Vt = randomized_svd(train_set,
                                       n_components=self.factors,

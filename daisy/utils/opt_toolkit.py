@@ -2,7 +2,7 @@ import re
 from prettytable import PrettyTable
 
 from daisy.utils.sampler import Sampler
-from daisy.utils.data import PointData, PairData, UAEData
+from daisy.utils.dataset import PointData, PairData, UAEData
 from daisy.utils.loader import get_ur
 
 def param_extract(args):
