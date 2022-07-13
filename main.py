@@ -6,16 +6,15 @@ import pandas as pd
 from tqdm import tqdm
 
 import torch
-import torch.utils.data as data
+from torch.utils.data import DataLoader
 
-from daisy.utils.sampler import BasicNegtiveSampler
+from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.parser import parse_args
 from daisy.utils.splitter import split_test
 from daisy.utils.dataset import BasicDataset, UAEData
 from daisy.utils.config import init_seed, model_config
 from daisy.utils.loader import Interactions, get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
-
 
 
 if __name__ == '__main__':
@@ -44,20 +43,19 @@ if __name__ == '__main__':
     config['user_num'] = user_num
     config['item_num'] = item_num
 
+    ''' Train Test split '''
     train_set, test_set = split_test(df, args.test_method, args.test_size)
 
-    # get ground truth
+    ''' get ground truth '''
     test_ur = get_ur(test_set)
     total_train_ur = get_ur(train_set)
     config['train_ur'] = total_train_ur
 
-    print('='*50, '\n')
-
-    sampler = BasicNegtiveSampler(train_set, total_train_ur, config)
-    train_samples = sampler.sampling()
-    
-
+    ''' select model '''
     model = model_config[config['algo_name']](config)
+
+    ''' build and train model '''
+    s_time = time.time()
     if config['algo_name'].lower() in ['itemknn', 'puresvd', 'slim', 'mostpop']:
         model.fit(train_set)
     elif config['algo_name'].lower() in ['multi-vae']:
@@ -65,27 +63,29 @@ if __name__ == '__main__':
         train_dataset = UAEData(user_num, item_num, train_set, test_set)
         training_mat = convert_npy_mat(user_num, item_num, train_set)
     elif config['algo_name'].lower() in ['mf', 'fm', 'neumf', 'nfm', 'ngcf']:
+        if config['algo_name'].lower() == 'ngcf':
+            _, norm_adj, _ = get_adj_mat(user_num,item_num)
+            config['norm_adj'] = norm_adj
+
+        sampler = BasicNegtiveSampler(train_set, total_train_ur, config)
+        train_samples = sampler.sampling()
         train_dataset = BasicDataset(train_samples)
-        train_loader = data.DataLoader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
-
-    # build recommender model
-    s_time = time.time()
-    if args.algo_name in ['itemknn', 'puresvd', 'slim', 'mostpop']:
-        model.fit(train_set)
-    else:
-        train_loader = data.DataLoader(
-        train_dataset, 
-        batch_size=args.batch_size, 
-        shuffle=True, 
-        num_workers=4,
-        pin_memory=True,)
-
+        train_loader = DataLoader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
+    elif config['algo_name'].lower() in ['item2vec']:
+        sampler = SkipGramNegativeSampler(train_set, total_train_ur, config)
+        train_samples = sampler.sampling()
+        train_dataset = BasicDataset(train_samples)
+        train_loader = DataLoader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
+        model.fit(train_loader)
+    else:
+        raise NotImplementedError('Something went wrong when building and training...')
     elapsed_time = time.time() - s_time
-    print(f'{args.dataset}_{args.prepro}_{args.test_method}_{args.problem_type}{args.algo_name}_{args.loss_type}_{args.sample_method}: {elapsed_time:.4f}')
+    print(f"Finish training: {config['dataset']} {config['prepro']} {config['algo_name']} with {config['loss_type']} and {config['sample_method']} sampling, {elapsed_time:.4f}")
+
 
     print('Start Calculating Metrics...')
-    test_ucands = build_candidates_set(test_ur, total_train_ur, item_pool, candidates_num)
+    test_ucands = build_candidates_set(test_ur, total_train_ur, config)
 
     # get predict result
     print('')

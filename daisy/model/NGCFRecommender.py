@@ -6,7 +6,7 @@ from daisy.model.AbstractRecommender import GeneralRecommender
 from daisy.utils.config import initializer_param_config, initializer_config
 
 class NGCF(GeneralRecommender):
-    def __init__(self, config, norm_adj):
+    def __init__(self, config):
         """
         Pair-wise NGCF Recommender Class
         Parameters
@@ -34,7 +34,8 @@ class NGCF(GeneralRecommender):
         self.node_dropout = config['node_dropout']
         self.mess_dropout = [config['mess_dropout'], config['mess_dropout'], config['mess_dropout']]
         self.layers = [config['factors'], config['factors'], config['factors']]
-        self.norm_adj = norm_adj
+
+        self.norm_adj = config['norm_adj']
         
         self.reg_1 = config['reg_1']
         self.reg_2 = config['reg_2']
