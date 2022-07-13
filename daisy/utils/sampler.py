@@ -1,7 +1,7 @@
 import numpy as np
 
 class BasicNegtiveSampler(object):
-    def __init__(self, df, ur, config):
+    def __init__(self, df, config):
         """
         negative sampling class for <u, pos_i, neg_i> or <u, pos_i, r>
         Parameters
@@ -75,7 +75,6 @@ class BasicNegtiveSampler(object):
         else:
             # all negative samples are sampled by uniform distribution
             for u in range(self.user_num):
-                # sample = np.random.choice(self.item_num, size=)
                 past_inter = list(self.ur[u])
                 js[u] = np.random.choice(
                     np.setdiff1d(np.arange(self.item_num), past_inter), 
@@ -84,20 +83,20 @@ class BasicNegtiveSampler(object):
 
         self.df['neg_set'] = self.df[self.uid_name].agg(lambda u: js[u])
 
-        if self.loss_type in ['CL', 'SL']:
+        if self.loss_type.upper() in ['CL', 'SL']:
             point_pos = self.df[[self.uid_name, self.iid_name, self.inter_name]]
             point_neg = self.df[[self.uid_name, 'neg_set', self.inter_name]].copy()
             point_neg[self.inter_name] = 0
             point_neg = point_neg.explode('neg_set')    
             return np.vstack([point_pos.values, point_neg.values]).astype(np.int32)
-        elif self.loss_type in ['BPR', 'HL', 'TL']:
+        elif self.loss_type.upper() in ['BPR', 'HL', 'TL']:
             self.df = self.df[[self.uid_name, self.iid_name, 'neg_set']].explode('neg_set')
             return self.df.values.astype(np.int32)
         else:
             raise NotImplementedError
 
 class SkipGramNegativeSampler(object):
-    def __init__(self, df, ur, config, discard=False):
+    def __init__(self, df, config, discard=False):
         '''
         skip-gram negative sampling class for <target_i, context_i, label>
 
