@@ -30,7 +30,7 @@ class BasicNegtiveSampler(object):
         assert 0 <= self.sample_ratio <= 1, 'Invalid sample ratio value'
 
         self.df = df
-        self.ur = ur
+        self.ur = config['train_ur']
         self.pop_prob = None
         
         if self.sample_method in ['high-pop', 'low-pop']:
@@ -114,7 +114,7 @@ class SkipGramNegativeSampler(object):
         self.uid_name = config['UID_NAME']
         self.context_window = config['context_window']
         self.item_num = config['item_num']
-        self.ur = ur
+        self.ur = config['train_ur']
 
         word_frequecy = df[self.iid_name].value_counts()
         prob_discard = 1 - np.sqrt(config['rho'] / word_frequecy)
