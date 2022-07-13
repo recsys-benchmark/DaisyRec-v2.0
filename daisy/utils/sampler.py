@@ -3,7 +3,7 @@ import numpy as np
 class BasicNegtiveSampler(object):
     def __init__(self, df, ur, config):
         """
-        negative sampling class for <u, pos_i, neg_i, label>, if num_ng=0, then neg_i will be nan.
+        negative sampling class for <u, pos_i, neg_i> or <u, pos_i, r>
         Parameters
         ----------
         df : pd.DataFrame, the raw <u, i, r> dataframe
@@ -24,6 +24,7 @@ class BasicNegtiveSampler(object):
         self.inter_name = config['INTER_NAME']
         self.sample_method = config['sample_method']
         self.sample_ratio = config['sample_ratio']
+        self.loss_type = config['loss_type'].upper()
 
         assert self.sample_method in ['uniform', 'low-pop', 'high-pop'], f'Invalid sampling method: {self.sample_method}'
         assert 0 <= self.sample_ratio <= 1, 'Invalid sample ratio value'
@@ -47,8 +48,10 @@ class BasicNegtiveSampler(object):
     def sampling(self):
         if self.num_ng == 0:
             self.df['neg_set'] = self.df.apply(lambda x: [], axis=1)
-            self.df = self.df[[self.uid_name, self.iid_name, 'neg_set', self.inter_name]].explode('neg_set')
-            return self.df.values
+            if self.loss_type in ['CL', 'SL']:
+                return self.df[[self.uid_name, self.iid_name, self.inter_name]].values.astype(np.int32)
+            else:
+                raise NotImplementedError('loss function (BPR, TL, HL) need num_ng > 0')
 
         js = np.zeros((self.user_num, self.num_ng), dtype=np.int32)
         if self.sample_method in ['low-pop', 'high-pop']:
@@ -80,9 +83,18 @@ class BasicNegtiveSampler(object):
                 )
 
         self.df['neg_set'] = self.df[self.uid_name].agg(lambda u: js[u])
-        self.df = self.df[[self.uid_name, self.iid_name, 'neg_set', self.inter_name]].explode('neg_set')
 
-        return self.df.values
+        if self.loss_type in ['CL', 'SL']:
+            point_pos = self.df[[self.uid_name, self.iid_name, self.inter_name]]
+            point_neg = self.df[[self.uid_name, 'neg_set', self.inter_name]].copy()
+            point_neg[self.inter_name] = 0
+            point_neg = point_neg.explode('neg_set')    
+            return np.vstack([point_pos.values, point_neg.values]).astype(np.int32)
+        elif self.loss_type in ['BPR', 'HL', 'TL']:
+            self.df = self.df[[self.uid_name, self.iid_name, 'neg_set']].explode('neg_set')
+            return self.df.values.astype(np.int32)
+        else:
+            raise NotImplementedError
 
 class SkipGramNegativeSampler(object):
     def __init__(self, df, ur, config, discard=False):
@@ -95,7 +107,6 @@ class SkipGramNegativeSampler(object):
             training set
         rho : float, optional
             threshold to discard word in a sequence, by default 1e-5
-        
         user_num: int, the number of users
         item_num: int, the number of items
         '''        
