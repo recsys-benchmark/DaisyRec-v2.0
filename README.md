@@ -1,5 +1,5 @@
 <p align="left">
-<img src="pics/logo-1.png" align="center" width="70%" style="margin: 0 auto">
+<img src="pics/logo.png" align="center" width="60%" style="margin: 0 auto">
 </p>
 
 ![PyPI - Python Version](https://img.shields.io/badge/pyhton-3.5%2B-blue) [![Version](https://img.shields.io/badge/version-v2.0-orange)](https://github.com/recsys-benchmark/DaisyRec-v2.0) ![GitHub repo size](https://img.shields.io/github/repo-size/recsys-benchmark/DaisyRec-v2.0) ![GitHub](https://img.shields.io/github/license/recsys-benchmark/DaisyRec-v2.0)
