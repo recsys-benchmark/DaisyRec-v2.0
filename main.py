@@ -83,9 +83,12 @@ if __name__ == '__main__':
     elapsed_time = time.time() - s_time
     print(f"Finish training: {config['dataset']} {config['prepro']} {config['algo_name']} with {config['loss_type']} and {config['sample_method']} sampling, {elapsed_time:.4f}")
 
-
+    ''' build candidates set '''
     print('Start Calculating Metrics...')
     test_ucands = build_candidates_set(test_ur, total_train_ur, config)
+    
+
+
 
     # get predict result
     print('')
@@ -110,7 +113,7 @@ if __name__ == '__main__':
             })
             tmp_neg_set = sampler.transform(tmp, is_training=False)
             tmp_dataset = PairData(tmp_neg_set, is_training=False)
-            tmp_loader = data.DataLoader(
+            tmp_loader = DataLoader(
                 tmp_dataset,
                 batch_size=candidates_num, 
                 shuffle=False, 

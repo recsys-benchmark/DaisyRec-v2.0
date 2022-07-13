@@ -1,6 +1,5 @@
 import os
 import gc
-from pickle import FALSE
 import re
 import json
 import random
@@ -334,33 +333,38 @@ def convert_npy_mat(user_num, item_num, df):
     return mat
 
 
-def build_candidates_set(test_ur, train_ur, item_pool, candidates_num=1000):
+def build_candidates_set(test_ur, train_ur, config, drop_past_inter=True):
     """
     method of building candidate items for ranking
     Parameters
     ----------
     test_ur : dict, ground_truth that represents the relationship of user and item in the test set
     train_ur : dict, this represents the relationship of user and item in the train set
-    item_pool : the set of all items
-    candidates_num : int, the number of candidates
+    item_num : No. of all items
+    cand_num : int, the number of candidates
+    drop_past_inter : drop items already appeared in train set
+
     Returns
     -------
     test_ucands : dict, dictionary storing candidates for each user in test set
     """
-    test_ucands = defaultdict(list)
-    for k, v in test_ur.items():
-        sample_num = candidates_num - len(v) if len(v) < candidates_num else 0
-        sub_item_pool = item_pool - v - train_ur[k] # remove GT & interacted
-        sample_num = min(len(sub_item_pool), sample_num)
+    item_num = config['item_num']
+    candidates_num = config['cand_num']
+
+    test_ucands = []
+    for u, r in test_ur.items():
+        sample_num = candidates_num - len(r) if len(r) <= candidates_num else 0
         if sample_num == 0:
-            samples = random.sample(v, candidates_num)
-            test_ucands[k] = list(set(samples))
+            samples = np.random.choice(list(r), candidates_num)
         else:
-            samples = random.sample(sub_item_pool, sample_num)
-            test_ucands[k] = list(v | set(samples))
+            pos_items = list(r) + list(train_ur[u]) if drop_past_inter else list(r)
+            neg_items = np.setdiff1d(np.arange(item_num), pos_items)
+            samples = np.random.choice(neg_items, size=sample_num)
+            samples = np.concatenate((samples, list(r)), axis=None)
+
+        test_ucands.append([u, samples])
     
     return test_ucands
-
 
 def get_adj_mat(n_users, n_items):
     """
