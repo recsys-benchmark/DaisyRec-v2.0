@@ -96,7 +96,7 @@ All data are available in links below:
 - [ ] modify split_test to Splitter
 - [ ] metrics to class and add coverage, popularity, and diversity
 - [ ] change hyperopt to optuna
-- [ ] optimize mostpop
+- [x] optimize mostpop
 - [x] Improve the efficiency of the negative sample process
 - [x] Optimize the part of building candidate set
 - [x] Improve the modularity and scalability of the code (e.g., initializer, optimizer, loss function)  
