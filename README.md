@@ -91,8 +91,12 @@ All data are available in links below:
 - [ ] A more friendly GUI command generator
 - [ ] Reconstruct convert_npy_mat() and UAEData class in Multi-VAE
 - [ ] Add [∞-AE](https://arxiv.org/pdf/2206.02626.pdf) (with [code](https://github.com/noveens/infinite_ae_cf)) and [EASE](https://arxiv.org/abs/1905.03375) algorithms
+- [ ] full rank interface
+- [ ] predict, rank interface
 - [ ] modify split_test to Splitter
 - [ ] metrics to class and add coverage, popularity, and diversity
+- [ ] change hyperopt to optuna
+- [ ] optimize mostpop
 - [x] Improve the efficiency of the negative sample process
 - [x] Optimize the part of building candidate set
 - [x] Improve the modularity and scalability of the code (e.g., initializer, optimizer, loss function)  
