@@ -1,37 +1,39 @@
 import os
-import gc
 import numpy as np
+import pandas as pd
 import scipy.sparse as sp
 from collections import defaultdict
 
-from daisy.utils.loader import load_rate, split_test
+from daisy.utils.metrics import Metric
+from daisy.utils.config import metrics_name_config
 
-def generate_experiment_data(dataset, prepro, test_method):
-    """
-    method of generating dataset for reproducing paper KPI
-    Parameters
-    ----------
-    dataset : str, dataset name, available options: 'netflix', 'ml-100k', 'ml-1m', 'ml-10m', 'ml-20m', 'lastfm', 'book-x',
-                                                    'amazon-cloth', 'amazon-electronic', 'amazon-book', 'amazon-music',
-                                                    'epinions', 'yelp', 'citeulike'
-    prepro : str, way to pre-process data, available options: 'origin', '5filter', '10filter'
-    test_method : str, way to get test dataset, available options: 'tsbr', 'rsbr', 'tloo', 'rloo'
+def calc_ranking_results(test_ur, pred_ur, test_u, config):
+    path = config['res_path']
+    if not os.path.exists(path):
+        os.makedirs(path)
 
-    Returns
-    -------
+    metric = Metric(config)
+    res = pd.DataFrame({
+        'KPI@K': [metrics_name_config[kpi_name] for kpi_name in config['metrics']]
+    })
 
-    """
-    if not os.path.exists('./experiment_data/'):
-        os.makedirs('./experiment_data/')
-    print(f'start process {dataset} with {prepro} method...')
-    df, user_num, item_num = load_rate(dataset, prepro, False)
-    print(f'test method : {test_method}')
-    train_set, test_set = split_test(df, test_method, .2)
-    train_set.to_csv(f'./experiment_data/train_{dataset}_{prepro}_{test_method}.dat', index=False)
-    test_set.to_csv(f'./experiment_data/test_{dataset}_{prepro}_{test_method}.dat', index=False)
-    print('Finish save train and test set...')
-    del train_set, test_set, df
-    gc.collect()
+    common_ks = [1, 5, 10, 20, 30, 50]
+    if config['topk'] not in common_ks:
+        common_ks.append(config['topk'])
+    for topk in common_ks:
+        if topk > config['topk']:
+            continue
+        else:
+            rank_list = pred_ur[:, :topk]
+            kpis = metric.run(test_ur, rank_list, test_u)
+            if topk == 10:
+                for kpi_name, kpi_res in zip(config['metrics'], kpis):
+                    kpi_name = metrics_name_config[kpi_name]
+                    print(f'{kpi_name}@{topk}: {kpi_res:.4f}')
+
+            res[topk] = np.array(kpis)
+
+    return res
 
 def get_ur(df):
     """
@@ -49,7 +51,6 @@ def get_ur(df):
         ur[int(row['user'])].add(int(row['item']))
 
     return ur
-
 
 def get_ir(df):
     """

@@ -16,6 +16,8 @@ from daisy.model.NFMRecommender import NFM
 from daisy.model.NGCFRecommender import NGCF
 from daisy.model.VAERecommender import VAE
 
+from daisy.utils.metrics import Precision, Recall, NDCG, MRR, MAP, HR, F1, AUC, Coverage, Diversity, Popularity
+
 algo_config = {
     'itemknn': ['maxk'],
     'puresvd': ['factors'],
@@ -26,6 +28,32 @@ algo_config = {
     'nfm': ['num_ng', 'factors', 'num_layers', 'dropout', 'lr', 'batch_size', 'reg_1', 'reg_2'],
     'ngcf': ['num_ng', 'factors', 'node_dropout', 'mess_dropout', 'batch_size', 'lr', 'reg_1', 'reg_2'],
     'multi-vae': ['num_ng', 'factors', 'node_dropout', 'mess_dropout', 'batch_size', 'lr', 'reg_2', 'kl_reg', 'reg_1']
+}
+
+metrics_config = {
+    "recall": Recall,
+    "mrr": MRR,
+    "ndcg": NDCG,
+    "hr": HR,
+    "precision": Precision,
+    "f1": F1,
+    "auc": AUC,
+    "coverage": Coverage,
+    "diversity": Diversity,
+    "popularity": Popularity,
+}
+
+metrics_name_config = {
+    "recall": 'Recall',
+    "mrr": 'MRR',
+    "ndcg": 'NDCG',
+    "hr": 'Hit Ratio',
+    "precision": 'Precision',
+    "f1": 'F1-score',
+    "auc": 'AUC',
+    "coverage": 'Coverage',
+    "diversity": 'Diversity',
+    "popularity": 'Average Popularity',
 }
 
 model_config = {

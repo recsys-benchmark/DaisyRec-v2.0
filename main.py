@@ -1,9 +1,5 @@
-import os
 import time
 import yaml
-import numpy as np
-import pandas as pd
-
 
 from daisy.utils.parser import parse_args
 from daisy.utils.splitter import TestSplitter
@@ -11,8 +7,7 @@ from daisy.utils.config import init_seed, model_config
 from daisy.utils.loader import RawDataReader, Preprocessor
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.dataset import convert_dataloader, BasicDataset, CandidatesDataset, UAEData
-from daisy.utils.utils import get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
-from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
+from daisy.utils.utils import get_ur, convert_npy_mat, build_candidates_set, get_adj_mat, calc_ranking_results
 
 
 if __name__ == '__main__':
@@ -94,58 +89,19 @@ if __name__ == '__main__':
     print('')
     print('Generate recommend list...')
     print('')
-
     test_dataset = CandidatesDataset(test_ucands)
     test_loader = convert_dataloader(test_dataset, batch_size=128, shuffle=False, num_workers=0)
-    preds = model.rank(test_loader)
+    preds = model.rank(test_loader) # np.array (u, topk)
 
     if config['algo_name'].lower() in ['multi-vae']:
         # TODO
         pass
 
     ''' calculating KPIs '''
-
-
-
-
-    # convert rank list to binary-interaction
-    for u in preds.keys():
-        preds[u] = [1 if i in test_ur[u] else 0 for i in preds[u]]
-
-    # process topN list and store result for reporting KPI
     print('Save metric@k result to res folder...')
-    result_save_path = f'./res/{args.dataset}/{args.prepro}/{args.test_method}/'
-    if not os.path.exists(result_save_path):
-        os.makedirs(result_save_path)
+    result_save_path = f"./res/{config['dataset']}/{config['prepro']}/{config['test_method']}/"
+    algo_prefix = f"{config['loss_type']}_{config['algo_name']}"
+    common_prefix = f"with_{config['sample_ratio']}{config['sample_method']}"
 
-    res = pd.DataFrame({'metric@K': ['pre', 'rec', 'hr', 'map', 'mrr', 'ndcg']})
-    for k in [1, 5, 10, 20, 30, 50]:
-        if k > args.topk:
-            continue
-        tmp_preds = preds.copy()        
-        tmp_preds = {key: rank_list[:k] for key, rank_list in tmp_preds.items()}
-
-        pre_k = np.mean([precision_at_k(r, k) for r in tmp_preds.values()])
-        rec_k = recall_at_k(tmp_preds, test_ur, k)
-        hr_k = hr_at_k(tmp_preds, test_ur)
-        map_k = map_at_k(tmp_preds.values())
-        mrr_k = mrr_at_k(tmp_preds, k)
-        ndcg_k = np.mean([ndcg_at_k(r, k) for r in tmp_preds.values()])
-
-        if k == 10:
-            print(f'Precision@{k}: {pre_k:.4f}')
-            print(f'Recall@{k}: {rec_k:.4f}')
-            print(f'HR@{k}: {hr_k:.4f}')
-            print(f'MAP@{k}: {map_k:.4f}')
-            print(f'MRR@{k}: {mrr_k:.4f}')
-            print(f'NDCG@{k}: {ndcg_k:.4f}')
-
-        res[k] = np.array([pre_k, rec_k, hr_k, map_k, mrr_k, ndcg_k])
-
-    common_prefix = f'with_{args.sample_ratio}{args.sample_method}'
-    algo_prefix = f'{args.loss_type}_{args.problem_type}_{args.algo_name}'
-
-    res.to_csv(
-        f'{result_save_path}{algo_prefix}_{common_prefix}_kpi_results.csv', 
-        index=False
-    )
+    results = calc_ranking_results(test_ur, preds, test_u, config)
+    results.to_csv(f'{result_save_path}{algo_prefix}_{common_prefix}_kpi_results.csv')

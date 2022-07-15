@@ -1,17 +1,80 @@
 import numpy as np
+import pandas as pd
+
 from daisy.utils.config import metrics_config
 
 class Metric(object):
     def __init__(self, config) -> None:
         self.metrics = config['metrics']
+        self.item_num = config['item_num']
+        self.item_pop = config['item_pop'] if 'coverage' in self.metrics else None
+        self.i_categories = config['i_categories'] if 'diversity' in self.metrics else None
 
     def run(self, test_ur, pred_ur, test_u):
         res = []
         for mc in self.metrics:
-            kpi = metrics_config[mc](test_ur, pred_ur, test_u)
+            if mc == "coverage":
+                kpi = metrics_config[mc](pred_ur, self.item_num)
+            elif mc == "popularity":
+                kpi = metrics_config[mc](test_ur, pred_ur, test_u, self.item_pop)
+            elif mc == "diversity":
+                kpi = metrics_config[mc](pred_ur, self.i_categories)
+            else:
+                kpi = metrics_config[mc](test_ur, pred_ur, test_u)
+
             res.append(kpi)
     
         return res
+
+def Coverage(pred_ur, item_num):
+    '''
+    Ge, Mouzhi, Carla Delgado-Battenfeld, and Dietmar Jannach. "Beyond accuracy: evaluating recommender systems by coverage and serendipity." Proceedings of the fourth ACM conference on Recommender systems. 2010.
+    '''
+    return len(np.unique(pred_ur)) / item_num
+
+def Popularity(test_ur, pred_ur, test_u, item_pop):
+    '''
+    Abdollahpouri, Himan, et al. "The unfairness of popularity bias in recommendation." arXiv preprint arXiv:1907.13286 (2019).
+
+    \frac{1}{|U|} \sum_{u \in U } \frac{\sum_{i \in R_{u}} \phi(i)}{|R_{u}|}
+    '''
+    res = []
+    for idx in range(len(test_u)):
+        u = test_u[idx]
+        gt = test_ur[u]
+        pred = pred_ur[idx]
+        i = np.intersect1d(pred, list(gt))
+        if len(i):
+            avg_pop = np.sum(item_pop[i]) / len(gt)
+            res.append(avg_pop)
+        else:
+            res.append(0)
+
+    return np.mean(res)
+
+def Diversity(pred_ur, i_categories):
+    '''
+    Intra-list similarity for diversity
+
+    Parameters
+    ----------
+    pred_ur : np.array
+        rank list for each user in test set
+    i_categories : np.array
+        (item_num, category_num) with 0/1 value
+    ''' 
+    res = []
+    for u in range(len(pred_ur)):
+        ILD = []
+        for i in range(len(pred_ur[u])):
+            item_i_cats = i_categories[pred_ur[u, i]]
+            for j in range(i + 1, len(pred_ur[u])):
+                item_j_cats = i_categories[pred_ur[u, j]]
+                distance = np.linalg.norm(item_i_cats - item_j_cats)
+                ILD.append(distance)
+        res.append(np.mean(ILD))
+
+    return np.mean(res)
 
 def Precision(test_ur, pred_ur, test_u):
     res = []

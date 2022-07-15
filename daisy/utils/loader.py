@@ -3,6 +3,7 @@ import gc
 import re
 import json
 import requests
+import numpy as np
 import pandas as pd
 import scipy.io as sio
 from collections import Counter
@@ -160,7 +161,10 @@ class Preprocessor(object):
         self.pos_threshold = config['positive_threshold']
         self.level = config['level'] # ui, u, i
 
+        self.get_pop = True if 'popularity' in config['metrics'] else False
+
         self.user_num, self.item_num = None, None
+        self.item_pop = None
 
     def process(self, df):
         df = self.__remove_duplication(df)
@@ -170,9 +174,17 @@ class Preprocessor(object):
         self.user_num, self.item_num = self.__get_stats(df)
         df = self.__category_encoding(df)
         df = self.__sort_by_time(df)
+        if self.get_pop:
+            self.__get_item_popularity(df)
+
         print(f'Finish loading [{self.src}]-[{self.prepro}] dataset')
 
         return df
+
+    def __get_item_popularity(self, df):
+        self.item_pop = np.zeros(self.item_num)
+        pop = df.groupby(self.iid_name).size() / self.user_num
+        self.item_pop[pop.index] = pop.values
 
     def __sort_by_time(self, df):
         df = df.sort_values(self.tid_name).reset_index(drop=True)
