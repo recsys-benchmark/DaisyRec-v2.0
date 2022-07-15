@@ -426,7 +426,8 @@ class ItemKNNCF(GeneralRecommender):
         return rec_ids
 
     def full_rank(self, u):
-        return self.pred_mat[u, :].A.squeeze()
+        scores = self.pred_mat[u, :].A.squeeze()
+        return np.argsort(-scores)[:self.topk]
 
 class UserKNNCF(GeneralRecommender):
     def __init__(self, config):
@@ -499,4 +500,5 @@ class UserKNNCF(GeneralRecommender):
         return rec_ids
 
     def full_rank(self, u):
-        return self.pred_mat[u, :].A.squeeze()
+        scores = self.pred_mat[u, :].A.squeeze()
+        return np.argsort(-scores)[:self.topk]

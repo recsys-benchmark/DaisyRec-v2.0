@@ -39,4 +39,4 @@ class MostPop(GeneralRecommender):
         return rec_ids.cpu().numpy()
 
     def full_rank(self, u):
-        return np.argsort(self.item_score)[::-1]
+        return np.argsort(-self.item_score)[:self.topk]

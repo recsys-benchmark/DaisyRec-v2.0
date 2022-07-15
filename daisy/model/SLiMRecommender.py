@@ -122,7 +122,8 @@ class SLiM(GeneralRecommender):
         return rec_ids
 
     def full_rank(self, u):
-        return self.A_tilde[u, :].A.squeeze()
+        scores = self.A_tilde[u, :].A.squeeze()
+        return np.argsort(-scores)[:self.topk]
 
     def _convert_df(self, user_num, item_num, df):
         """
