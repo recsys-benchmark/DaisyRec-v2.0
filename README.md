@@ -93,7 +93,7 @@ All data are available in links below:
 - [ ] Add [∞-AE](https://arxiv.org/pdf/2206.02626.pdf) (with [code](https://github.com/noveens/infinite_ae_cf)) and [EASE](https://arxiv.org/abs/1905.03375) algorithms
 - [ ] full rank interface
 - [ ] predict, rank interface
-- [ ] modify split_test to Splitter
+- [x] modify split_test to Splitter
 - [ ] metrics to class and add coverage, popularity, and diversity
 - [ ] change hyperopt to optuna
 - [x] optimize mostpop

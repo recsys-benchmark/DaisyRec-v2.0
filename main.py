@@ -4,12 +4,13 @@ import yaml
 import numpy as np
 import pandas as pd
 
-from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
+
 from daisy.utils.parser import parse_args
-from daisy.utils.splitter import split_test
-from daisy.utils.dataset import convert_dataloader, BasicDataset, CandidatesDataset, UAEData
+from daisy.utils.splitter import TestSplitter
 from daisy.utils.config import init_seed, model_config
 from daisy.utils.loader import RawDataReader, Preprocessor
+from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
+from daisy.utils.dataset import convert_dataloader, BasicDataset, CandidatesDataset, UAEData
 from daisy.utils.utils import get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
 
@@ -43,7 +44,9 @@ if __name__ == '__main__':
     config['item_num'] = item_num
 
     ''' Train Test split '''
-    train_set, test_set = split_test(df, args.test_method, args.test_size)
+    splitter = TestSplitter(config)
+    train_index, test_index = splitter.split(df)
+    train_set, test_set = df.iloc[train_index, :].copy(), df.iloc[test_index, :].copy()
 
     ''' get ground truth '''
     test_ur = get_ur(test_set)

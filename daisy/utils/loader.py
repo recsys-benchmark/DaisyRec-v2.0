@@ -169,7 +169,13 @@ class Preprocessor(object):
         df = self.__core_filter(df)
         self.user_num, self.item_num = self.__get_stats(df)
         df = self.__category_encoding(df)
+        df = self.__sort_by_time(df)
         print(f'Finish loading [{self.src}]-[{self.prepro}] dataset')
+
+        return df
+
+    def __sort_by_time(self, df):
+        df = df.sort_values(self.tid_name).reset_index(drop=True)
 
         return df
 
