@@ -89,13 +89,16 @@ All data are available in links below:
 ## TODO List
 
 - [ ] A more friendly GUI command generator
+- [ ] change hyperopt to optuna
 - [ ] Reconstruct convert_npy_mat() and UAEData class in Multi-VAE
 - [ ] Add [∞-AE](https://arxiv.org/pdf/2206.02626.pdf) (with [code](https://github.com/noveens/infinite_ae_cf)) and [EASE](https://arxiv.org/abs/1905.03375) algorithms
+- [ ] add logger
+- [ ] release to Pypi
+- [ ] add download function in RawDataReader
 - [x] full rank interface
 - [x] predict, rank interface
 - [x] modify split_test to Splitter
 - [x] metrics to class and add coverage, popularity, and diversity
-- [ ] change hyperopt to optuna
 - [x] optimize mostpop
 - [x] Improve the efficiency of the negative sample process
 - [x] Optimize the part of building candidate set
