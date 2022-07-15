@@ -3,17 +3,14 @@ import time
 import yaml
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
-
-import torch
-from torch.utils.data import DataLoader
 
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.parser import parse_args
 from daisy.utils.splitter import split_test
-from daisy.utils.dataset import BasicDataset, CandidatesDataset, UAEData
+from daisy.utils.dataset import convert_dataloader, BasicDataset, CandidatesDataset, UAEData
 from daisy.utils.config import init_seed, model_config
-from daisy.utils.loader import Interactions, get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
+from daisy.utils.loader import RawDataReader, Preprocessor
+from daisy.utils.utils import get_ur, convert_npy_mat, build_candidates_set, get_adj_mat
 from daisy.utils.metrics import precision_at_k, recall_at_k, map_at_k, hr_at_k, ndcg_at_k, mrr_at_k
 
 
@@ -37,9 +34,11 @@ if __name__ == '__main__':
     init_seed(config['seed'], config['reproducibility'])
     
     ''' Test Process for Metrics Exporting '''
-    inter = Interactions(config)
-    df = inter.get_data()
-    user_num, item_num = inter.user_num, inter.item_num
+    reader, processor = RawDataReader(config), Preprocessor(config)
+    df = reader.get_data()
+    df = processor.process(df)
+    user_num, item_num = processor.user_num, processor.item_num
+
     config['user_num'] = user_num
     config['item_num'] = item_num
 
@@ -70,14 +69,14 @@ if __name__ == '__main__':
         sampler = BasicNegtiveSampler(train_set, config)
         train_samples = sampler.sampling()
         train_dataset = BasicDataset(train_samples)
-        train_loader = DataLoader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
+        train_loader = convert_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
     elif config['algo_name'].lower() in ['item2vec']:
         model = model_config[config['algo_name']](config)
         sampler = SkipGramNegativeSampler(train_set, config)
         train_samples = sampler.sampling()
         train_dataset = BasicDataset(train_samples)
-        train_loader = DataLoader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
+        train_loader = convert_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
     else:
         raise NotImplementedError('Something went wrong when building and training...')
@@ -94,10 +93,11 @@ if __name__ == '__main__':
     print('')
 
     test_dataset = CandidatesDataset(test_ucands)
-    test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=0)
+    test_loader = convert_dataloader(test_dataset, batch_size=128, shuffle=False, num_workers=0)
     preds = model.rank(test_loader)
 
     if config['algo_name'].lower() in ['multi-vae']:
+        # TODO
         pass
 
     ''' calculating KPIs '''
