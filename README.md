@@ -3,7 +3,7 @@
 </p>
 
 ![PyPI - Python Version](https://img.shields.io/badge/pyhton-3.5%2B-blue) 
-[![Version](https://img.shields.io/badge/version-v2.0-orange)](https://github.com/recsys-benchmark/DaisyRec-v2.0) 
+[![Version](https://img.shields.io/badge/version-2.0-orange)](https://github.com/recsys-benchmark/DaisyRec-v2.0) 
 ![GitHub repo size](https://img.shields.io/github/repo-size/recsys-benchmark/DaisyRec-v2.0) 
 ![GitHub](https://img.shields.io/github/license/recsys-benchmark/DaisyRec-v2.0)
 [![arXiv](https://img.shields.io/badge/arXiv-daisyRec-%23B21B1B)](https://arxiv.org/abs/2206.10848)
