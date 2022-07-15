@@ -49,12 +49,11 @@ class Item2Vec(GeneralRecommender):
             self.user_embedding.weight.data[u] = self.shared_embedding(uis).sum(dim=0)
 
     def calc_loss(self, batch):
-        len_batch = batch.shape[0]
         target_i = batch[0].to(self.device)
         context_j = batch[1].to(self.device)
         label = batch[2].to(self.device)
         prediction = self.forward(target_i, context_j)
-        loss = self.criterion(prediction, label) / len_batch
+        loss = self.criterion(prediction, label)
         
         return loss
     

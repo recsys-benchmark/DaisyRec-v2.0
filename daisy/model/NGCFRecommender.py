@@ -138,7 +138,6 @@ class NGCF(GeneralRecommender):
         return scores
 
     def calc_loss(self, batch):
-        len_batch = batch.shape[0]
         user = batch[0].to(self.device)
         pos_item = batch[1].to(self.device)
 
@@ -150,8 +149,8 @@ class NGCF(GeneralRecommender):
             label = batch[2].to(self.device)
             loss = self.criterion(pos_pred, label)
 
-            loss += self.reg_1 * torch.norm(emb_pos, p=1) / len_batch
-            loss += self.reg_2 * torch.norm(emb_pos, p=2) / len_batch
+            loss += self.reg_1 * torch.norm(emb_pos, p=1)
+            loss += self.reg_2 * torch.norm(emb_pos, p=2)
         elif self.loss_type.upper() in ['BPR', 'TL', 'HL']:
             neg_item = batch[2].to(self.device)
             emb_neg = self.embedding_dict['item_emb'][neg_item]
@@ -159,13 +158,13 @@ class NGCF(GeneralRecommender):
             neg_pred = self.forward(user, neg_item)
             loss = self.criterion(pos_pred, neg_pred)
 
-            loss += self.reg_1 * (torch.norm(emb_pos, p=1) + torch.norm(emb_neg, p=1)) / len_batch
-            loss += self.reg_2 * (torch.norm(emb_pos, p=2) + torch.norm(emb_neg, p=2)) / len_batch
+            loss += self.reg_1 * (torch.norm(emb_pos, p=1) + torch.norm(emb_neg, p=1))
+            loss += self.reg_2 * (torch.norm(emb_pos, p=2) + torch.norm(emb_neg, p=2))
         else:
             raise NotImplementedError(f'Invalid loss type: {self.loss_type}')
 
-        loss += self.reg_1 * torch.norm(emb_u, p=1) / len_batch
-        loss += self.reg_2 * torch.norm(emb_u, p=2) / len_batch
+        loss += self.reg_1 * torch.norm(emb_u, p=1)
+        loss += self.reg_2 * torch.norm(emb_u, p=2)
 
         return loss
 
