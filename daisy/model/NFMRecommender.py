@@ -172,6 +172,7 @@ class NFM(GeneralRecommender):
 
     def full_rank(self, u):
         u = torch.tensor(u, self.device)
+
         user_emb = self.embed_user(u)  # factor
         items_emb = self.embed_item.weight  # item_num * factor
 

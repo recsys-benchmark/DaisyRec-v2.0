@@ -106,8 +106,10 @@ class MF(GeneralRecommender):
 
     def full_rank(self, u):
         u = torch.tensor(u, self.device)
+
         user_emb = self.embed_user(u)
         items_emb = self.embed_item.weight 
         scores = torch.matmul(user_emb, items_emb.transpose(1, 0)) #  (item_num,)
+
         return torch.argsort(scores, descending=True)[:self.topk].cpu().numpy()
 

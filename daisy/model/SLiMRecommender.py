@@ -123,6 +123,7 @@ class SLiM(GeneralRecommender):
 
     def full_rank(self, u):
         scores = self.A_tilde[u, :].A.squeeze()
+
         return np.argsort(-scores)[:self.topk]
 
     def _convert_df(self, user_num, item_num, df):
@@ -132,7 +133,6 @@ class SLiM(GeneralRecommender):
         ratings = list(df['rating'])
         rows = list(df['user'])
         cols = list(df['item'])
-
         mat = sp.csc_matrix((ratings, (rows, cols)), shape=(user_num, item_num))
 
         return mat

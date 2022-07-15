@@ -68,5 +68,6 @@ class PureSVD(GeneralRecommender):
 
     def full_rank(self, u):
         scores = self.user_vec[u, :].dot(self.item_vec.T) #  (item_num,)
+
         return np.argsort(-scores)[:self.topk]
 
