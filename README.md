@@ -32,6 +32,10 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 
 ### How to Run
 
+```
+python fair_compare.py
+```
+
 - The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator.pythonanywhere.com).
 
 - Please refer to [DaisyRec-v2.0-Tutorial.ipynb](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/DaisyRec-v2.0-Tutorial.ipynb), which demontrates how to use DaisyRec-v2.0 to tune hyper-parameters and test the algorithms step by step.
