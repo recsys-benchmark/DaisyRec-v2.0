@@ -51,14 +51,13 @@ if __name__ == '__main__':
     total_train_ur = get_ur(train_set)
     config['train_ur'] = total_train_ur
 
-    ''' select model '''
-    model = model_config[config['algo_name']](config)
-
     ''' build and train model '''
     s_time = time.time()
     if config['algo_name'].lower() in ['itemknn', 'puresvd', 'slim', 'mostpop']:
+        model = model_config[config['algo_name']](config)
         model.fit(train_set)
     elif config['algo_name'].lower() in ['multi-vae']:
+        model = model_config[config['algo_name']](config)
         # TODO
         train_dataset = UAEData(user_num, item_num, train_set, test_set)
         training_mat = convert_npy_mat(user_num, item_num, train_set)
@@ -67,13 +66,15 @@ if __name__ == '__main__':
             _, norm_adj, _ = get_adj_mat(user_num,item_num)
             config['norm_adj'] = norm_adj
 
-        sampler = BasicNegtiveSampler(train_set, total_train_ur, config)
+        model = model_config[config['algo_name']](config)
+        sampler = BasicNegtiveSampler(train_set, config)
         train_samples = sampler.sampling()
         train_dataset = BasicDataset(train_samples)
         train_loader = DataLoader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
     elif config['algo_name'].lower() in ['item2vec']:
-        sampler = SkipGramNegativeSampler(train_set, total_train_ur, config)
+        model = model_config[config['algo_name']](config)
+        sampler = SkipGramNegativeSampler(train_set, config)
         train_samples = sampler.sampling()
         train_dataset = BasicDataset(train_samples)
         train_loader = DataLoader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
@@ -91,14 +92,13 @@ if __name__ == '__main__':
     print('')
     print('Generate recommend list...')
     print('')
-    if config['algo_name'].lower() in ['itemknn', 'puresvd', 'slim', 'mostpop']:
+
+    test_dataset = CandidatesDataset(test_ucands)
+    test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=0)
+    preds = model.rank(test_loader)
+
+    if config['algo_name'].lower() in ['multi-vae']:
         pass
-    elif config['algo_name'].lower() in ['multi-vae']:
-        pass
-    elif config['algo_name'].lower() in ['mf', 'fm', 'neumf', 'nfm', 'ngcf', 'item2vec']:
-        test_dataset = CandidatesDataset(test_ucands)
-        test_loader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=0)
-        preds = model.predict(test_loader)
 
     ''' calculating KPIs '''
 

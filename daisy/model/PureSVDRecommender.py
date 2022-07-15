@@ -1,8 +1,11 @@
+import torch
+import numpy as np
 import scipy.sparse as sp
 from sklearn.utils.extmath import randomized_svd
 
+from daisy.model.AbstractRecommender import GeneralRecommender
 
-class PureSVD(object):
+class PureSVD(GeneralRecommender):
     def __init__(self, config):
         """
         PureSVD Recommender
@@ -19,6 +22,8 @@ class PureSVD(object):
         self.user_vec = None
         self.item_vec = None
 
+        self.topk = config['topk']
+
     def fit(self, train_set):
         print(" Computing SVD decomposition...")
         train_set = self._convert_df(self.user_num, self.item_num, train_set)
@@ -32,21 +37,34 @@ class PureSVD(object):
         self.item_vec = s_Vt.T
         print('Done!')
 
-    def predict(self, u, i):
-        return self.user_vec[u, :].dot(self.item_vec[i, :])
-
-    def rank(self, test_loader):
-        pass
-
     def _convert_df(self, user_num, item_num, df):
         """Process Data to make WRMF available"""
         ratings = list(df['rating'])
         rows = list(df['user'])
         cols = list(df['item'])
-
         mat = sp.csr_matrix((ratings, (rows, cols)), shape=(user_num, item_num))
 
         return mat
 
+    def predict(self, u, i):
+        return self.user_vec[u, :].dot(self.item_vec[i, :])
+
+    def rank(self, test_loader):
+        rec_ids = np.array([])
+
+        for us, cands_ids in test_loader:
+            us = us.numpy()
+            cands_ids = cands_ids.numpy() # batch * cand_num
+
+            user_emb = np.expand_dims(self.user_vec[us, :], axis=1) # batch * factor -> batch * 1 * factor
+            items_emb = self.item_vec[cands_ids, :].transpose(0, 2, 1)  # batch * cand_num * factor -> batch * factor * cand_num
+            scores = np.einsum('BNi,BiM -> BNM', user_emb, items_emb).squeeze() # batch * 1 * cand_num -> batch * cand_num
+            rank_ids = np.argsort(-scores)[:, :self.topk]
+            rank_list = cands_ids[:, rank_ids]
+            
+            rec_ids = np.vstack([rec_ids, rank_list])
+
+        return rec_ids
+
     def full_rank(self, u):
-        pass
+        return self.user_vec[u, :].dot(self.item_vec.T) # 1 * item_num

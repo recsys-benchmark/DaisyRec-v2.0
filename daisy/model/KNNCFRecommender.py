@@ -2,7 +2,8 @@ import sys
 import time
 import numpy as np
 import scipy.sparse as sp
-from collections import defaultdict
+
+from daisy.model.AbstractRecommender import GeneralRecommender
 
 def convert_df(user_num, item_num, df):
     """ 
@@ -352,7 +353,7 @@ class Similarity:
         return w_sparse
 
 
-class ItemKNNCF(object):
+class ItemKNNCF(GeneralRecommender):
     def __init__(self, config):
         """
         ItemKNN recommender
@@ -382,6 +383,8 @@ class ItemKNNCF(object):
         self.normalize = config['normalize']
         self.similarity = config['similarity']
 
+        self.topk = config['topk']
+
         self.pred_mat = None
 
     def fit(self, train_set):
@@ -409,12 +412,23 @@ class ItemKNNCF(object):
         return self.pred_mat[u, i]
 
     def rank(self, test_loader):
-        pass
+        rec_ids = np.array([])
+
+        for us, cands_ids in test_loader:
+            us = us.numpy()
+            cands_ids = cands_ids.numpy()
+            scores = self.pred_mat[us, cands_ids].A
+            rank_ids = np.argsort(-scores)[:, :self.topk]
+            rank_list = cands_ids[:, rank_ids]
+
+            rec_ids = np.vstack([rec_ids, rank_list])
+
+        return rec_ids
 
     def full_rank(self, u):
-        pass
+        return self.pred_mat[u, :].A.squeeze()
 
-class UserKNNCF(object):
+class UserKNNCF(GeneralRecommender):
     def __init__(self, config):
         """
         UserKNN recommender
@@ -471,7 +485,18 @@ class UserKNNCF(object):
         return self.pred_mat[u, i]
 
     def rank(self, test_loader):
-        pass
+        rec_ids = np.array([])
+
+        for us, cands_ids in test_loader:
+            us = us.numpy()
+            cands_ids = cands_ids.numpy()
+            scores = self.pred_mat[us, cands_ids].A
+            rank_ids = np.argsort(-scores)[:, :self.topk]
+            rank_list = cands_ids[:, rank_ids]
+
+            rec_ids = np.vstack([rec_ids, rank_list])
+
+        return rec_ids
 
     def full_rank(self, u):
-        pass
+        return self.pred_mat[u, :].A.squeeze()

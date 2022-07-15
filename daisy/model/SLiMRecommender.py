@@ -4,7 +4,9 @@ import numpy as np
 import scipy.sparse as sp
 from sklearn.linear_model import ElasticNet
 
-class SLiM(object):
+from daisy.model.AbstractRecommender import GeneralRecommender
+
+class SLiM(GeneralRecommender):
     def __init__(self, config):
         """
         SLIM Recommender Class
@@ -103,14 +105,24 @@ class SLiM(object):
         self.A_tilde = train.dot(self.w_sparse).tolil()
 
     def predict(self, u, i):
-
         return self.A_tilde[u, i]
 
     def rank(self, test_loader):
-        pass
+        rec_ids = np.array([])
+
+        for us, cands_ids in test_loader:
+            us = us.numpy()
+            cands_ids = cands_ids.numpy()
+            scores = self.A_tilde[us, cands_ids].A
+            rank_ids = np.argsort(-scores)[:, :self.topk]
+            rank_list = cands_ids[:, rank_ids]
+
+            rec_ids = np.vstack([rec_ids, rank_list])
+
+        return rec_ids
 
     def full_rank(self, u):
-        pass
+        return self.A_tilde[u, :].A.squeeze()
 
     def _convert_df(self, user_num, item_num, df):
         """
