@@ -1,242 +1,144 @@
 import numpy as np
+from daisy.utils.config import metrics_config
 
+class Metric(object):
+    def __init__(self, config) -> None:
+        self.metrics = config['metrics']
 
-def precision_at_k(r, k):
-    """
-    Precision calculation method
-    Parameters
-    ----------
-    r : List, list of the rank items
-    k : int, top-K number
+    def run(self, test_ur, pred_ur, test_u):
+        res = []
+        for mc in self.metrics:
+            kpi = metrics_config[mc](test_ur, pred_ur, test_u)
+            res.append(kpi)
+    
+        return res
 
-    Returns
-    -------
-    pre : float, precision value
-    """
-    assert k >= 1
-    r = np.asarray(r)[:k] != 0
-    if r.size != k:
-        raise ValueError('Relevance score length < k')
-    # return np.mean(r)
-    pre = sum(r) / len(r)
-
-    return pre
-
-
-def recall_at_k(rs, test_ur, k):
-    """
-    Recall calculation method
-    Parameters
-    ----------
-    rs : Dict, {user : rank items} for test set
-    test_ur : Dict, {user : items} for test set ground truth
-    k : int, top-K number
-
-    Returns
-    -------
-    rec : float recall value
-    """
-    assert k >= 1
+def Precision(test_ur, pred_ur, test_u):
     res = []
-    for user in test_ur.keys():
-        r = np.asarray(rs[user])[:k] != 0
-        if r.size != k:
-            raise ValueError('Relevance score length < k')
-        if len(test_ur[user]) == 0:
-            raise KeyError(f'Invalid User Index: {user}')
-        res.append(sum(r) / len(test_ur[user]))
-    rec = np.mean(res)
+    for idx in range(len(test_u)):
+        u = test_u[idx]
+        gt = test_ur[u]
+        pred = pred_ur[idx]
+        pre = np.in1d(pred, list(gt)).sum() / len(pred)
 
-    return rec
+        res.append(pre)
 
+    return np.mean(res)
 
-def mrr_at_k(rs, k):
-    """
-    Mean Reciprocal Rank calculation method
-    Parameters
-    ----------
-    rs : Dict, {user : rank items} for test set
-    k : int, topK number
+def Recall(test_ur, pred_ur, test_u):
+    res = []
+    for idx in range(len(test_u)):
+        u = test_u[idx]
+        gt = test_ur[u]
+        pred = pred_ur[idx]
+        rec = np.in1d(pred, list(gt)).sum() / len(gt)
 
-    Returns
-    -------
-    mrr : float, MRR value
-    """
-    assert k >= 1
-    res = 0
-    for r in rs.values():
-        r = np.asarray(r)[:k] != 0 
-        for index, item in enumerate(r):
-            if item == 1:
-                res += 1 / (index + 1)
-    mrr = res / len(rs)
+        res.append(rec)
 
-    return mrr
+    return np.mean(res)
 
+def MRR(test_ur, pred_ur, test_u):
+    res = []
+    for idx in range(len(test_u)):
+        u = test_u[idx]
+        gt = test_ur[u]
+        pred = pred_ur[idx]
+        for index, item in enumerate(pred):
+            if item in gt:
+                mrr = 1 / (index + 1)
+                break
+        
+        res.append(mrr)
 
-def ap(r):
-    """
-    Average precision calculation method
-    Parameters
-    ----------
-    r : List, Relevance scores (list or numpy) in rank order (first element is the first item)
+    return np.mean(res)
 
-    Returns
-    -------
-    a_p : float, Average precision value
-    """
-    r = np.asarray(r) != 0
-    out = [precision_at_k(r, k + 1) for k in range(r.size) if r[k]]
-    if not out:
+def MAP(test_ur, pred_ur, test_u):
+    res = []
+    for idx in range(len(test_u)):
+        u = test_u[idx]
+        gt = test_ur[u]
+        pred = pred_ur[idx]
+        r = np.in1d(pred, list(gt))
+        out = [r[:k+1].sum() / (k + 1) for k in range(r.size) if r[k]]
+        if not out:
+            res.append(0.)
+        else:
+            ap = np.mean(out)
+            res.append(ap)
+
+    return np.mean(res)
+
+def NDCG(test_ur, pred_ur, test_u):
+    def DCG(r):
+        r = np.asfarray(r) != 0
+        if r.size:
+            dcg = np.sum(np.subtract(np.power(2, r), 1) / np.log2(np.arange(2, r.size + 2)))
+            return dcg
         return 0.
-    a_p = np.sum(out) / len(r)
 
-    return a_p
+    res = []
+    for idx in range(len(test_u)):
+        u = test_u[idx]
+        gt = test_ur[u]
+        pred = pred_ur[idx]
+        r = np.in1d(pred, list(gt))
 
+        idcg = DCG(sorted(r, reverse=True))
+        if not idcg:
+            return 0.
+        ndcg = DCG(r) / idcg
 
-def map_at_k(rs):
-    """
-    Mean Average Precision calculation method
-    Parameters
-    ----------
-    rs : Dict, {user : rank items} for test set
+        res.append(ndcg)
 
-    Returns
-    -------
-    m_a_p : float, MAP value
-    """
-    m_a_p = np.mean([ap(r) for r in rs])
-    return m_a_p
+    return np.mean(res)
 
+def HR(test_ur, pred_ur, test_u):
+    res = []
+    for idx in range(len(test_u)):
+        u = test_u[idx]
+        gt = test_ur[u]
+        pred = pred_ur[idx]
 
-def dcg_at_k(r, k):
-    """
-    Discounted Cumulative Gain calculation method
-    Parameters
-    ----------
-    r : List, Relevance scores (list or numpy) in rank order
-                (first element is the first item)
-    k : int, top-K number
+        r = np.in1d(pred, list(gt))
+        res.append(1 if r.sum() else 0)
 
-    Returns
-    -------
-    dcg : float, DCG value
-    """
-    assert k >= 1
-    r = np.asfarray(r)[:k] != 0
-    if r.size:
-        dcg = np.sum(np.subtract(np.power(2, r), 1) / np.log2(np.arange(2, r.size + 2)))
-        return dcg
-    return 0.
+    return np.mean(res)
 
+def AUC(test_ur, pred_ur, test_u):
+    res = []
 
-def ndcg_at_k(r, k):
-    """
-    Normalized Discounted Cumulative Gain calculation method
-    Parameters
-    ----------
-    r : List, Relevance scores (list or numpy) in rank order
-            (first element is the first item)
-    k : int, top-K number
+    for idx in range(len(test_u)):
+        u = test_u[idx]
+        gt = test_ur[u]
+        pred = pred_ur[idx]
 
-    Returns
-    -------
-    ndcg : float, NDCG value
-    """
-    assert k >= 1
-    idcg = dcg_at_k(sorted(r, reverse=True), k)
-    if not idcg:
-        return 0.
-    ndcg = dcg_at_k(r, k) / idcg
-
-    return ndcg
-
-
-def hr_at_k(rs, test_ur):
-    """
-    Hit Ratio calculation method
-    Parameters
-    ----------
-    rs : Dict, {user : rank items} for test set
-    test_ur : (Deprecated) Dict, {user : items} for test set ground truth
-
-    Returns
-    -------
-    hr : float, HR value
-    """
-    # another way for calculating hit rate
-    # numer, denom = 0., 0.
-    # for user in test_ur.keys():
-    #     numer += np.sum(rs[user])
-    #     denom += len(test_ur[user])
-
-    # return numer / denom
-    uhr = 0
-    for r in rs.values():
-        if np.sum(r) != 0:
-            uhr += 1
-    hr = uhr / len(rs)
-
-    return hr
-
-
-def auc_at_k(rs):
-    """
-    Area Under Curve calculation method
-    Parameters
-    ----------
-    rs : Dict, {user : rank items} for test set
-
-    Returns
-    -------
-    m_auc : float, AUC value
-    """
-    uauc = 0.
-    for user in rs.keys():
-        label_all = rs[user]
-
-        pos_num = len(list(filter(lambda x: x == 1, label_all)))
-        neg_num = len(label_all) - pos_num
+        r = np.in1d(pred, list(gt))
+        pos_num = r.sum()
+        neg_num = len(pred) - pos_num
 
         pos_rank_num = 0
-        for j in range(len(pred_all)):
-            if label_all[j] == 1:
-                pos_rank_num += j + 1
+        for j in range(len(r) - 1):
+            if r[j]:
+                pos_rank_num += np.sum(~r[j + 1:])
 
-        auc = (pos_rank_num - pos_num * (pos_num + 1) / 2) / (pos_num * neg_num)
+        auc = pos_rank_num / (pos_num * neg_num)
+        res.append(auc)
+                
+    return np.mean(res)
 
-        uauc += auc
-    m_auc = uauc / len(rs)
+def F1(test_ur, pred_ur, test_u):
+    res = []
 
-    return m_auc
+    for idx in range(len(test_u)):
+        u = test_u[idx]
+        gt = test_ur[u]
+        pred = pred_ur[idx]
 
+        r = np.in1d(pred, list(gt))
+        pre = r.sum() / len(pred)
+        rec = r.sum() / len(gt)
 
-def f1_at_k(rs, test_ur):
-    """
-    F1-score calculation method
-    Parameters
-    ----------
-    rs : Dict, {user : rank items} for test set
-    test_ur : Dict, {user : items} for test set ground truth
+        f1 = 2 * pre * rec / (pre + rec)
+        res.append(f1)
 
-    Returns
-    -------
-    fs : float, F1-score value
-    """
-    uf1 = 0.
-    for user in rs.keys():
-        r = rs[user]
-        r = np.asarray(r) != 0
-        # start calculate precision
-        prec_k = sum(r) / len(r)
-        # start calculate recall
-        if len(test_ur[user]) == 0:
-            raise KeyError(f'Invalid User Index: {user}')
-        rec_k = sum(r) / len(test_ur[user])
-        # start calculate f1-score
-        f1_k = 2 * prec_k * rec_k / (rec_k + prec_k)
-
-        uf1 += f1_k
-    fs = uf1 / len(rs)
-
-    return fs
+    return np.mean(res)
