@@ -90,7 +90,30 @@ class FM(GeneralRecommender):
         return pred
 
     def rank(self, test_loader):
-        pass
+        rec_ids = torch.tensor([], device=self.device)
+
+        for us, cands_ids in test_loader:
+            us = us.to(self.device)
+            cands_ids = cands_ids.to(self.device)
+
+            user_emb = self.embed_user(us).unsqueeze(dim=1) # batch * factor -> batch * 1 * factor
+            item_emb = self.embed_item(cands_ids).transpose(0, 2, 1) # batch * cand_num * factor -> batch * factor * cand_num 
+            scores = torch.bmm(user_emb, item_emb).squeeze() # batch * 1 * cand_num -> batch * cand_num
+            scores += self.u_bias(us) + self.i_bias(cands_ids).squeeze() + self.bias_
+
+            rank_ids = torch.argsort(scores, descending=True)
+            rank_list = torch.gather(cands_ids, 1, rank_ids)
+            rank_list = rank_list[:, :self.topk]
+
+            rec_ids = torch.cat((rec_ids, rank_list), 0)
+
+        return rec_ids.cpu().numpy()
 
     def full_rank(self, u):
-        pass
+        u = torch.tensor(u, self.device)
+        user_emb = self.embed_user(u)
+        items_emb = self.embed_item.weight 
+        scores = torch.matmul(user_emb, items_emb.transpose(1, 0)) #  (item_num,)
+        scores += self.u_bias(u) + self.i_bias.weight + self.bias_
+
+        return torch.argsort(scores, descending=True)[:self.topk].cpu().numpy()

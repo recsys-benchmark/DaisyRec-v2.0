@@ -63,14 +63,17 @@ class NFM(GeneralRecommender):
             out_dim = in_dim # dim
             MLP_modules.append(nn.Linear(in_dim, out_dim))
             in_dim = out_dim
+
             if self.batch_norm:
                 MLP_modules.append(nn.BatchNorm1d(out_dim))
+
             if self.act_function == 'relu':
                 MLP_modules.append(nn.ReLU())
             elif self.act_function == 'sigmoid':
                 MLP_modules.append(nn.Sigmoid())
             elif self.act_function == 'tanh':
                 MLP_modules.append(nn.Tanh())
+
             MLP_modules.append(nn.Dropout(self.dropout))
         self.deep_layers = nn.Sequential(*MLP_modules)
         predict_size = config['factors']  # layers[-1] if layers else factors
@@ -143,7 +146,42 @@ class NFM(GeneralRecommender):
         return pred
 
     def rank(self, test_loader):
-        pass
+        rec_ids = torch.tensor([], device=self.device)
+
+        for us, cands_ids in test_loader:
+            us = us.to(self.device)
+            cands_ids = cands_ids.to(self.device)
+
+            user_emb = self.embed_user(us).unsqueeze(dim=1) # batch * factor -> batch * 1 * factor 
+            item_emb = self.embed_item(cands_ids) # batch * cand_num * factor
+
+            fm = user_emb * item_emb # batch * cand_num * factor
+            fm = self.FM_layers(fm) # batch * cand_num * factor
+            if self.num_layers:
+                fm = self.deep_layers(fm) # batch * cand_num * factor
+            fm += self.u_bias(us) + self.i_bias(cands_ids) + self.bias_ # batch * cand_num * factor
+            scores = self.prediction(fm).squeeze() # batch * cand_num * 1 -> # batch * cand_num
+
+            rank_ids = torch.argsort(scores, descending=True)
+            rank_list = torch.gather(cands_ids, 1, rank_ids)
+            rank_list = rank_list[:, :self.topk]
+
+            rec_ids = torch.cat((rec_ids, rank_list), 0)
+
+        return rec_ids.cpu().numpy()
 
     def full_rank(self, u):
-        pass
+        u = torch.tensor(u, self.device)
+        user_emb = self.embed_user(u)  # factor
+        items_emb = self.embed_item.weight  # item_num * factor
+
+        fm = user_emb * items_emb  # item_num * factor
+        fm = self.FM_layers(fm) # item_num * factor
+        if self.num_layers:
+            fm = self.deep_layers(fm) # item_num * factor
+        fm += self.u_bias(u) + self.i_bias.weight + self.bias_
+        scores = self.prediction(fm) # item_num
+
+        return torch.argsort(scores, descending=True)[:self.topk].cpu().numpy()
+
+        

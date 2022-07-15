@@ -176,7 +176,30 @@ class NGCF(GeneralRecommender):
         return pred.cpu()
 
     def rank(self, test_loader):
-        pass
+        rec_ids = torch.tensor([], device=self.device)
+
+        for us, cands_ids in test_loader:
+            us = us.to(self.device)
+            cands_ids = cands_ids.to(self.device)
+
+            user_emb = self.embedding_dict['user_emb'][us].unsqueeze(dim=1) # batch * 1 * factor
+            item_emb = self.embedding_dict['item_emb'][cands_ids].transpose(0, 2, 1) # batch * factor * cand_num
+            scores = torch.bmm(user_emb, item_emb).squeeze() # batch * cand_num
+
+            rank_ids = torch.argsort(scores, descending=True)
+            rank_list = torch.gather(cands_ids, 1, rank_ids)
+            rank_list = rank_list[:, :self.topk]
+
+            rec_ids = torch.cat((rec_ids, rank_list), 0)
+
+        return rec_ids.cpu().numpy()
+
 
     def full_rank(self, u):
-        pass
+        u = torch.tensor(u, self.device)
+
+        user_emb = self.embedding_dict['user_emb'][u] # factor
+        items_emb = self.embedding_dict['item_emb'].data # item * factor
+        scores = torch.matmul(user_emb, items_emb.transpose(1, 0))
+
+        return torch.argsort(scores, descending=True)[:self.topk].cpu().numpy()

@@ -29,6 +29,8 @@ class MF(GeneralRecommender):
         self.reg_2 = config['reg_2']
         self.epochs = config['epochs']
 
+        self.topk = config['topk']
+
         self.embed_user = nn.Embedding(config['user_num'], config['factors'])
         self.embed_item = nn.Embedding(config['item_num'], config['factors'])
 
@@ -83,7 +85,29 @@ class MF(GeneralRecommender):
         return pred
 
     def rank(self, test_loader):
-        pass
+        rec_ids = torch.tensor([], device=self.device)
+
+        for us, cands_ids in test_loader:
+            us = us.to(self.device)
+            cands_ids = cands_ids.to(self.device)
+
+            user_emb = self.embed_user(us).unsqueeze(dim=1) # batch * factor -> batch * 1 * factor
+            item_emb = self.embed_item(cands_ids).transpose(0, 2, 1) # batch * cand_num * factor -> batch * factor * cand_num 
+            scores = torch.bmm(user_emb, item_emb).squeeze() # batch * 1 * cand_num -> batch * cand_num
+
+            rank_ids = torch.argsort(scores, descending=True)
+            rank_list = torch.gather(cands_ids, 1, rank_ids)
+            rank_list = rank_list[:, :self.topk]
+
+            rec_ids = torch.cat((rec_ids, rank_list), 0)
+
+        return rec_ids.cpu().numpy()
+
 
     def full_rank(self, u):
-        pass
+        u = torch.tensor(u, self.device)
+        user_emb = self.embed_user(u)
+        items_emb = self.embed_item.weight 
+        scores = torch.matmul(user_emb, items_emb.transpose(1, 0)) #  (item_num,)
+        return torch.argsort(scores, descending=True)[:self.topk].cpu().numpy()
+
