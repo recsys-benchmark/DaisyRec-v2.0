@@ -14,7 +14,7 @@ from daisy.model.Item2VecRecommender import Item2Vec
 from daisy.model.NeuMFRecommender import NeuMF
 from daisy.model.NFMRecommender import NFM
 from daisy.model.NGCFRecommender import NGCF
-from daisy.model.VAERecommender import VAE
+from daisy.model.VAECFRecommender import VAECF
 
 from daisy.utils.metrics import Precision, Recall, NDCG, MRR, MAP, HR, F1, AUC, Coverage, Diversity, Popularity
 
@@ -66,7 +66,7 @@ model_config = {
     'ngcf': NGCF,
     'neumf': NeuMF,
     'nfm': NFM,
-    'multi-vae': VAE,
+    'multi-vae': VAECF,
     'item2vec': Item2Vec,
 }
 
