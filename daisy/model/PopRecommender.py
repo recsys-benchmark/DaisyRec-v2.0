@@ -1,3 +1,12 @@
+'''
+@inproceedings{ji2020re,
+  title={A re-visit of the popularity baseline in recommender systems},
+  author={Ji, Yitong and Sun, Aixin and Zhang, Jie and Li, Chenliang},
+  booktitle={Proceedings of the 43rd International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  pages={1749--1752},
+  year={2020}
+}
+'''
 import torch
 import numpy as np
 

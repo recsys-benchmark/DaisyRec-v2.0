@@ -1,3 +1,13 @@
+'''
+@inproceedings{rendle2010factorization,
+  title={Factorization machines},
+  author={Rendle, Steffen},
+  booktitle={2010 IEEE International conference on data mining},
+  pages={995--1000},
+  year={2010},
+  organization={IEEE}
+}
+'''
 import torch
 import torch.nn as nn
 

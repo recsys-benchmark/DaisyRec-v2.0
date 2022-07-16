@@ -1,3 +1,12 @@
+'''
+@inproceedings{he2017neural,
+  title={Neural factorization machines for sparse predictive analytics},
+  author={He, Xiangnan and Chua, Tat-Seng},
+  booktitle={Proceedings of the 40th International ACM SIGIR conference on Research and Development in Information Retrieval},
+  pages={355--364},
+  year={2017}
+}
+'''
 import torch
 import torch.nn as nn
 

@@ -1,12 +1,19 @@
-import numpy as np
-
+'''
+@inproceedings{liang2018variational,
+  title={Variational autoencoders for collaborative filtering},
+  author={Liang, Dawen and Krishnan, Rahul G and Hoffman, Matthew D and Jebara, Tony},
+  booktitle={Proceedings of the 2018 world wide web conference},
+  pages={689--698},
+  year={2018}
+}
+'''
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from daisy.model.AbstractRecommender import AERecommender
 
 
-class VAE(AERecommender):
+class VAECF(AERecommender):
     def __init__(self, config):
         """
         VAE Recommender Class
@@ -26,7 +33,7 @@ class VAE(AERecommender):
         gpuid : str, GPU ID
         early_stop : bool, whether to activate early stop mechanism
         """
-        super(VAE, self).__init__(config)
+        super(VAECF, self).__init__(config)
         self.epochs = config['epochs']
         self.lr = config['lr']
         self.beta = config['beta']
@@ -139,4 +146,3 @@ class VAE(AERecommender):
         scores, _, _ = self.forward(rating_matrix)
 
         return torch.argsort(scores.view(-1), descending=True)[:self.topk].cpu().numpy()
-

@@ -1,3 +1,13 @@
+'''
+@inproceedings{ning2011slim,
+  title={Slim: Sparse linear methods for top-n recommender systems},
+  author={Ning, Xia and Karypis, George},
+  booktitle={2011 IEEE 11th international conference on data mining},
+  pages={497--506},
+  year={2011},
+  organization={IEEE}
+}
+'''
 import sys
 import time
 import numpy as np

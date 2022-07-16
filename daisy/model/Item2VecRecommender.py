@@ -1,3 +1,13 @@
+'''
+@inproceedings{barkan2016item2vec,
+  title={Item2vec: neural item embedding for collaborative filtering},
+  author={Barkan, Oren and Koenigstein, Noam},
+  booktitle={2016 IEEE 26th International Workshop on Machine Learning for Signal Processing (MLSP)},
+  pages={1--6},
+  year={2016},
+  organization={IEEE}
+}
+'''
 import torch
 import torch.nn as nn
 

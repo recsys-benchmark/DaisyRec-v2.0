@@ -1,3 +1,12 @@
+'''
+@inproceedings{he2017neural,
+  title={Neural collaborative filtering},
+  author={He, Xiangnan and Liao, Lizi and Zhang, Hanwang and Nie, Liqiang and Hu, Xia and Chua, Tat-Seng},
+  booktitle={Proceedings of the 26th international conference on world wide web},
+  pages={173--182},
+  year={2017}
+}
+'''
 import torch
 import torch.nn as nn
 

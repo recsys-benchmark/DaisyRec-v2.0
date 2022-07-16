@@ -1,4 +1,13 @@
-import torch
+'''
+@inproceedings{kang2016top,
+  title={Top-n recommender system via matrix completion},
+  author={Kang, Zhao and Peng, Chong and Cheng, Qiang},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={30},
+  number={1},
+  year={2016}
+}
+'''
 import numpy as np
 import scipy.sparse as sp
 from sklearn.utils.extmath import randomized_svd

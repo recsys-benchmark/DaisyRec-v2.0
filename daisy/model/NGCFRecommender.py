@@ -1,3 +1,12 @@
+'''
+@inproceedings{wang2019neural,
+  title={Neural graph collaborative filtering},
+  author={Wang, Xiang and He, Xiangnan and Wang, Meng and Feng, Fuli and Chua, Tat-Seng},
+  booktitle={Proceedings of the 42nd international ACM SIGIR conference on Research and development in Information Retrieval},
+  pages={165--174},
+  year={2019}
+}
+'''
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

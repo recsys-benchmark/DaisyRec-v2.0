@@ -1,3 +1,26 @@
+'''
+@inproceedings{sarwar2001item,
+  title={Item-based collaborative filtering recommendation algorithms},
+  author={Sarwar, Badrul and Karypis, George and Konstan, Joseph and Riedl, John},
+  booktitle={Proceedings of the 10th international conference on World Wide Web},
+  pages={285--295},
+  year={2001}
+}
+@inproceedings{aiolli2013efficient,
+  title={Efficient top-n recommendation for very large scale binary rated datasets},
+  author={Aiolli, Fabio},
+  booktitle={Proceedings of the 7th ACM conference on Recommender systems},
+  pages={273--280},
+  year={2013}
+}
+@inproceedings{ferrari2019we,
+  title={Are we really making much progress? A worrying analysis of recent neural recommendation approaches},
+  author={Ferrari Dacrema, Maurizio and Cremonesi, Paolo and Jannach, Dietmar},
+  booktitle={Proceedings of the 13th ACM conference on recommender systems},
+  pages={101--109},
+  year={2019}
+}
+'''
 import sys
 import time
 import numpy as np

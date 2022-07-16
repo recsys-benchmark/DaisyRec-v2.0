@@ -1,3 +1,22 @@
+'''
+@article{koren2009matrix,
+  title={Matrix factorization techniques for recommender systems},
+  author={Koren, Yehuda and Bell, Robert and Volinsky, Chris},
+  journal={Computer},
+  volume={42},
+  number={8},
+  pages={30--37},
+  year={2009},
+  publisher={IEEE}
+}
+@article{rendle2012bpr,
+  title={BPR: Bayesian personalized ranking from implicit feedback},
+  author={Rendle, Steffen and Freudenthaler, Christoph and Gantner, Zeno and Schmidt-Thieme, Lars},
+  journal={arXiv preprint arXiv:1205.2618},
+  year={2012}
+}
+'''
+
 import torch
 import torch.nn as nn
 
