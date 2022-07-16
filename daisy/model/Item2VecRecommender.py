@@ -39,6 +39,9 @@ class Item2Vec(GeneralRecommender):
 
         # default loss function for item2vec is cross-entropy
         self.loss_type = 'CL'
+        self.optimizer = config['optimizer'] if config['optimizer'] != 'default' else 'adam'
+        self.initializer = config['initializer'] if config['initializer'] != 'default' else 'normal'
+        self.early_stop = config['early_stop']
 
         self.apply(self._init_weight)
 
