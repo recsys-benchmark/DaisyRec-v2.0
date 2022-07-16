@@ -55,4 +55,4 @@ class AEDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, index):
-        return (self.data[index], )
+        return self.data[index]
