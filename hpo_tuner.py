@@ -153,7 +153,7 @@ if __name__ == '__main__':
                         early_stop=args.early_stop
                     )
                 elif args.algo_name == 'multi-vae':
-                    from daisy.model.VAERecommender import VAE
+                    from daisy.model.VAECFRecommender import VAE
                     model = VAE(
                         rating_mat=training_mat,
                         q=dropout,
