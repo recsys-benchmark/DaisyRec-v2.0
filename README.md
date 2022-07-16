@@ -10,7 +10,7 @@
 
 ## Overview
 
-<!-- ![daisyRec's structure](pics/framework.png) -->
+<!-- ![daisyRec's structure](images/framework.png) -->
 
 DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compar**I**son for recommender **SY**stem. Note that the preliminary version of DaisyRec is available [here](https://github.com/AmazingDD/daisyRec), which will not be updated anymore. Please refer to DaisyRec-v2.0 for the latest version. ***(Please note that DaisyRec-v2.0 is still under testing. If there is any issue, please feel free to let us know)*** 
 
