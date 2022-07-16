@@ -94,11 +94,12 @@ All data are available in links below:
 
 - [ ] A more friendly GUI command generator
 - [ ] change hyperopt to optuna
-- [x] Reconstruct convert_npy_mat() and UAEData class in Multi-VAE
-- [ ] Add [∞-AE](https://arxiv.org/pdf/2206.02626.pdf) (with [code](https://github.com/noveens/infinite_ae_cf)) and [EASE](https://arxiv.org/abs/1905.03375) algorithms
+- [ ] Add [∞-AE](https://arxiv.org/pdf/2206.02626.pdf) (with [code](https://github.com/noveens/infinite_ae_cf)) 
+- [ ] Add [EASE](https://arxiv.org/abs/1905.03375) algorithms
 - [ ] add logger
 - [ ] release to Pypi
 - [ ] add download function in RawDataReader
+- [x] Reconstruct convert_npy_mat() and UAEData class in Multi-VAE
 - [x] full rank interface
 - [x] predict, rank interface
 - [x] modify split_test to Splitter
