@@ -1,6 +1,16 @@
 import numpy as np
 
-class BasicNegtiveSampler(object):
+class AbstractSampler(object):
+    def __init__(self, config):
+        self.uid_name = config['UID_NAME']
+        self.iid_name = config['IID_NAME']
+        self.item_num = config['item_num']
+        self.ur = config['train_ur']
+
+    def sampling(self):
+        raise NotImplementedError
+
+class BasicNegtiveSampler(AbstractSampler):
     def __init__(self, df, config):
         """
         negative sampling class for <u, pos_i, neg_i> or <u, pos_i, r>
@@ -16,11 +26,9 @@ class BasicNegtiveSampler(object):
                         'low-pop' sample items with low popularity as prority
         sample_ratio : float, scope [0, 1], it determines the ratio that the other sample method except 'uniform' occupied, default is 0
         """
+        super(BasicNegtiveSampler, self).__init__(config)
         self.user_num = config['user_num']
-        self.item_num = config['item_num']
         self.num_ng = config['num_ng']
-        self.uid_name = config['UID_NAME']
-        self.iid_name = config['IID_NAME']
         self.inter_name = config['INTER_NAME']
         self.sample_method = config['sample_method']
         self.sample_ratio = config['sample_ratio']
@@ -30,7 +38,6 @@ class BasicNegtiveSampler(object):
         assert 0 <= self.sample_ratio <= 1, 'Invalid sample ratio value'
 
         self.df = df
-        self.ur = config['train_ur']
         self.pop_prob = None
         
         if self.sample_method in ['high-pop', 'low-pop']:
@@ -95,7 +102,7 @@ class BasicNegtiveSampler(object):
         else:
             raise NotImplementedError
 
-class SkipGramNegativeSampler(object):
+class SkipGramNegativeSampler(AbstractSampler):
     def __init__(self, df, config, discard=False):
         '''
         skip-gram negative sampling class for <target_i, context_i, label>
@@ -106,14 +113,12 @@ class SkipGramNegativeSampler(object):
             training set
         rho : float, optional
             threshold to discard word in a sequence, by default 1e-5
-        user_num: int, the number of users
+        context_window: int, context range around target
+        train_ur: dict, ground truth for each user in train set
         item_num: int, the number of items
-        '''        
-        self.iid_name = config['IID_NAME']
-        self.uid_name = config['UID_NAME']
+        '''    
+        super(SkipGramNegativeSampler, self).__init__(config)    
         self.context_window = config['context_window']
-        self.item_num = config['item_num']
-        self.ur = config['train_ur']
 
         word_frequecy = df[self.iid_name].value_counts()
         prob_discard = 1 - np.sqrt(config['rho'] / word_frequecy)
