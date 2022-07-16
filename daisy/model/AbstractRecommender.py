@@ -116,3 +116,33 @@ class GeneralRecommender(AbstractRecommender):
                 break
             else:
                 last_loss = current_loss
+
+class AERecommender(GeneralRecommender):
+    def __init__(self, config):
+        super(AERecommender, self).__init__(config)
+        self.user_num = None 
+        self.item_num = None
+        self.history_user_id, self.history_item_id = None, None
+        self.history_user_value, self.history_item_value = None, None
+
+    def get_user_rating_matrix(self, user):
+        '''
+        just convert the raw rating matrix to a much smaller matrix for calculation,
+        the row index will be the new id for uid, but col index will still remain the old iid
+        '''
+        col_indices = self.history_item_id[user].flatten() # batch * max_inter_by_user -> (batch * max_inter_by_user)
+        row_indices = torch.arange(user.shape[0]).to(self.device).repeat_interleave(
+            self.history_item_id.shape[1], dim=0) # batch -> (batch * max_inter_by_user)
+        rating_matrix = torch.zeros(1).to(self.device).repeat(user.shape[0], self.item_num) # batch * item_num
+        rating_matrix.index_put_((row_indices, col_indices), self.history_item_value[user].flatten())
+        
+        return rating_matrix
+
+    def get_item_rating_matrix(self, item):
+        col_indices = self.history_user_id[item].flatten()
+        row_indices = torch.arange(item.shape[0]).to(self.device).repeat_interleave(
+            self.history_user_id.shape[1], dim=0)
+        rating_matrix = torch.zeros(1).to(self.device).repeat(item.shape[0], self.user_num)
+        rating_matrix.index_put_((row_indices, col_indices), self.history_user_value[item].flatten())
+        
+        return rating_matrix

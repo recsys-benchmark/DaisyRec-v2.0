@@ -33,7 +33,7 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 ### How to Run
 
 ```
-python fair_compare.py
+python fair_rec.py
 ```
 
 - The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator.pythonanywhere.com).
@@ -94,7 +94,7 @@ All data are available in links below:
 
 - [ ] A more friendly GUI command generator
 - [ ] change hyperopt to optuna
-- [ ] Reconstruct convert_npy_mat() and UAEData class in Multi-VAE
+- [x] Reconstruct convert_npy_mat() and UAEData class in Multi-VAE
 - [ ] Add [∞-AE](https://arxiv.org/pdf/2206.02626.pdf) (with [code](https://github.com/noveens/infinite_ae_cf)) and [EASE](https://arxiv.org/abs/1905.03375) algorithms
 - [ ] add logger
 - [ ] release to Pypi

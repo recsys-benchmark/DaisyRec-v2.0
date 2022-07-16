@@ -37,79 +37,22 @@ class CandidatesDataset(Dataset):
     def __getitem__(self, index):
         return torch.tensor(self.data[index][0]), torch.tensor(self.data[index][1])
 
-class UAEData(Dataset):
-    def __init__(self, user_num, item_num, train_set, test_set):
+class AEDataset(Dataset):
+    def __init__(self, train_set, yield_col='user'):
         """
-        user-level Dataset formatter adapted AutoEncoder-like algorithms
+        covert user in train_set to array-like <u> / <i> for AutoEncoder-like algorithms
         Parameters
         ----------
-        user_num : int, the number of users
-        item_num : int, the number of items
-        train_set : pd.DataFrame, training set
-        test_set : pd.DataFrame, test set
+        train_set : pd.DataFrame
+            training set
+        yield_col : string
+            column name used to generate array
         """
-        super(UAEData, self).__init__()
-        self.user_num = user_num
-        self.item_num = item_num
-
-        self.R = sp.dok_matrix((user_num, item_num), dtype=np.float32)  # true label
-        self.mask_R = sp.dok_matrix((user_num, item_num), dtype=np.float32) # only concern interaction known
-        self.user_idx = np.array(range(user_num))
-
-        for _, row in train_set.iterrows():
-            user, item = int(row['user']), int(row['item'])
-            self.R[user, item] = 1.
-            self.mask_R[user, item] = 1.
-
-        for _, row in test_set.iterrows():
-            user, item = int(row['user']), int(row['item'])
-            self.R[user, item] = 1.
+        super(AEDataset, self).__init__()
+        self.data = train_set[yield_col].unique()
 
     def __len__(self):
-        return self.user_num
+        return len(self.data)
 
-    def __getitem__(self, idx):
-        u = self.user_idx[idx]
-        ur = self.R[idx].A.squeeze()
-        mask_ur = self.mask_R[idx].A.squeeze()
-
-        return u, ur, mask_ur
-
-
-class IAEData(Dataset):
-    def __init__(self, user_num, item_num, train_set, test_set):
-        """
-        item-level Dataset formatter adapted AutoEncoder-like algorithms
-        Parameters
-        ----------
-        user_num : int, the number of users
-        item_num : int, the number of items
-        train_set : pd.DataFrame, training set
-        test_set : pd.DataFrame, test set
-        """
-        super(IAEData, self).__init__()
-        self.user_num = user_num
-        self.item_num = item_num
-        
-        self.R = sp.dok_matrix((item_num, user_num), dtype=np.float32)  # true label
-        self.mask_R = sp.dok_matrix((item_num, user_num), dtype=np.float32) # only concern interaction known
-        self.item_idx = np.array(range(item_num))
-
-        for _, row in train_set.iterrows():
-            user, item = int(row['user']), int(row['item'])
-            self.R[item, user] = 1.
-            self.mask_R[item, user] = 1.
-
-        for _, row in test_set.iterrows():
-            user, item = int(row['user']), int(row['item'])
-            self.R[item, user] = 1.
-
-    def __len__(self):
-        return self.item_num
-
-    def __getitem__(self, idx):
-        i = self.item_idx[idx]
-        ir = self.R[idx].A.squeeze()
-        mask_ir = self.mask_R[idx].A.squeeze()
-
-        return i, ir, mask_ir
+    def __getitem__(self, index):
+        return (self.data[index], )

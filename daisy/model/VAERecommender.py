@@ -1,30 +1,13 @@
-import os
 import numpy as np
-from tqdm import tqdm
 
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import torch.nn.functional as F
-import torch.backends.cudnn as cudnn
-from daisy.utils.config import model_config, initializer_config, optimizer_config
+from daisy.model.AbstractRecommender import AERecommender
 
 
-class VAE(nn.Module):
-    def __init__(self,
-                 rating_mat,
-                 q_dims=None,
-                 q=0.5,
-                 epochs=10,
-                 lr=1e-3,
-                 reg_1=0.,
-                 reg_2=0.,
-                 beta=0.5,
-                 loss_type='CL',
-                 optimizer='adam',
-                 initializer='xavier_normal',
-                 gpuid='0',
-                 early_stop=True):
+class VAE(AERecommender):
+    def __init__(self, config):
         """
         VAE Recommender Class
         Parameters
@@ -43,91 +26,43 @@ class VAE(nn.Module):
         gpuid : str, GPU ID
         early_stop : bool, whether to activate early stop mechanism
         """
-        super(VAE, self).__init__()
+        super(VAE, self).__init__(config)
+        self.epochs = config['epochs']
+        self.lr = config['lr']
+        self.beta = config['beta']
 
-        self.epochs = epochs
-        self.lr = lr
-        self.reg_1 = reg_1
-        self.reg_2 = reg_2
-        self.beta = beta
-        self.loss_type = loss_type
-        if initializer == 'default':
-            initializer = 'xavier_normal'
-        if optimizer == 'default':
-            optimizer = 'adam'
-        self.optimizer = optimizer
-        self.early_stop = early_stop
+        self.layers = config["mlp_hidden_size"] if config['mlp_hidden_size'] is not None else [600]
+        self.lat_dim = config['latent_dim']
+        self.anneal_cap = config['anneal_cap']
+        self.total_anneal_steps = config["total_anneal_steps"]
 
-        os.environ['CUDA_VISIBLE_DEVICES'] = gpuid
-        # torch.cuda.set_device(int(gpuid)) # if internal error, try this code instead
+        self.user_num = config['user_num']
+        self.item_num = config['item_num']
 
-        cudnn.benchmark = True
+        self.history_item_id = self.history_item_id.to(self.device)
+        self.history_item_value = self.history_item_value.to(self.device)
+        self.update = 0
 
-        user_num, item_num = rating_mat.shape
-        self.user_num = user_num
-        self.item_num = item_num
-        self.rating_mat = rating_mat
+        self.encode_layer_dims = [self.item_num] + self.layers + [self.lat_dim]
+        self.decode_layer_dims = [int(self.lat_dim / 2)] + self.encode_layer_dims[::-1][1:]
 
-        p_dims = [200, 600, item_num]
-        self.p_dims = p_dims
-        if q_dims:
-            assert q_dims[0] == p_dims[-1], "In and Out dimensions must equal to each other"
-            assert q_dims[-1] == p_dims[0], "Latent dimension for p- and q- network mismatches."
-            self.q_dims = q_dims
-        else:
-            self.q_dims = p_dims[::-1]
+        self.encoder = self.mlp_layers(self.encode_layer_dims)
+        self.decoder = self.mlp_layers(self.decode_layer_dims)
         
-        # Last dimension of q- network is for mean and variance
-        tmp_q_dims = self.q_dims[:-1] + [self.q_dims[-1] * 2]  # essay setting only focus on 2 encoder
-        self.q_layers = nn.ModuleList(
-            [nn.Linear(d_in, d_out) for d_in, d_out in zip(tmp_q_dims[:-1], tmp_q_dims[1:])]
-        )
-        self.p_layers = nn.ModuleList(
-            [nn.Linear(d_in, d_out) for d_in, d_out in zip(self.p_dims[:-1], self.p_dims[1:])]
-        )
-        self.drop = nn.Dropout(q)
-        self._init_weights(initializer)
+        self.optimizer = config['optimizer'] if config['optimizer'] != 'default' else 'adam'
+        self.initializer = config['initializer'] if config['initializer'] != 'default' else 'xavier_normal'
+        self.early_stop = config['early_stop']
 
-        self.prediction = None
+        self.apply(self._init_weight)
+        self.topk = config['topk']
 
-    def _init_weights(self, initializer):
-        for layer in self.q_layers:
-            # Xavier Initialization for weights
-            initializer_config[initializer](layer.weight)
-
-            # size = layer.weight.size()
-            # fan_out = size[0]
-            # fan_in = size[1]
-            # std = np.sqrt(2.0/(fan_in + fan_out))
-            # layer.weight.data.normal_(0.0, std)
-
-            # Normal Initialization for Biases
-            layer.bias.data.normal_(0.0, 0.001)
-        
-        for layer in self.p_layers:
-            # Xavier Initialization for weights
-            initializer_config[initializer](layer.weight)
-            # size = layer.weight.size()
-            # fan_out = size[0]
-            # fan_in = size[1]
-            # std = np.sqrt(2.0/(fan_in + fan_out))
-            # layer.weight.data.normal_(0.0, std)
-
-            # Normal Initialization for Biases
-            layer.bias.data.normal_(0.0, 0.001)
-    
-    def encode(self, input):
-        h = F.normalize(input)
-        h = self.drop(h)
-        for i, layer in enumerate(self.q_layers):
-            h = layer(h)
-            if i != len(self.q_layers) - 1:
-                h = F.tanh(h)
-            else:
-                mu = h[:, :self.q_dims[-1]]  
-                logvar = h[:, self.q_dims[-1]:]
-        
-        return mu, logvar
+    def mlp_layers(self, layer_dims):
+        mlp_modules = []
+        for i, (in_dim, out_dim) in enumerate(zip(layer_dims[:-1], layer_dims[1:])):
+            mlp_modules.append(nn.Linear(in_dim, out_dim))
+            if i != len(layer_dims[:-1]) - 1:
+                mlp_modules.append(nn.Tanh())
+        return nn.Sequential(*mlp_modules)
 
     def reparameterize(self, mu, logvar):
         if self.training:
@@ -137,128 +72,71 @@ class VAE(nn.Module):
         else:
             return mu
 
-    def decode(self, z):
-        h = z
-        for i, layer in enumerate(self.p_layers):
-            h = layer(h)
-            if i != len(self.p_layers) - 1:
-                h = F.tanh(h)
-        return h
+    def forward(self, rating_matrix):
+        h = F.normalize(rating_matrix)
+        h = F.dropout(h, self.drop_out, training=self.training)
+        h = self.encoder(h)
 
-    def forward(self, input):
-        mu, logvar = self.encode(input)
+        mu = h[:, :int(self.lat_dim / 2)]
+        logvar = h[:, int(self.lat_dim / 2):]
+
         z = self.reparameterize(mu, logvar)
-        z = self.decode(z)
+        z = self.decoder(z)
+
         return z, mu, logvar
 
-    def fit(self, train_loader):
-        if torch.cuda.is_available():
-            self.cuda()
+    def calc_loss(self, batch):
+        user = batch[0].to(self.device)
+        rating_matrix = self.get_user_rating_matrix(user)
+
+        self.update += 1
+        if self.total_anneal_steps > 0:
+            anneal = min(self.anneal_cap, 1. * self.update / self.total_anneal_steps)
         else:
-            self.cpu()
+            anneal = self.anneal_cap
 
-        if self.loss_type == 'CL':
-            criterion = nn.BCEWithLogitsLoss(reduction='mean')
-        elif self.loss_type == 'SL':
-            criterion = nn.MSELoss(reduction='mean')
-        else:
-            raise ValueError('Invalid loss type')
+        z, mu, logvar = self.forward(rating_matrix)
+        # KL loss
+        kl_loss = -0.5 * torch.mean(torch.sum(1 + logvar - mu.pow(2) - logvar.exp(), dim=1)) * anneal
+        # CE loss
+        ce_loss = -(F.log_softmax(z, 1) * rating_matrix).sum(1).mean()
 
-        optimizer = optimizer_config[self.optimizer](self.parameters(), lr=self.lr)
-
-        last_loss = 0.
-        for epoch in range(1, self.epochs + 1):
-            self.train()
-
-            current_loss = 0.
-            pbar = tqdm(train_loader)
-            pbar.set_description(f'[Epoch {epoch:03d}]')
-            for _, ur, mask_ur in pbar:
-                if torch.cuda.is_available():
-                    ur = ur.cuda()
-                    mask_ur = mask_ur.cuda()
-                else:
-                    ur = ur.cpu()
-                    mask_ur = mask_ur.cpu()
-
-                self.zero_grad()
-                ur = ur.float()
-                mask_ur = mask_ur.float()
-                pred, mu, logvar = self.forward(mask_ur)
-                # BCE
-                # BCE = -torch.mean(torch.sum(F.log_softmax(pred, 1) * ur, -1))
-                loss = criterion(pred * mask_ur, ur * mask_ur)
-                KLD = -self.beta * torch.mean(torch.sum(1 + logvar - mu.pow(2) - logvar.exp(), dim=1))
-                loss += KLD
-
-                for layer in self.q_layers:
-                    loss += self.reg_1 * layer.weight.norm(p=1)
-                    loss += self.reg_2 * layer.weight.norm()
-                for layer in self.p_layers:
-                    loss += self.reg_1 * layer.weight.norm(p=1)
-                    loss += self.reg_2 * layer.weight.norm()
-
-                if torch.isnan(loss):
-                    raise ValueError(f'Loss=Nan or Infinity: current settings does not fit the recommender')
-                
-                loss.backward()
-                optimizer.step()
-                
-                pbar.set_postfix(loss=loss.item())
-                current_loss += loss.item()
-
-            self.eval()
-            delta_loss = float(current_loss - last_loss)
-            if (abs(delta_loss) < 1e-5) and self.early_stop:
-                print('Satisfy early stop mechanism')
-                break
-            else:
-                last_loss = current_loss
+        loss = ce_loss + kl_loss
         
-        # since there is not enough GPU memory to calculate, so we divide the data into batches, and then calculate them.
-        row_size = self.rating_mat.shape[0]
-        row_batch_size = 100
-        for i in range(row_size // row_batch_size + 1):
-            tmp = self.rating_mat[i * row_batch_size : (i + 1) * row_batch_size, :]
-            tmp = torch.tensor(tmp).float()
-
-            if torch.cuda.is_available():
-                tmp = tmp.cuda()
-            else:
-                tmp = tmp.cpu()
-            tmp_pred = self.forward(tmp)[0]
-            tmp_pred.clamp_(min=0, max=5)
-            tmp_pred = tmp_pred.cpu().detach().numpy()
-
-            if i == 0:
-                self.prediction = tmp_pred
-            else:
-                self.prediction = np.vstack((self.prediction, tmp_pred))
-        # x_items = torch.tensor(self.rating_mat).float()
-        # if torch.cuda.is_available():
-        #     x_items = x_items.cuda()
-        # else:
-        #     x_items = x_items.cpu()
-
-        # # consider there is no enough GPU memory to calculate, we must turn to other methods
-        # self.prediction = self.forward(x_items)[0]
-        # self.prediction.clamp_(min=0, max=5)
-        # self.prediction = self.prediction.cpu().detach().numpy()
-
-        # get row number
-        #row_tmp = x_items.size()[0]
-        #for idx in range(row_tmp):
-        #    tmp = x_items[idx, :].unsqueeze(dim=0)
-        #    tmp_pred = self.forward(tmp)[0]
-        #    tmp_pred.clamp_(min=0, max=5)
-        #    tmp_pred = tmp_pred.cpu().detach().numpy()
-        #    if idx == 0:
-        #        self.prediction = tmp_pred
-        #    else:
-        #        self.prediction = np.vstack((self.prediction, tmp_pred))
+        return loss
 
     def predict(self, u, i):
-        return self.prediction[u, i]
+        u = torch.tensor(u, device=self.device)
+        i = torch.tensor(i, device=self.device)
+
+        rating_matrix = self.get_user_rating_matrix(u)
+        scores, _, _ = self.forward(rating_matrix)
+
+        return scores[[torch.arange(len(i)).to(self.device), i]].cpu()
+
+    def rank(self, test_loader):
+        rec_ids = torch.tensor([], device=self.device)
+
+        for us, cands_ids in test_loader:
+            us = us.to(self.device)
+            cands_ids = cands_ids.to(self.device)
+
+            rating_matrix = self.get_user_rating_matrix(us)
+            scores, _, _ = self.forward(rating_matrix) # dimension of scores: batch * item_num
+            scores = scores[torch.arange(cands_ids.shape[0]).to(self.device).reshape(-1, 1).expand_as(cands_ids), cands_ids] # batch * item_num -> batch * cand_num
+
+            rank_ids = torch.argsort(scores, descending=True)
+            rank_list = torch.gather(cands_ids, 1, rank_ids)
+            rank_list = rank_list[:, :self.topk]
+
+            rec_ids = torch.cat((rec_ids, rank_list), 0)
+
+        return rec_ids.cpu().numpy()
 
     def full_rank(self, u):
-        pass
+        u = torch.tensor(u, device=self.device)
+        rating_matrix = self.get_user_rating_matrix(u)
+        scores, _, _ = self.forward(rating_matrix)
+
+        return torch.argsort(scores.view(-1), descending=True)[:self.topk].cpu().numpy()
+

@@ -6,8 +6,8 @@ from daisy.utils.splitter import TestSplitter
 from daisy.utils.config import init_seed, model_config
 from daisy.utils.loader import RawDataReader, Preprocessor
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
-from daisy.utils.dataset import convert_dataloader, BasicDataset, CandidatesDataset, UAEData
-from daisy.utils.utils import get_ur, convert_npy_mat, build_candidates_set, get_adj_mat, calc_ranking_results
+from daisy.utils.dataset import convert_dataloader, BasicDataset, CandidatesDataset, AEDataset
+from daisy.utils.utils import get_ur, get_history_matrix, build_candidates_set, get_adj_mat, calc_ranking_results
 
 
 if __name__ == '__main__':
@@ -53,11 +53,15 @@ if __name__ == '__main__':
     if config['algo_name'].lower() in ['itemknn', 'puresvd', 'slim', 'mostpop']:
         model = model_config[config['algo_name']](config)
         model.fit(train_set)
+
     elif config['algo_name'].lower() in ['multi-vae']:
+        history_item_id, history_item_value, _  = get_history_matrix(train_set, config, row='user')
+        config['history_item_id'], config['history_item_value'] = history_item_id, history_item_value
         model = model_config[config['algo_name']](config)
-        # TODO
-        train_dataset = UAEData(user_num, item_num, train_set, test_set)
-        training_mat = convert_npy_mat(user_num, item_num, train_set)
+        train_dataset = AEDataset(train_set, yield_col=config['UID_NAME'])
+        train_loader = convert_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
+        model.fit(train_loader)
+
     elif config['algo_name'].lower() in ['mf', 'fm', 'neumf', 'nfm', 'ngcf']:
         if config['algo_name'].lower() == 'ngcf':
             _, norm_adj, _ = get_adj_mat(user_num,item_num)
@@ -69,6 +73,7 @@ if __name__ == '__main__':
         train_dataset = BasicDataset(train_samples)
         train_loader = convert_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
+
     elif config['algo_name'].lower() in ['item2vec']:
         model = model_config[config['algo_name']](config)
         sampler = SkipGramNegativeSampler(train_set, config)
@@ -76,6 +81,7 @@ if __name__ == '__main__':
         train_dataset = BasicDataset(train_samples)
         train_loader = convert_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
+
     else:
         raise NotImplementedError('Something went wrong when building and training...')
     elapsed_time = time.time() - s_time
@@ -92,10 +98,6 @@ if __name__ == '__main__':
     test_dataset = CandidatesDataset(test_ucands)
     test_loader = convert_dataloader(test_dataset, batch_size=128, shuffle=False, num_workers=0)
     preds = model.rank(test_loader) # np.array (u, topk)
-
-    if config['algo_name'].lower() in ['multi-vae']:
-        # TODO
-        pass
 
     ''' calculating KPIs '''
     print('Save metric@k result to res folder...')
