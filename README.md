@@ -1,5 +1,5 @@
 <p align="left">
-<img src="pics/logo.png" align="center" width="45%" style="margin: 0 auto">
+<img src="images/logo.png" align="center" width="45%" style="margin: 0 auto">
 </p>
 
 ![PyPI - Python Version](https://img.shields.io/badge/pyhton-3.5%2B-blue) 
