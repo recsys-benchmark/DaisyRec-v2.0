@@ -6,7 +6,7 @@ from daisy.utils.splitter import TestSplitter
 from daisy.utils.config import init_seed, model_config
 from daisy.utils.loader import RawDataReader, Preprocessor
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
-from daisy.utils.dataset import convert_dataloader, BasicDataset, CandidatesDataset, AEDataset
+from daisy.utils.dataset import get_dataloader, BasicDataset, CandidatesDataset, AEDataset
 from daisy.utils.utils import get_ur, get_history_matrix, build_candidates_set, get_adj_mat, calc_ranking_results
 
 
@@ -59,7 +59,7 @@ if __name__ == '__main__':
         config['history_item_id'], config['history_item_value'] = history_item_id, history_item_value
         model = model_config[config['algo_name']](config)
         train_dataset = AEDataset(train_set, yield_col=config['UID_NAME'])
-        train_loader = convert_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
+        train_loader = get_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
 
     elif config['algo_name'].lower() in ['mf', 'fm', 'neumf', 'nfm', 'ngcf']:
@@ -71,7 +71,7 @@ if __name__ == '__main__':
         sampler = BasicNegtiveSampler(train_set, config)
         train_samples = sampler.sampling()
         train_dataset = BasicDataset(train_samples)
-        train_loader = convert_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
+        train_loader = get_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
 
     elif config['algo_name'].lower() in ['item2vec']:
@@ -79,7 +79,7 @@ if __name__ == '__main__':
         sampler = SkipGramNegativeSampler(train_set, config)
         train_samples = sampler.sampling()
         train_dataset = BasicDataset(train_samples)
-        train_loader = convert_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
+        train_loader = get_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
 
     else:
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     print('Generate recommend list...')
     print('')
     test_dataset = CandidatesDataset(test_ucands)
-    test_loader = convert_dataloader(test_dataset, batch_size=128, shuffle=False, num_workers=0)
+    test_loader = get_dataloader(test_dataset, batch_size=128, shuffle=False, num_workers=0)
     preds = model.rank(test_loader) # np.array (u, topk)
 
     ''' calculating KPIs '''
