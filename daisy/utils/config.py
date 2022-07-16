@@ -15,6 +15,8 @@ from daisy.model.NeuMFRecommender import NeuMF
 from daisy.model.NFMRecommender import NFM
 from daisy.model.NGCFRecommender import NGCF
 from daisy.model.VAECFRecommender import VAECF
+from daisy.model.EASERecommender import EASE
+from daisy.model.InfAERecommender import InfAE
 
 from daisy.utils.metrics import Precision, Recall, NDCG, MRR, MAP, HR, F1, AUC, Coverage, Diversity, Popularity
 
@@ -35,6 +37,7 @@ metrics_config = {
     "mrr": MRR,
     "ndcg": NDCG,
     "hr": HR,
+    "map": MAP,
     "precision": Precision,
     "f1": F1,
     "auc": AUC,
@@ -68,6 +71,8 @@ model_config = {
     'nfm': NFM,
     'multi-vae': VAECF,
     'item2vec': Item2Vec,
+    'ease': EASE,
+    'infae': InfAE
 }
 
 initializer_param_config = {
