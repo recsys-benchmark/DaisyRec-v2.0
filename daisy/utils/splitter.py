@@ -1,7 +1,5 @@
 import numpy as np
-import pandas as pd
-
-from sklearn.model_selection import KFold, train_test_split
+from sklearn.model_selection import KFold
 
 class TestSplitter(object):
     def __init__(self, config):
