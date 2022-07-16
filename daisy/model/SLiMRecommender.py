@@ -7,6 +7,13 @@
   year={2011},
   organization={IEEE}
 }
+@inproceedings{ferrari2019we,
+  title={Are we really making much progress? A worrying analysis of recent neural recommendation approaches},
+  author={Ferrari Dacrema, Maurizio and Cremonesi, Paolo and Jannach, Dietmar},
+  booktitle={Proceedings of the 13th ACM conference on recommender systems},
+  pages={101--109},
+  year={2019}
+}
 '''
 import sys
 import time
