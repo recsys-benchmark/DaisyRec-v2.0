@@ -145,4 +145,5 @@ Please cite both of the following papers if you use **DaisyRec-v2.0** in a resea
 We refer to the following repositories to improve our code:
 
  - SLIM and KNN-CF parts with [RecSys2019_DeepLearning_Evaluation](https://github.com/MaurizioFD/RecSys2019_DeepLearning_Evaluation)
+ - Improve code efficiency by [Recbole](https://github.com/RUCAIBox/RecBole)
  - NGCF part with [NGCF-PyTorch](https://github.com/huangtinglin/NGCF-PyTorch)
