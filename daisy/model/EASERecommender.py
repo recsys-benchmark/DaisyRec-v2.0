@@ -22,7 +22,7 @@ class EASE(GeneralRecommender):
         self.user_num = config['user_num']
         self.item_num = config['item_num']
 
-        self.reg_weight = config['reg_weight']
+        self.reg_weight = config['reg']
 
         self.topk = config['topk']
 
