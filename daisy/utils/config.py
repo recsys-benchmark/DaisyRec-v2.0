@@ -21,6 +21,7 @@ from daisy.model.InfAERecommender import InfAE
 from daisy.utils.metrics import Precision, Recall, NDCG, MRR, MAP, HR, F1, AUC, Coverage, Diversity, Popularity
 
 algo_config = {
+    'mostpop': [],
     'itemknn': ['maxk'],
     'puresvd': ['factors'],
     'slim': ['alpha', 'elastic'],
@@ -29,7 +30,9 @@ algo_config = {
     'neumf': ['num_ng', 'factors', 'num_layers', 'dropout', 'lr', 'batch_size', 'reg_1', 'reg_2'],
     'nfm': ['num_ng', 'factors', 'num_layers', 'dropout', 'lr', 'batch_size', 'reg_1', 'reg_2'],
     'ngcf': ['num_ng', 'factors', 'node_dropout', 'mess_dropout', 'batch_size', 'lr', 'reg_1', 'reg_2'],
-    'multi-vae': ['num_ng', 'factors', 'node_dropout', 'mess_dropout', 'batch_size', 'lr', 'reg_2', 'kl_reg', 'reg_1']
+    'multi-vae': ['latent_dim', 'dropout','batch_size', 'lr', 'anneal_cap'],
+    'ease': ['reg'],
+    'item2vec': ['context_window', 'rho', 'lr', 'factors'],
 }
 
 metrics_config = {
