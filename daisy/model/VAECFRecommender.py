@@ -19,24 +19,20 @@ class VAECF(AERecommender):
         VAE Recommender Class
         Parameters
         ----------
-        rating_mat : np.matrix,
-        q_dims : List, Q-net dimension list
-        q : float, drop out rate
+        mlp_hidden_size : List, Q-net dimension list
+        dropout : float, drop out rate
         epochs : int, number of training epochs
         lr : float, learning rate
-        reg_1 : float, first-order regularization term
-        reg_2 : float, second-order regularization term
-        beta : float, KLD regularization term
-        loss_type : str, loss function type
+        latent_dim: size of bottleneck layer
+        anneal_cap : float, regularization for KLD
         optimizer : str, optimization method for training the algorithms
         initializer: str, parameter initializer
-        gpuid : str, GPU ID
         early_stop : bool, whether to activate early stop mechanism
         """
         super(VAECF, self).__init__(config)
         self.epochs = config['epochs']
         self.lr = config['lr']
-        self.beta = config['beta']
+        self.dropout = config['dropout']
 
         self.layers = config["mlp_hidden_size"] if config['mlp_hidden_size'] is not None else [600]
         self.lat_dim = config['latent_dim']

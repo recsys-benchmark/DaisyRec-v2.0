@@ -33,7 +33,7 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 ### How to Run
 
 ```
-python fair_rec.py
+python run_examples/fair_rec.py
 ```
 
 - The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator.pythonanywhere.com).
