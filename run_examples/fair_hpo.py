@@ -3,7 +3,7 @@ import json
 import optuna
 import numpy as np
 
-from daisy.utils.config import init_seed, get_config, tune_params_config, param_type_config, model_config, metrics_config
+from daisy.utils.config import init_seed, init_config, tune_params_config, param_type_config, model_config, metrics_config
 from daisy.utils.loader import RawDataReader, Preprocessor
 from daisy.utils.dataset import AEDataset, BasicDataset, CandidatesDataset, get_dataloader
 from daisy.utils.splitter import TestSplitter, ValidationSplitter
@@ -12,7 +12,7 @@ from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 
 if __name__ == '__main__':
     ''' summarize hyper-parameter part (basic yaml + args + model yaml) '''
-    config = get_config()
+    config = init_config()
 
     ''' init seed for reproducibility '''
     init_seed(config['seed'], config['reproducibility'])

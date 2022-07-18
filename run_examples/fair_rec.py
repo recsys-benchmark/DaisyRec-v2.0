@@ -1,7 +1,7 @@
 import time
 
 from daisy.utils.splitter import TestSplitter
-from daisy.utils.config import init_seed, get_config,model_config
+from daisy.utils.config import init_seed, init_config, model_config
 from daisy.utils.loader import RawDataReader, Preprocessor
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.dataset import get_dataloader, BasicDataset, CandidatesDataset, AEDataset
@@ -10,7 +10,7 @@ from daisy.utils.utils import get_ur, get_history_matrix, build_candidates_set, 
 
 if __name__ == '__main__':
     ''' summarize hyper-parameter part (basic yaml + args + model yaml) '''
-    config = get_config()
+    config = init_config()
 
     ''' init seed for reproducibility '''
     init_seed(config['seed'], config['reproducibility'])

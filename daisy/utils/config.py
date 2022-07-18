@@ -139,7 +139,7 @@ def init_seed(seed, reproducibility):
         torch.backends.cudnn.benchmark = True
         torch.backends.cudnn.deterministic = False
 
-def get_config(param_dict=None):
+def init_config(param_dict=None):
         ''' 
         summarize hyper-parameter part (basic yaml + args + model yaml) 
         '''
@@ -161,3 +161,5 @@ def get_config(param_dict=None):
             config.update(param_dict)
 
         return config
+
+
