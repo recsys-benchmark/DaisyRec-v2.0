@@ -93,7 +93,7 @@ All data are available in links below:
 ## TODO List
 
 - [ ] A more friendly GUI command generator
-- [ ] change hyperopt to optuna
+- [x] change hyperopt to optuna
 - [ ] Add [∞-AE](https://arxiv.org/pdf/2206.02626.pdf) (with [code](https://github.com/noveens/infinite_ae_cf)) 
 - [x] Add [EASE](https://arxiv.org/abs/1905.03375) algorithms
 - [ ] add logger
