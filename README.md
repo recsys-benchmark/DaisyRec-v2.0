@@ -96,11 +96,9 @@ All data are available in links below:
 
 - [ ] A more friendly GUI command generator
 - [x] change hyperopt to optuna
-- [ ] Add [∞-AE](https://arxiv.org/pdf/2206.02626.pdf) (with [code](https://github.com/noveens/infinite_ae_cf)) 
 - [x] Add [EASE](https://arxiv.org/abs/1905.03375) algorithms
 - [x] add logger
 - [ ] release to Pypi
-- [ ] add download function in RawDataReader
 - [x] Reconstruct convert_npy_mat() and UAEData class in Multi-VAE
 - [x] full rank interface
 - [x] predict, rank interface
@@ -118,6 +116,8 @@ All data are available in links below:
 - [x] Simplify SLIM and KNN-CF (YD's team to do)
 - [x] ~~A new GUI to generate results without any command (YD's team to do)~~
 - [x] ~~Update SVDpp, WRMF with torch, torch.linalg.solve~~
+- [ ] ~~add download function in RawDataReader~~
+- [ ] ~~Add [∞-AE](https://arxiv.org/pdf/2206.02626.pdf) (with [code](https://github.com/noveens/infinite_ae_cf))~~
 
 ## Cite
 
