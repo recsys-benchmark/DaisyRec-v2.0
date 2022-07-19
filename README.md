@@ -50,11 +50,13 @@ The documentation of DaisyRec-v2.0 is available [here](https://daisyrec.readthed
 Below are the algorithms implemented in DaisyRec-v2.0. More baselines will be added later.
 
 - **Memory-based Methods**
-    - MostPop, ItemKNN
+    - MostPop, ItemKNN, EASE
 - **Latent Factor Methods**
     - PureSVD, SLIM, MF, FM
 - **Deep Learning Methods**
     - NeuMF, NFM, NGCF, Multi-VAE
+- **Representation Methods**
+    - Item2Vec
     
 
 ## Datasets
