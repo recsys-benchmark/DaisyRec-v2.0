@@ -190,11 +190,11 @@ def init_logger(config):
     logfilename = f'{config["algo_name"]}/{get_local_time()}.log'
     logfilepath = os.path.join(log_root, logfilename)
 
-    filefmt = "%(asctime)-15s %(levelname)s  %(message)s"
+    filefmt = "%(asctime)-10s %(levelname)s - %(message)s"
     filedatefmt = "%a %d %b %Y %H:%M:%S"
     fileformatter = logging.Formatter(filefmt, filedatefmt)
 
-    sfmt = "%(log_color)s%(asctime)-15s %(levelname)s  %(message)s"
+    sfmt = "%(log_color)s%(asctime)-10s %(levelname)s - %(message)s"
     sdatefmt = "%d %b %H:%M"
     sformatter = colorlog.ColoredFormatter(sfmt, sdatefmt, log_colors=log_colors_config)
     if config['state'] is None or config['state'].lower() == 'info':
