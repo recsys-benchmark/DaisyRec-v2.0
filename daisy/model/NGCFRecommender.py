@@ -12,7 +12,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from daisy.model.AbstractRecommender import GeneralRecommender
-from daisy.utils.config import initializer_param_config, initializer_config
+
 
 class NGCF(GeneralRecommender):
     def __init__(self, config):
@@ -61,7 +61,7 @@ class NGCF(GeneralRecommender):
         self.sparse_norm_adj.to(self.device)
 
     def init_weight(self):
-        initializer = initializer_config[self.initializer]
+        initializer = self.initializer_config[self.initializer]
 
         embedding_dict = nn.ParameterDict({
             'user_emb': nn.Parameter(initializer(torch.empty(self.n_user, self.emb_size))),

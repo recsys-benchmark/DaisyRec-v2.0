@@ -10,6 +10,7 @@ from collections import Counter
 
 from daisy.utils.utils import ensure_dir
 
+
 class RawDataReader(object):
     def __init__(self, config):
         self.src = config['dataset']
