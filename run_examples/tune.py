@@ -21,7 +21,7 @@ from daisy.utils.config import init_seed, init_config, init_logger
 from daisy.utils.metrics import MAP, NDCG, Recall, Precision, HR, MRR
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.dataset import AEDataset, BasicDataset, CandidatesDataset, get_dataloader
-from daisy.utils.utils import get_history_matrix, get_adj_mat, get_ur, build_candidates_set, ensure_dir
+from daisy.utils.utils import get_history_matrix, get_ur, build_candidates_set, ensure_dir
 
 model_config = {
     'mostpop': MostPop,
@@ -173,10 +173,6 @@ if __name__ == '__main__':
                 model.fit(train_loader)
 
             elif config['algo_name'].lower() in ['mf', 'fm', 'neumf', 'nfm', 'ngcf']:
-                if config['algo_name'].lower() == 'ngcf':
-                    _, norm_adj, _ = get_adj_mat(user_num,item_num)
-                    config['norm_adj'] = norm_adj
-
                 model = model_config[config['algo_name']](config)
                 sampler = BasicNegtiveSampler(train, config)
                 train_samples = sampler.sampling()
