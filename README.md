@@ -3,7 +3,7 @@
 </p>
 
 ![PyPI - Python Version](https://img.shields.io/badge/pyhton-3.5%2B-blue) 
-[![Version](https://img.shields.io/badge/version-2.1.0-orange)](https://github.com/recsys-benchmark/DaisyRec-v2.0) 
+[![Version](https://img.shields.io/badge/version-2.1.3-orange)](https://github.com/recsys-benchmark/DaisyRec-v2.0) 
 ![GitHub repo size](https://img.shields.io/github/repo-size/recsys-benchmark/DaisyRec-v2.0) 
 ![GitHub](https://img.shields.io/github/license/recsys-benchmark/DaisyRec-v2.0)
 [![arXiv](https://img.shields.io/badge/arXiv-daisyRec-%23B21B1B)](https://arxiv.org/abs/2206.10848)
@@ -33,7 +33,8 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 ### How to Run
 
 ```
-python run_examples/fair_rec.py
+python run_examples/test.py
+python run_examples/tune.py
 ```
 
 - The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator.pythonanywhere.com).
@@ -94,7 +95,7 @@ All data are available in links below:
 
 ## TODO List
 
-- [ ] A more friendly GUI command generator
+- [x] A more friendly GUI command generator
 
 ## Cite
 
