@@ -58,15 +58,16 @@ def init_config(param_dict=None):
         model_init_file = os.path.join(current_path, f'../assets/{algo_name}.yaml')
         model_conf = yaml.load(
             open(model_init_file), Loader=yaml.loader.SafeLoader)
-        config.update(model_conf)
+        if model_conf is not None:
+            config.update(model_conf)
 
         args_conf = vars(args)
 
         for k, v in config.items():
-            if k in args_conf.keys() and args_conf[k] is None:
-                config[k] = v
-            else:
+            if k in args_conf.keys() and args_conf[k] is not None:
                 config[k] = args_conf[k]
+            else:
+                config[k] = v
 
         if param_dict is not None:
             config.update(param_dict)
