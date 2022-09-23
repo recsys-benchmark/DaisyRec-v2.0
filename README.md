@@ -46,7 +46,7 @@ python run_examples/tune.py
 
 - The updated GUI Command Generator is available [here](https://daisyrec.netlify.app/).
 
-- Please refer to [DaisyRec-v2.0-Tutorial.ipynb](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/DaisyRec-v2.0-Tutorial.ipynb), which demontrates how to use DaisyRec-v2.0 to tune hyper-parameters and test the algorithms step by step.
+- Please refer to [DaisyRec-v2.0-Tutorial-New.ipynb](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/DaisyRec-v2.0-Tutorial.ipynb), which demontrates how to use DaisyRec-v2.0 to tune hyper-parameters and test the algorithms step by step.
 
 ## Documentation 
 
