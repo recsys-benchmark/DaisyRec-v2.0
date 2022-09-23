@@ -37,10 +37,16 @@ python run_examples/test.py
 python run_examples/tune.py
 ```
 
+#### Earlier Version of GUI Command Generator and Tutorial
 - The GUI Command Generator is available [here](http://DaisyRecGuiCommandGenerator.pythonanywhere.com).
 
 - Please refer to [DaisyRec-v2.0-Tutorial.ipynb](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/DaisyRec-v2.0-Tutorial.ipynb), which demontrates how to use DaisyRec-v2.0 to tune hyper-parameters and test the algorithms step by step.
 
+#### Updated Version of GUI Command Generator and Tutorial
+
+- The updated GUI Command Generator is available [here](https://daisyrec.netlify.app/).
+
+- Please refer to [DaisyRec-v2.0-Tutorial.ipynb](https://github.com/recsys-benchmark/DaisyRec-v2.0/blob/main/DaisyRec-v2.0-Tutorial.ipynb), which demontrates how to use DaisyRec-v2.0 to tune hyper-parameters and test the algorithms step by step.
 
 ## Documentation 
 
