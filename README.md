@@ -103,6 +103,35 @@ All data are available in links below:
 
 - [x] A more friendly GUI command generator
 
+## Team Members
+<table>
+	<tr >
+	    <td rowspan="3"><a href="https://github.com/AmazingDD/daisyRec">DaisyRec</a></td>
+	    <td>Leaders</td>
+	    <td>Zhu Sun</td>
+	</tr>
+	<tr>
+	    <td>Senior members</td>
+	    <td>Hui Fang, Jie Yang, Xinghua Qu, Jie Zhang</td>
+	</tr>
+        <td>Developers</td>
+	    <td>Di Yu, Cong Geng</td>
+	</tr>
+	<tr >
+	    <td rowspan="3"><a href="https://github.com/recsys-benchmark/DaisyRec-v2.0">DaisyRec-v2.0</a></td>
+	    <td>Leaders</td>
+	    <td>Zhu Sun</td>
+	</tr>
+    <tr>
+	    <td>Senior members</td>
+	    <td>Hui Fang, Jie Yang, Xinghua Qu, Jie Zhang, Yew-Soon Ong</td>
+	</tr>
+	<tr>
+	    <td>Developers</td>
+	    <td>Di Yu, Cong Geng, Hongyang Liu, Yanmu Ding</td>
+	</tr>
+</table>
+
 ## Cite
 
 Please cite both of the following papers if you use **DaisyRec-v2.0** in a research paper in any way (e.g., code and ranking results):
