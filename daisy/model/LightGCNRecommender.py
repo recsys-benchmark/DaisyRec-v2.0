@@ -16,6 +16,7 @@ import scipy.sparse as sp
 from daisy.model.AbstractRecommender import GeneralRecommender
 
 class LightGCN(GeneralRecommender):
+    hyperparameters = ['num_ng', 'factors', 'batch_size', 'lr', 'reg_1', 'reg_2', 'num_layers']
     def __init__(self, config):
         '''
         LightGCN Recommender Class
@@ -37,7 +38,7 @@ class LightGCN(GeneralRecommender):
         early_stop : bool, whether to activate early stop mechanism
         '''  
         super(LightGCN, self).__init__(config)
-
+        
         self.epochs = config['epochs']
         self.lr = config['lr']
         self.topk = config['topk']

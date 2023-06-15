@@ -276,3 +276,12 @@ def F1(test_ur, pred_ur, test_u):
         res.append(f1)
 
     return np.mean(res)
+
+metrics_config = {
+    "recall": Recall,
+    "mrr": MRR,
+    "ndcg": NDCG,
+    "hr": HR,
+    "map": MAP,
+    "precision": Precision,
+}

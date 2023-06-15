@@ -14,6 +14,7 @@ import torch.nn as nn
 from daisy.model.AbstractRecommender import GeneralRecommender
 
 class Item2Vec(GeneralRecommender):
+    hyperparameters = ['context_window', 'rho', 'lr', 'factors']
     def __init__(self, config):
         '''
         Item2Vec Recommender class

@@ -13,6 +13,7 @@ import torch.nn as nn
 from daisy.model.AbstractRecommender import GeneralRecommender
 
 class NFM(GeneralRecommender):
+    hyperparameters = ['num_ng', 'factors', 'num_layers', 'dropout', 'lr', 'batch_size', 'reg_1', 'reg_2']
     def __init__(self, config):
         """
         NFM Recommender Class
@@ -41,7 +42,7 @@ class NFM(GeneralRecommender):
         self.num_layers = config['num_layers']
         self.batch_norm = config['batch_norm']
         self.dropout = config['dropout']
-
+        
         self.lr = config['lr']
         self.reg_1 = config['reg_1']
         self.reg_2 = config['reg_2']

@@ -143,3 +143,23 @@ def get_inter_matrix(df, config, form='coo'):
     else:
         raise NotImplementedError(f'Sparse matrix format [{form}] has not been implemented...')
 
+param_type_config = {
+    'num_layers': 'int',
+    'maxk': 'int',
+    'factors': 'int',
+    'alpha': 'float',
+    'elastic': 'float',
+    'num_ng': 'int',
+    'lr': 'float',
+    'batch_size': 'int',
+    'reg_1': 'float',
+    'reg_2': 'float',
+    'dropout': 'float',
+    'node_dropout': 'float',
+    'mess_dropout': 'float',
+    'latent_dim': 'int',
+    'anneal_cap': 'float',
+    'reg': 'float',
+    'context_window': 'int',
+    'rho': 'float'
+}

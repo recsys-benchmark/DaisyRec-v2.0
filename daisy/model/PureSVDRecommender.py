@@ -16,6 +16,7 @@ from daisy.model.AbstractRecommender import GeneralRecommender
 
 
 class PureSVD(GeneralRecommender):
+    yperparameters = ['factors']
     def __init__(self, config):
         """
         PureSVD Recommender

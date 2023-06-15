@@ -1,91 +1,16 @@
-from ast import Global
 import json
 import optuna
 import numpy as np
 from logging import getLogger
-
-from daisy.model.MFRecommender import MF
-from daisy.model.FMRecommender import FM
-from daisy.model.NFMRecommender import NFM
-from daisy.model.NGCFRecommender import NGCF
-from daisy.model.EASERecommender import EASE
-from daisy.model.SLiMRecommender import SLiM
-from daisy.model.VAECFRecommender import VAECF
-from daisy.model.NeuMFRecommender import NeuMF
-from daisy.model.PopRecommender import MostPop
-from daisy.model.KNNCFRecommender import ItemKNNCF
-from daisy.model.PureSVDRecommender import PureSVD
-from daisy.model.Item2VecRecommender import Item2Vec
-from daisy.model.LightGCNRecommender import LightGCN
+from daisy.model.models import RecommenderModel
 from daisy.utils.loader import RawDataReader, Preprocessor
 from daisy.utils.splitter import TestSplitter, ValidationSplitter
 from daisy.utils.config import init_seed, init_config, init_logger
-from daisy.utils.metrics import MAP, NDCG, Recall, Precision, HR, MRR
+from daisy.utils.metrics import metrics_config
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.dataset import AEDataset, BasicDataset, CandidatesDataset, get_dataloader
-from daisy.utils.utils import get_history_matrix, get_ur, build_candidates_set, ensure_dir, get_inter_matrix
+from daisy.utils.utils import get_history_matrix, get_ur, build_candidates_set, ensure_dir, get_inter_matrix, param_type_config
 
-model_config = {
-    'mostpop': MostPop,
-    'slim': SLiM,
-    'itemknn': ItemKNNCF,
-    'puresvd': PureSVD,
-    'mf': MF,
-    'fm': FM,
-    'ngcf': NGCF,
-    'neumf': NeuMF,
-    'nfm': NFM,
-    'multi-vae': VAECF,
-    'item2vec': Item2Vec,
-    'ease': EASE,
-    'lightgcn': LightGCN,
-}
-
-metrics_config = {
-    "recall": Recall,
-    "mrr": MRR,
-    "ndcg": NDCG,
-    "hr": HR,
-    "map": MAP,
-    "precision": Precision,
-}
-
-tune_params_config = {
-    'mostpop': [],
-    'itemknn': ['maxk'],
-    'puresvd': ['factors'],
-    'slim': ['alpha', 'elastic'],
-    'mf': ['num_ng', 'factors', 'lr', 'batch_size', 'reg_1', 'reg_2'],
-    'fm': ['num_ng', 'factors', 'lr', 'batch_size', 'reg_1', 'reg_2'],
-    'neumf': ['num_ng', 'factors', 'num_layers', 'dropout', 'lr', 'batch_size', 'reg_1', 'reg_2'],
-    'nfm': ['num_ng', 'factors', 'num_layers', 'dropout', 'lr', 'batch_size', 'reg_1', 'reg_2'],
-    'ngcf': ['num_ng', 'factors', 'node_dropout', 'mess_dropout', 'batch_size', 'lr', 'reg_1', 'reg_2'],
-    'multi-vae': ['latent_dim', 'dropout','batch_size', 'lr', 'anneal_cap'],
-    'ease': ['reg'],
-    'item2vec': ['context_window', 'rho', 'lr', 'factors'],
-    'lightgcn': ['num_ng', 'factors', 'batch_size', 'lr', 'reg_1', 'reg_2', 'num_layers'],
-}
-
-param_type_config = {
-    'num_layers': 'int',
-    'maxk': 'int',
-    'factors': 'int',
-    'alpha': 'float',
-    'elastic': 'float',
-    'num_ng': 'int',
-    'lr': 'float',
-    'batch_size': 'int',
-    'reg_1': 'float',
-    'reg_2': 'float',
-    'dropout': 'float',
-    'node_dropout': 'float',
-    'mess_dropout': 'float',
-    'latent_dim': 'int',
-    'anneal_cap': 'float',
-    'reg': 'float',
-    'context_window': 'int',
-    'rho': 'float'
-}
 
 TRIAL_CNT = 0
 
@@ -104,9 +29,9 @@ if __name__ == '__main__':
 
     ''' unpack hyperparameters to tune '''
     param_dict = json.loads(config['tune_pack'])
-    algo_name = config['algo_name']
     kpi_name = config['optimization_metric']
-    tune_param_names = tune_params_config[algo_name]
+    algo_name = config['algo_name'].lower()
+    tune_param_names = RecommenderModel(algo_name).hyperparameters
 
     ''' open logfile to record tuning process '''
     # begin tuning here
@@ -165,14 +90,13 @@ if __name__ == '__main__':
             config['train_ur'] = train_ur
 
             ''' build and train model '''
+            model = RecommenderModel(config['algo_name'])(config)
             if config['algo_name'].lower() in ['itemknn', 'puresvd', 'slim', 'mostpop', 'ease']:
-                model = model_config[config['algo_name']](config)
                 model.fit(train)
             
             elif config['algo_name'].lower() in ['multi-vae']:
                 history_item_id, history_item_value, _  = get_history_matrix(train, config, row='user')
                 config['history_item_id'], config['history_item_value'] = history_item_id, history_item_value
-                model = model_config[config['algo_name']](config)
                 train_dataset = AEDataset(train, yield_col=config['UID_NAME'])
                 train_loader = get_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
                 model.fit(train_loader)
@@ -180,7 +104,6 @@ if __name__ == '__main__':
             elif config['algo_name'].lower() in ['mf', 'fm', 'neumf', 'nfm', 'ngcf', 'lightgcn']:
                 if config['algo_name'].lower() in ['lightgcn', 'ngcf']:
                     config['inter_matrix'] = get_inter_matrix(train, config)
-                model = model_config[config['algo_name']](config)
                 sampler = BasicNegtiveSampler(train, config)
                 train_samples = sampler.sampling()
                 train_dataset = BasicDataset(train_samples)
@@ -188,7 +111,6 @@ if __name__ == '__main__':
                 model.fit(train_loader)
 
             elif config['algo_name'].lower() in ['item2vec']:
-                model = model_config[config['algo_name']](config)
                 sampler = SkipGramNegativeSampler(train, config)
                 train_samples = sampler.sampling()
                 train_dataset = BasicDataset(train_samples)

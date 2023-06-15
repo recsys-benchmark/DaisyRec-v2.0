@@ -14,6 +14,7 @@ from daisy.model.AbstractRecommender import GeneralRecommender
 
 
 class EASE(GeneralRecommender):
+    hyperparameters = ['reg']
     def __init__(self, config):
         super(EASE, self).__init__(config)
         self.inter_name = config['INTER_NAME']
@@ -26,6 +27,7 @@ class EASE(GeneralRecommender):
         self.reg_weight = config['reg']
 
         self.topk = config['topk']
+        
 
     def fit(self, train_set):
         row_ids = train_set[self.uid_name].values

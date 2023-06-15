@@ -15,6 +15,7 @@ from daisy.model.AbstractRecommender import AERecommender
 
 
 class VAECF(AERecommender):
+    hyperparameters = ['latent_dim', 'dropout','batch_size', 'lr', 'anneal_cap']
     def __init__(self, config):
         """
         VAE Recommender Class
@@ -31,6 +32,7 @@ class VAECF(AERecommender):
         early_stop : bool, whether to activate early stop mechanism
         """
         super(VAECF, self).__init__(config)
+
         self.epochs = config['epochs']
         self.lr = config['lr']
         self.dropout = config['dropout']

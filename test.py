@@ -1,18 +1,6 @@
 import time
 from logging import getLogger
-from daisy.model.MFRecommender import MF
-from daisy.model.FMRecommender import FM
-from daisy.model.NFMRecommender import NFM
-from daisy.model.NGCFRecommender import NGCF
-from daisy.model.EASERecommender import EASE
-from daisy.model.SLiMRecommender import SLiM
-from daisy.model.VAECFRecommender import VAECF
-from daisy.model.NeuMFRecommender import NeuMF
-from daisy.model.PopRecommender import MostPop
-from daisy.model.KNNCFRecommender import ItemKNNCF
-from daisy.model.PureSVDRecommender import PureSVD
-from daisy.model.Item2VecRecommender import Item2Vec
-from daisy.model.LightGCNRecommender import LightGCN
+from daisy.model.models import RecommenderModel
 from daisy.utils.splitter import TestSplitter
 from daisy.utils.metrics import calc_ranking_results
 from daisy.utils.loader import RawDataReader, Preprocessor
@@ -21,21 +9,7 @@ from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.dataset import get_dataloader, BasicDataset, CandidatesDataset, AEDataset
 from daisy.utils.utils import ensure_dir, get_ur, get_history_matrix, build_candidates_set, get_inter_matrix
 
-model_config = {
-    'mostpop': MostPop,
-    'slim': SLiM,
-    'itemknn': ItemKNNCF,
-    'puresvd': PureSVD,
-    'mf': MF,
-    'fm': FM,
-    'ngcf': NGCF,
-    'neumf': NeuMF,
-    'nfm': NFM,
-    'multi-vae': VAECF,
-    'item2vec': Item2Vec,
-    'ease': EASE,
-    'lightgcn': LightGCN,
-}
+
 
 if __name__ == '__main__':
     ''' summarize hyper-parameter part (basic yaml + args + model yaml) '''
@@ -72,13 +46,13 @@ if __name__ == '__main__':
     ''' build and train model '''
     s_time = time.time()
     if config['algo_name'].lower() in ['itemknn', 'puresvd', 'slim', 'mostpop', 'ease']:
-        model = model_config[config['algo_name']](config)
+        model = RecommenderModel(config['algo_name'])(config)
         model.fit(train_set)
 
     elif config['algo_name'].lower() in ['multi-vae']:
         history_item_id, history_item_value, _  = get_history_matrix(train_set, config, row='user')
         config['history_item_id'], config['history_item_value'] = history_item_id, history_item_value
-        model = model_config[config['algo_name']](config)
+        model = RecommenderModel(config['algo_name'])(config)
         train_dataset = AEDataset(train_set, yield_col=config['UID_NAME'])
         train_loader = get_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
@@ -86,7 +60,7 @@ if __name__ == '__main__':
     elif config['algo_name'].lower() in ['mf', 'fm', 'neumf', 'nfm', 'ngcf', 'lightgcn']:
         if config['algo_name'].lower() in ['lightgcn', 'ngcf']:
             config['inter_matrix'] = get_inter_matrix(train_set, config)
-        model = model_config[config['algo_name']](config)
+        model = RecommenderModel(config['algo_name'])(config)
         sampler = BasicNegtiveSampler(train_set, config)
         train_samples = sampler.sampling()
         train_dataset = BasicDataset(train_samples)
@@ -94,7 +68,7 @@ if __name__ == '__main__':
         model.fit(train_loader)
 
     elif config['algo_name'].lower() in ['item2vec']:
-        model = model_config[config['algo_name']](config)
+        model = RecommenderModel(config['algo_name'])(config)
         sampler = SkipGramNegativeSampler(train_set, config)
         train_samples = sampler.sampling()
         train_dataset = BasicDataset(train_samples)
