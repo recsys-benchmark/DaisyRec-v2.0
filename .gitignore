@@ -163,6 +163,7 @@ cython_debug/
 #Logs
 tune_res
 logs/
+res/
 
 #VSCode config files
 .vscode/

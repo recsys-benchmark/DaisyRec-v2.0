@@ -2,7 +2,7 @@ import json
 import optuna
 import numpy as np
 from logging import getLogger
-from daisy.model.models import RecommenderModel
+from daisy.model.Models import RecommenderModel
 from daisy.utils.loader import RawDataReader, Preprocessor
 from daisy.utils.splitter import TestSplitter, ValidationSplitter
 from daisy.utils.config import init_seed, init_config, init_logger

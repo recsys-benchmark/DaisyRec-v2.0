@@ -1,6 +1,6 @@
 import time
 from logging import getLogger
-from daisy.model.models import RecommenderModel
+from daisy.model.Models import RecommenderModel
 from daisy.utils.splitter import TestSplitter
 from daisy.utils.metrics import calc_ranking_results
 from daisy.utils.loader import RawDataReader, Preprocessor
