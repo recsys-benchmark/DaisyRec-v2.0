@@ -378,7 +378,7 @@ class Similarity:
 
 
 class ItemKNNCF(GeneralRecommender):
-    hyperparameters = ['maxk']
+    tunable_param_names = ['maxk']
     def __init__(self, config):
         """
         ItemKNN recommender

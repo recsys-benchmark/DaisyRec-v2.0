@@ -31,7 +31,7 @@ if __name__ == '__main__':
     param_dict = json.loads(config['tune_pack'])
     kpi_name = config['optimization_metric']
     algo_name = config['algo_name'].lower()
-    tune_param_names = RecommenderModel(algo_name).hyperparameters
+    tune_param_names = RecommenderModel(algo_name).tunable_param_names
 
     ''' open logfile to record tuning process '''
     # begin tuning here

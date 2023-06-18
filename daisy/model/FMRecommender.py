@@ -15,7 +15,7 @@ from daisy.model.AbstractRecommender import GeneralRecommender
 
 
 class FM(GeneralRecommender):
-    hyperparameters = ['num_ng', 'factors', 'lr', 'batch_size', 'reg_1', 'reg_2']
+    tunable_param_names = ['num_ng', 'factors', 'lr', 'batch_size', 'reg_1', 'reg_2']
     def __init__(self, config):
         """
         Factorization Machine Recommender Class

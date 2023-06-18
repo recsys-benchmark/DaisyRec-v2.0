@@ -15,7 +15,7 @@ from daisy.model.AbstractRecommender import AERecommender
 
 
 class VAECF(AERecommender):
-    hyperparameters = ['latent_dim', 'dropout','batch_size', 'lr', 'anneal_cap']
+    tunable_param_names = ['latent_dim', 'dropout','batch_size', 'lr', 'anneal_cap']
     def __init__(self, config):
         """
         VAE Recommender Class

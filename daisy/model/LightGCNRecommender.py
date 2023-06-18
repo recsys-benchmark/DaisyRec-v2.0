@@ -16,7 +16,7 @@ import scipy.sparse as sp
 from daisy.model.AbstractRecommender import GeneralRecommender
 
 class LightGCN(GeneralRecommender):
-    hyperparameters = ['num_ng', 'factors', 'batch_size', 'lr', 'reg_1', 'reg_2', 'num_layers']
+    tunable_param_names = ['num_ng', 'factors', 'batch_size', 'lr', 'reg_1', 'reg_2', 'num_layers']
     def __init__(self, config):
         '''
         LightGCN Recommender Class

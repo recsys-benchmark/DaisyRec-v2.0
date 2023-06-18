@@ -14,7 +14,7 @@ from daisy.model.AbstractRecommender import GeneralRecommender
 
 
 class EASE(GeneralRecommender):
-    hyperparameters = ['reg']
+    tunable_param_names = ['reg']
     def __init__(self, config):
         super(EASE, self).__init__(config)
         self.inter_name = config['INTER_NAME']
