@@ -8,7 +8,7 @@ import colorlog
 import numpy as np
 from colorama import init
 
-from daisy.utils.parser import parse_args
+from daisy.utils.parser import parse_args, json_format_corrector
 from daisy.utils.utils import ensure_dir, get_local_time
 
 log_colors_config = {
@@ -71,6 +71,10 @@ def init_config(param_dict=None):
 
         if param_dict is not None:
             config.update(param_dict)
+
+        # Correct the format of the tune pack
+        if config.get('tune_pack', '{}') != '{}':
+            config['tune_pack'] = json_format_corrector(config['tune_pack'])
 
         return config
 

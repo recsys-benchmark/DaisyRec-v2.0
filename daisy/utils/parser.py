@@ -134,3 +134,43 @@ def parse_args():
     args = parser.parse_args()
 
     return args
+
+
+
+def json_format_corrector(json_string: str) -> str:
+    '''
+    Takes the string produced from the command line parser, and corrects the string format to fit json.loads()
+    Adds a double quote to all keys and non-numeric values (except null)
+    '''
+
+    # Characters used for JSON syntax
+    json_syntax = ["{", "}", ",", ":", '""', " ", "."]
+
+    # Array used to store the string. Array used since mutable
+    modified_string = []
+
+    # Boolean if the previous character in the loop is for syntax, or non-content character (i.e., not alphanumeric)
+    prev_char_is_syntax = True
+
+    # Process char by char
+    for char in json_string:
+
+        # Check if character is for json syntax or is content. Ignore numeric values
+        cur_char_is_syntax = char in json_syntax or char.isnumeric()
+
+        # If the previous character is syntax and current is content or vice-versa, append a double-quote 
+        if cur_char_is_syntax != prev_char_is_syntax:
+            modified_string.append('"')
+            prev_char_is_syntax = cur_char_is_syntax
+
+        modified_string.append(char)
+
+    # Convert array to string
+    modified_string = "".join(modified_string)
+
+    # Convert remove double quote from "null"
+    modified_string = modified_string.replace('"null"', 'null')
+
+    return modified_string
+
+
