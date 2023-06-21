@@ -5,11 +5,11 @@ from logging import getLogger
 from daisy.model.Models import RecommenderModel
 from daisy.utils.loader import RawDataReader, Preprocessor
 from daisy.utils.splitter import TestSplitter, ValidationSplitter
-from daisy.utils.config import init_seed, init_config, init_logger
+from daisy.utils.config import init_seed, init_config, init_logger, param_type_config
 from daisy.utils.metrics import metrics_config
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.dataset import AEDataset, BasicDataset, CandidatesDataset, get_dataloader
-from daisy.utils.utils import get_history_matrix, get_ur, build_candidates_set, ensure_dir, get_inter_matrix, param_type_config
+from daisy.utils.utils import get_history_matrix, get_ur, build_candidates_set, ensure_dir, get_inter_matrix
 
 
 TRIAL_CNT = 0
@@ -134,7 +134,7 @@ if __name__ == '__main__':
             preds = model.rank(val_loader) 
 
             ''' calculating KPIs '''
-            kpi = metrics_config[kpi_name](val_ur, preds, val_u)
+            kpi = metrics_config[kpi_name]['evaluator'](val_ur, preds, val_u)
             kpis.append(kpi)
         
         TRIAL_CNT += 1

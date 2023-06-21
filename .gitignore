@@ -161,9 +161,9 @@ cython_debug/
 #.idea/
 
 #Logs
-tune_res
-logs/
-res/
+tune_res/*
+logs/*
+res/*
 
 #VSCode config files
 .vscode/
