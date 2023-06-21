@@ -1,5 +1,5 @@
 import argparse
-
+from json import loads, JSONDecodeError
 
 def parse_args():
     parser = argparse.ArgumentParser(description='arguments for daisy')
@@ -139,9 +139,20 @@ def parse_args():
 
 def json_format_corrector(json_string: str) -> str:
     '''
+    Argparse may not parse command line arguments with double quotes
     Takes the string produced from the command line parser, and corrects the string format to fit json.loads()
     Adds a double quote to all keys and non-numeric values (except null)
     '''
+    
+    # Check if the string is empty (or is None)
+    if not json_string or json_string == '{}': return json_string
+
+    # Checks if json string is already in correct format
+    try:
+        loads(json_string)
+        return json_string
+    except JSONDecodeError:
+        pass
 
     # Characters used for JSON syntax
     json_syntax = ["{", "}", ",", ":", '""', " ", "."]

@@ -18,6 +18,27 @@ log_colors_config = {
     'CRITICAL': 'red',
 }
 
+param_type_config = {
+    'num_layers': 'int',
+    'maxk': 'int',
+    'factors': 'int',
+    'alpha': 'float',
+    'elastic': 'float',
+    'num_ng': 'int',
+    'lr': 'float',
+    'batch_size': 'int',
+    'reg_1': 'float',
+    'reg_2': 'float',
+    'dropout': 'float',
+    'node_dropout': 'float',
+    'mess_dropout': 'float',
+    'latent_dim': 'int',
+    'anneal_cap': 'float',
+    'reg': 'float',
+    'context_window': 'int',
+    'rho': 'float'
+}
+
 def init_seed(seed, reproducibility):
     '''
     init random seed for random functions in numpy, torch, cuda and cudnn
@@ -73,8 +94,7 @@ def init_config(param_dict=None):
             config.update(param_dict)
 
         # Correct the format of the tune pack
-        if config.get('tune_pack', '{}') != '{}':
-            config['tune_pack'] = json_format_corrector(config['tune_pack'])
+        config['tune_pack'] = json_format_corrector(config['tune_pack'])
 
         return config
 
