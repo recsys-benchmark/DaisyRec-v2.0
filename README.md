@@ -99,10 +99,6 @@ All data are available in links below:
     - Table 19 shows the best hyper-parameter settings for TLOO
     
 
-## TODO List
-
-- [x] A more friendly GUI command generator
-
 ## Team Members
 <table>
 	<tr >
@@ -154,10 +150,18 @@ Please cite both of the following papers if you use **DaisyRec-v2.0** in a resea
 @article{sun2022daisyrec,
   title={DaisyRec 2.0: Benchmarking Recommendation for Rigorous Evaluation},
   author={Sun, Zhu and Fang, Hui and Yang, Jie and Qu, Xinghua and Liu, Hongyang and Yu, Di and Ong, Yew-Soon and Zhang, Jie},
-  journal={arXiv preprint arXiv:2206.10848},
-  year={2022}
+  journal={IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI)},
+  year={2022},
+  publisher={IEEE}
 }
 ```
+
+## TODO List
+
+- [x] A more friendly GUI command generator
+- [ ] Two ways of negative sampling
+- [ ] Add data source link for the well-split datasets in the TPMAI paper
+- [ ] Add tutorial on how to integrate new algorithms in DaisyRec-v2.0
 
 ## Acknowledgements
 
