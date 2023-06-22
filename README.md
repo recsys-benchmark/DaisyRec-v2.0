@@ -39,8 +39,8 @@ Make sure you have a **CUDA** enviroment to accelarate since the deep-learning m
 ### How to Run
 
 ```
-python run_examples/test.py
-python run_examples/tune.py
+python test.py
+python tune.py
 ```
 
 #### Earlier Version of GUI Command Generator and Tutorial
