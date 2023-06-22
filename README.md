@@ -111,7 +111,7 @@ All data are available in links below:
 	    <td>Hui Fang, Jie Yang, Xinghua Qu, Jie Zhang</td>
 	</tr>
         <td>Developers</td>
-	    <td>Cong Geng</td>
+	    <td>Di Yu</td>
 	</tr>
 	</tr>
         <td>Contributors</td>
