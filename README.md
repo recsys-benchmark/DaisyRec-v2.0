@@ -102,7 +102,7 @@ All data are available in links below:
 ## Team Members
 <table>
 	<tr >
-	    <td rowspan="3"><a href="https://github.com/AmazingDD/daisyRec">DaisyRec</a></td>
+	    <td rowspan="4"><a href="https://github.com/AmazingDD/daisyRec">DaisyRec</a></td>
 	    <td>Leaders</td>
 	    <td>Zhu Sun</td>
 	</tr>
@@ -111,14 +111,18 @@ All data are available in links below:
 	    <td>Hui Fang, Jie Yang, Xinghua Qu, Jie Zhang</td>
 	</tr>
         <td>Developers</td>
-	    <td>Di Yu, Cong Geng</td>
+	    <td>Cong Geng</td>
+	</tr>
+	</tr>
+        <td>Contributors</td>
+	    <td>Cong Geng</td>
 	</tr>
 	<tr >
 	    <td rowspan="4"><a href="https://github.com/recsys-benchmark/DaisyRec-v2.0">DaisyRec-v2.0</a></td>
 	    <td>Leaders</td>
 	    <td>Zhu Sun</td>
 	</tr>
-    <tr>
+    	<tr>
 	    <td>Senior members</td>
 	    <td>Hui Fang, Jie Yang, Xinghua Qu, Jie Zhang, Yew-Soon Ong</td>
 	</tr>
