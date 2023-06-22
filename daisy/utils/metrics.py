@@ -130,9 +130,7 @@ def MRR(test_ur, pred_ur, test_u):
         mrr = 0.
         for index, item in enumerate(pred):
             if item in gt:
-                mrr = 1 / (index + 1)
-                break
-
+              mrr += 1 / (index + 1)
         res.append(mrr)
 
     return np.mean(res)

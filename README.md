@@ -12,12 +12,18 @@
 
 <!-- ![daisyRec's structure](images/framework.png) -->
 
-DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compar**I**son for recommender **SY**stem. Note that the preliminary version of DaisyRec is available [here](https://github.com/AmazingDD/daisyRec), which will not be updated anymore. Please refer to DaisyRec-v2.0 for the latest version. ***(Please note that DaisyRec-v2.0 is still under testing. If there is any issue, please feel free to let us know)*** 
+DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compar**I**son for recommender **SY**stem. Since its release, DaisyRec has undergone continuous upgrades and updates. The table below shows the code version and its corresponding research paper, and DaisyRec-v2.0 (dev branch) is the latest version. ***(Note that DaisyRec-v2.0 is still under testing. If there is any issue, please feel free to let us know)*** 
+
+| **Version** | **Papers** |
+|-------------|-----------------|
+| [DaisyRec](https://github.com/AmazingDD/daisyRec)   | Are We Evaluating Rigorously? Benchmarking Recommendation for Reproducible Evaluation and Fair Comparison |
+| [DaisyRec2.0-main](https://github.com/recsys-benchmark/DaisyRec-v2.0/tree/main)| DaisyRec 2.0: Benchmarking Recommendation for Rigorous Evaluation |
+| [DaisyRec2.0-dev](https://github.com/recsys-benchmark/DaisyRec-v2.0/tree/dev) | Under upgrade and optimizition|
 
 The figure below shows the overall framework of DaisyRec-v2.0. 
 
 <p align="center">
-<img src="images/framework.png" align="center" width="90%" style="margin: 0 auto">
+<img src="images/framework_update.png" align="center" width="90%" style="margin: 0 auto">
 </p>
 
 
@@ -99,9 +105,42 @@ All data are available in links below:
     - Table 19 shows the best hyper-parameter settings for TLOO
     
 
-## TODO List
-
-- [x] A more friendly GUI command generator
+## Team Members
+<table>
+	<tr >
+	    <td rowspan="4"><a href="https://github.com/AmazingDD/daisyRec">DaisyRec</a></td>
+	    <td>Leaders</td>
+	    <td>Zhu Sun</td>
+	</tr>
+	<tr>
+	    <td>Senior members</td>
+	    <td>Hui Fang, Jie Yang, Xinghua Qu, Jie Zhang</td>
+	</tr>
+        <td>Developers</td>
+	    <td>Di Yu</td>
+	</tr>
+	</tr>
+        <td>Contributors</td>
+	    <td>Cong Geng</td>
+	</tr>
+	<tr >
+	    <td rowspan="4"><a href="https://github.com/recsys-benchmark/DaisyRec-v2.0">DaisyRec-v2.0</a></td>
+	    <td>Leaders</td>
+	    <td>Zhu Sun</td>
+	</tr>
+    	<tr>
+	    <td>Senior members</td>
+	    <td>Hui Fang, Jie Yang, Xinghua Qu, Jie Zhang, Yew-Soon Ong</td>
+	</tr>
+	<tr>
+	    <td>Developers</td>
+	    <td>Di Yu, Hongyang Liu</td>
+	</tr>
+	<tr>
+	    <td>Contributors</td>
+	    <td>Cong Geng, Yanmu Ding, SYED MOHAMMED MOSAYEEB AL HADY ZAHEE</td>
+	</tr>
+</table>
 
 ## Cite
 
@@ -121,10 +160,18 @@ Please cite both of the following papers if you use **DaisyRec-v2.0** in a resea
 @article{sun2022daisyrec,
   title={DaisyRec 2.0: Benchmarking Recommendation for Rigorous Evaluation},
   author={Sun, Zhu and Fang, Hui and Yang, Jie and Qu, Xinghua and Liu, Hongyang and Yu, Di and Ong, Yew-Soon and Zhang, Jie},
-  journal={arXiv preprint arXiv:2206.10848},
-  year={2022}
+  journal={IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI)},
+  year={2022},
+  publisher={IEEE}
 }
 ```
+
+## TODO List
+
+- [x] A more friendly GUI command generator
+- [ ] Two ways of negative sampling
+- [ ] Add data source link for the well-split datasets in the TPMAI paper
+- [ ] Add tutorial on how to integrate new algorithms in DaisyRec-v2.0
 
 ## Acknowledgements
 
