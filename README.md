@@ -128,7 +128,11 @@ All data are available in links below:
 	</tr>
 	<tr>
 	    <td>Developers</td>
-	    <td>Di Yu, Cong Geng, Hongyang Liu, Yanmu Ding</td>
+	    <td>Di Yu, Hongyang Liu</td>
+	</tr>
+	<tr>
+	    <td>Contributors</td>
+	    <td>Cong Geng, Yanmu Ding</td>
 	</tr>
 </table>
 
