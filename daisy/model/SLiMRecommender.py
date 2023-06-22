@@ -25,6 +25,7 @@ from daisy.model.AbstractRecommender import GeneralRecommender
 
 
 class SLiM(GeneralRecommender):
+    tunable_param_names = ['alpha', 'elastic']
     def __init__(self, config):
         """
         SLIM Recommender Class

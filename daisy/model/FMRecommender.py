@@ -15,6 +15,7 @@ from daisy.model.AbstractRecommender import GeneralRecommender
 
 
 class FM(GeneralRecommender):
+    tunable_param_names = ['num_ng', 'factors', 'lr', 'batch_size', 'reg_1', 'reg_2']
     def __init__(self, config):
         """
         Factorization Machine Recommender Class
@@ -34,7 +35,6 @@ class FM(GeneralRecommender):
         early_stop : bool, whether to activate early stop mechanism
         """
         super(FM, self).__init__(config)
-
         self.epochs = config['epochs']
         self.lr = config['lr']
         self.reg_1 = config['reg_1']
@@ -53,7 +53,7 @@ class FM(GeneralRecommender):
         self.initializer = config['init_method'] if config['init_method'] != 'default' else 'normal'
         self.early_stop = config['early_stop']
         self.topk = config['topk']
-
+        
         self.apply(self._init_weight)
         nn.init.constant_(self.u_bias.weight, 0.0)
         nn.init.constant_(self.i_bias.weight, 0.0)

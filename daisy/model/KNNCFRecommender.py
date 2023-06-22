@@ -36,7 +36,7 @@ def convert_df(user_num, item_num, df):
     ratings = list(df['rating'])
     rows = list(df['user'])
     cols = list(df['item'])
-
+    
     mat = sp.csc_matrix((ratings, (rows, cols)), shape=(user_num, item_num))
 
     return mat
@@ -378,6 +378,7 @@ class Similarity:
 
 
 class ItemKNNCF(GeneralRecommender):
+    tunable_param_names = ['maxk']
     def __init__(self, config):
         """
         ItemKNN recommender
@@ -402,7 +403,6 @@ class ItemKNNCF(GeneralRecommender):
         super(ItemKNNCF, self).__init__(config)
         self.user_num = config['user_num']
         self.item_num = config['item_num']
-
         self.k = config['maxk']
         self.shrink = config['shrink']
         self.normalize = config['normalize']

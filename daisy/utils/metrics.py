@@ -2,60 +2,6 @@ import os
 import numpy as np
 import pandas as pd
 
-metrics_name_config = {
-    "recall": 'Recall',
-    "mrr": 'MRR',
-    "ndcg": 'NDCG',
-    "hit": 'Hit Ratio',
-    "precision": 'Precision',
-    "f1": 'F1-score',
-    "auc": 'AUC',
-    "coverage": 'Coverage',
-    "diversity": 'Diversity',
-    "popularity": 'Average Popularity',
-}
-
-def calc_ranking_results(test_ur, pred_ur, test_u, config):
-    '''
-    calculate metrics with prediction results and candidates sets
-
-    Parameters
-    ----------
-    test_ur : defaultdict(set)
-        groud truths for user in test set
-    pred_ur : np.array
-        rank list for user in test set
-    test_u : list
-        the user in order from test set
-    '''    
-    logger = config['logger']
-    path = config['res_path']
-    if not os.path.exists(path):
-        os.makedirs(path)
-
-    metric = Metric(config)
-    res = pd.DataFrame({
-        'KPI@K': [metrics_name_config[kpi_name] for kpi_name in config['metrics']]
-    })
-
-    common_ks = [1, 5, 10, 20, 30, 50]
-    if config['topk'] not in common_ks:
-        common_ks.append(config['topk'])
-    for topk in common_ks:
-        if topk > config['topk']:
-            continue
-        else:
-            rank_list = pred_ur[:, :topk]
-            kpis = metric.run(test_ur, rank_list, test_u)
-            if topk == 10:
-                for kpi_name, kpi_res in zip(config['metrics'], kpis):
-                    kpi_name = metrics_name_config[kpi_name]
-                    logger.info(f'{kpi_name}@{topk}: {kpi_res:.4f}')
-
-            res[topk] = np.array(kpis)
-
-    return res
-
 class Metric(object):
     def __init__(self, config) -> None:
         self.metrics = config['metrics']
@@ -92,14 +38,16 @@ class Metric(object):
                 raise ValueError(f'Invalid metric name {mc}')
 
             res.append(kpi)
-    
+
         return res
+
 
 def Coverage(pred_ur, item_num):
     '''
     Ge, Mouzhi, Carla Delgado-Battenfeld, and Dietmar Jannach. "Beyond accuracy: evaluating recommender systems by coverage and serendipity." Proceedings of the fourth ACM conference on Recommender systems. 2010.
     '''
     return len(np.unique(pred_ur)) / item_num
+
 
 def Popularity(test_ur, pred_ur, test_u, item_pop):
     '''
@@ -121,6 +69,7 @@ def Popularity(test_ur, pred_ur, test_u, item_pop):
 
     return np.mean(res)
 
+
 def Diversity(pred_ur, i_categories):
     '''
     Intra-list similarity for diversity
@@ -131,7 +80,7 @@ def Diversity(pred_ur, i_categories):
         rank list for each user in test set
     i_categories : np.array
         (item_num, category_num) with 0/1 value
-    ''' 
+    '''
     res = []
     for u in range(len(pred_ur)):
         ILD = []
@@ -145,6 +94,7 @@ def Diversity(pred_ur, i_categories):
 
     return np.mean(res)
 
+
 def Precision(test_ur, pred_ur, test_u):
     res = []
     for idx in range(len(test_u)):
@@ -156,6 +106,7 @@ def Precision(test_ur, pred_ur, test_u):
         res.append(pre)
 
     return np.mean(res)
+
 
 def Recall(test_ur, pred_ur, test_u):
     res = []
@@ -169,6 +120,7 @@ def Recall(test_ur, pred_ur, test_u):
 
     return np.mean(res)
 
+
 def MRR(test_ur, pred_ur, test_u):
     res = []
     for idx in range(len(test_u)):
@@ -178,11 +130,11 @@ def MRR(test_ur, pred_ur, test_u):
         mrr = 0.
         for index, item in enumerate(pred):
             if item in gt:
-                mrr += 1 / (index + 1)
-        
+              mrr += 1 / (index + 1)
         res.append(mrr)
 
     return np.mean(res)
+
 
 def MAP(test_ur, pred_ur, test_u):
     res = []
@@ -200,11 +152,13 @@ def MAP(test_ur, pred_ur, test_u):
 
     return np.mean(res)
 
+
 def NDCG(test_ur, pred_ur, test_u):
     def DCG(r):
         r = np.asfarray(r) != 0
         if r.size:
-            dcg = np.sum(np.subtract(np.power(2, r), 1) / np.log2(np.arange(2, r.size + 2)))
+            dcg = np.sum(np.subtract(np.power(2, r), 1) /
+                         np.log2(np.arange(2, r.size + 2)))
             return dcg
         return 0.
 
@@ -225,6 +179,7 @@ def NDCG(test_ur, pred_ur, test_u):
 
     return np.mean(res)
 
+
 def HR(test_ur, pred_ur, test_u):
     res = []
     for idx in range(len(test_u)):
@@ -236,6 +191,7 @@ def HR(test_ur, pred_ur, test_u):
         res.append(1 if r.sum() else 0)
 
     return np.mean(res)
+
 
 def AUC(test_ur, pred_ur, test_u):
     res = []
@@ -256,8 +212,9 @@ def AUC(test_ur, pred_ur, test_u):
 
         auc = pos_rank_num / (pos_num * neg_num)
         res.append(auc)
-                
+
     return np.mean(res)
+
 
 def F1(test_ur, pred_ur, test_u):
     res = []
@@ -275,3 +232,59 @@ def F1(test_ur, pred_ur, test_u):
         res.append(f1)
 
     return np.mean(res)
+
+
+metrics_config = {
+    "recall": {"name": "Recall", "evaluator": Recall},
+    "mrr": {"name": "MRR", "evaluator": MRR},
+    "ndcg": {"name": "NDCG", "evaluator": NDCG},
+    "map": {"name": "MAP", "evaluator": MAP},
+    "hit": {"name": "Hit Ratio", "evaluator": HR},
+    "precision": {"name": "Precision", "evaluator": Precision},
+    "f1": {"name": "F1-score", "evaluator": F1},
+    "auc": {"name": "AUC", "evaluator": AUC},
+    "coverage": {"name": "Coverage", "evaluator": Coverage},
+    "diversity": {"name": "Diversity", "evaluator": Diversity},
+    "popularity": {"name": "Average Popularity", "evaluator": Popularity}
+}
+
+def calc_ranking_results(test_ur, pred_ur, test_u, config):
+    '''
+    calculate metrics with prediction results and candidates sets
+
+    Parameters
+    ----------
+    test_ur : defaultdict(set)
+        groud truths for user in test set
+    pred_ur : np.array
+        rank list for user in test set
+    test_u : list
+        the user in order from test set
+    '''
+    logger = config['logger']
+    path = config['res_path']
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    metric = Metric(config)
+    res = pd.DataFrame({
+        'KPI@K': [metrics_config[kpi_name]['name'] for kpi_name in config['metrics']]
+    })
+
+    common_ks = [1, 5, 10, 20, 30, 50]
+    if config['topk'] not in common_ks:
+        common_ks.append(config['topk'])
+    for topk in common_ks:
+        if topk > config['topk']:
+            continue
+        else:
+            rank_list = pred_ur[:, :topk]
+            kpis = metric.run(test_ur, rank_list, test_u)
+            if topk == 10:
+                for kpi_name, kpi_res in zip(config['metrics'], kpis):
+                    kpi_name = metrics_config[kpi_name]['name']
+                    logger.info(f'{kpi_name}@{topk}: {kpi_res:.4f}')
+
+            res[topk] = np.array(kpis)
+
+    return res

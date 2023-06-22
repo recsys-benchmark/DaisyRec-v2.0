@@ -93,6 +93,7 @@ class AbstractRecommender(nn.Module):
         return criterion
 
 class GeneralRecommender(AbstractRecommender):
+    tunable_param_names = []
     def __init__(self, config):
         super(GeneralRecommender, self).__init__()
 

@@ -8,7 +8,7 @@ import colorlog
 import numpy as np
 from colorama import init
 
-from daisy.utils.parser import parse_args
+from daisy.utils.parser import parse_args, json_format_corrector
 from daisy.utils.utils import ensure_dir, get_local_time
 
 log_colors_config = {
@@ -16,6 +16,27 @@ log_colors_config = {
     'WARNING': 'yellow',
     'ERROR': 'red',
     'CRITICAL': 'red',
+}
+
+param_type_config = {
+    'num_layers': 'int',
+    'maxk': 'int',
+    'factors': 'int',
+    'alpha': 'float',
+    'elastic': 'float',
+    'num_ng': 'int',
+    'lr': 'float',
+    'batch_size': 'int',
+    'reg_1': 'float',
+    'reg_2': 'float',
+    'dropout': 'float',
+    'node_dropout': 'float',
+    'mess_dropout': 'float',
+    'latent_dim': 'int',
+    'anneal_cap': 'float',
+    'reg': 'float',
+    'context_window': 'int',
+    'rho': 'float'
 }
 
 def init_seed(seed, reproducibility):
@@ -71,6 +92,9 @@ def init_config(param_dict=None):
 
         if param_dict is not None:
             config.update(param_dict)
+
+        # Correct the format of the tune pack
+        config['tune_pack'] = json_format_corrector(config['tune_pack'])
 
         return config
 

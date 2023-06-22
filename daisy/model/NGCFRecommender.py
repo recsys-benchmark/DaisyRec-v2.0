@@ -60,6 +60,7 @@ class BiGNN(nn.Module):
         return inter_part1 + inter_part2
 
 class NGCF(GeneralRecommender):
+    tunable_param_names = ['num_ng', 'factors', 'node_dropout', 'mess_dropout', 'batch_size', 'lr', 'reg_1', 'reg_2']
     def __init__(self, config):
         """
         NGCF Recommender Class

@@ -23,6 +23,7 @@ from daisy.model.AbstractRecommender import GeneralRecommender
 
 
 class MF(GeneralRecommender):
+    tunable_param_names = ['num_ng', 'factors', 'lr', 'batch_size', 'reg_1', 'reg_2']
     def __init__(self, config):
         """
         Matrix Factorization Recommender Class
