@@ -12,12 +12,11 @@
 
 <!-- ![daisyRec's structure](images/framework.png) -->
 
-DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compar**I**son for recommender **SY**stem. Note that the preliminary version of DaisyRec is available [here](https://github.com/AmazingDD/daisyRec), which will not be updated anymore. 
-Since its release, DaisyRec has undergone continuous upgrades and updates. The table below shows the code version and its corresponding research paper, and DaisyRec-v2.0 (dev branch) is the latest version. ***(Note that DaisyRec-v2.0 is still under testing. If there is any issue, please feel free to let us know)*** 
+DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendation task. The name DAISY stands for multi-**D**imension f**A**irly compar**I**son for recommender **SY**stem. Since its release, DaisyRec has undergone continuous upgrades and updates. The table below shows the code version and its corresponding research paper, and DaisyRec-v2.0 (dev branch) is the latest version. ***(Note that DaisyRec-v2.0 is still under testing. If there is any issue, please feel free to let us know)*** 
 
 | **Version** | **Papers** |
 |-------------|-----------------|
-| DaisyRec   | Are We Evaluating Rigorously? Benchmarking Recommendation for Reproducible Evaluation and Fair Comparison |
+| [DaisyRec](https://github.com/AmazingDD/daisyRec)   | Are We Evaluating Rigorously? Benchmarking Recommendation for Reproducible Evaluation and Fair Comparison |
 | DaisyRec2.0-main| DaisyRec 2.0: Benchmarking Recommendation for Rigorous Evaluation |
 | DaisyRec2.0-dev | Under upgrade and optimizition|
 
