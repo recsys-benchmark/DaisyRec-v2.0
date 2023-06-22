@@ -118,7 +118,7 @@ All data are available in links below:
 	    <td>Di Yu, Cong Geng</td>
 	</tr>
 	<tr >
-	    <td rowspan="3"><a href="https://github.com/recsys-benchmark/DaisyRec-v2.0">DaisyRec-v2.0</a></td>
+	    <td rowspan="4"><a href="https://github.com/recsys-benchmark/DaisyRec-v2.0">DaisyRec-v2.0</a></td>
 	    <td>Leaders</td>
 	    <td>Zhu Sun</td>
 	</tr>
