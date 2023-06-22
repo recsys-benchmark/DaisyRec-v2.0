@@ -161,6 +161,9 @@ cython_debug/
 #.idea/
 
 #Logs
+/res
+/tune_res
+/log
 
 
 
