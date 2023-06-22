@@ -17,8 +17,15 @@ DaisyRec-v2.0 is a Python toolkit developed for benchmarking top-N recommendatio
 The figure below shows the overall framework of DaisyRec-v2.0. 
 
 <p align="center">
-<img src="images/framework.png" align="center" width="90%" style="margin: 0 auto">
+<img src="images/framework_update.png" align="center" width="90%" style="margin: 0 auto">
 </p>
+
+This table shows the papers corresponding to the code version
+| **Version** | **Papers** |
+|-------------|-----------------|
+| DaisyRec   | Are We Evaluating Rigorously? Benchmarking Recommendation for Reproducible Evaluation and Fair Comparison |
+| DaisyRec2.0-main| DaisyRec 2.0: Benchmarking Recommendation for Rigorous Evaluation |
+| DaisyRec2.0-dev | Under upgrade and optimizition|
 
 
 
