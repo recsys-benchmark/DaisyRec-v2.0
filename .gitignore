@@ -160,10 +160,11 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+logs/
 #Logs
-/res
-/tune_res
-/log
+res/
+tune_res/
+log/
 
 
 
