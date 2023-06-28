@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
             ''' build and train model '''
             model = RecommenderModel(config['algo_name'])(config)
-            if config['algo_name'].lower() in ['itemknn', 'puresvd', 'slim', 'mostpop', 'ease']:
+            if config['algo_name'].lower() in ['itemknn', 'puresvd', 'slim', 'mostpop', 'sndmostpop','ease']:
                 model.fit(train)
             
             elif config['algo_name'].lower() in ['multi-vae']:
