@@ -1,49 +1,49 @@
-from .AbstractRecommender import GeneralRecommender
+from daisy.model.AbstractRecommender import GeneralRecommender
 
 def RecommenderModel(algo_name: str) -> GeneralRecommender:
     """Takes the model name as a string and returns the model class
     """
     if algo_name == 'mf':
-        from .MFRecommender import MF
+        from daisy.model.accuracyRecommender.MFRecommender import MF
         return MF
     elif algo_name == 'fm':
-        from .FMRecommender import FM
+        from daisy.model.accuracyRecommender.FMRecommender import FM
         return FM
     elif algo_name == 'nfm':
-        from .NFMRecommender import NFM
+        from daisy.model.accuracyRecommender.NFMRecommender import NFM
         return NFM
     elif algo_name == 'ngcf':
-        from .NGCFRecommender import NGCF
+        from daisy.model.accuracyRecommender.NGCFRecommender import NGCF
         return NGCF
     elif algo_name == 'ease':
-        from .EASERecommender import EASE
+        from daisy.model.accuracyRecommender.EASERecommender import EASE
         return EASE
     elif algo_name == 'slim':
-        from .SLiMRecommender import SLiM
+        from daisy.model.accuracyRecommender.SLiMRecommender import SLiM
         return SLiM
     elif algo_name == 'multi-vae':
-        from .VAECFRecommender import VAECF
+        from daisy.model.accuracyRecommender.VAECFRecommender import VAECF
         return VAECF
     elif algo_name == 'neumf':
-        from .NeuMFRecommender import NeuMF
+        from daisy.model.accuracyRecommender.NeuMFRecommender import NeuMF
         return NeuMF
     elif algo_name == 'mostpop':
-        from .PopRecommender import MostPop
+        from daisy.model.accuracyRecommender.PopRecommender import MostPop
         return MostPop
     elif algo_name == 'itemknn':
-        from .KNNCFRecommender import ItemKNNCF
+        from daisy.model.accuracyRecommender.KNNCFRecommender import ItemKNNCF
         return ItemKNNCF
     elif algo_name == 'puresvd':
-        from .PureSVDRecommender import PureSVD
+        from daisy.model.accuracyRecommender.PureSVDRecommender import PureSVD
         return PureSVD
     elif algo_name == 'item2vec':
-        from .Item2VecRecommender import Item2Vec
+        from daisy.model.accuracyRecommender.Item2VecRecommender import Item2Vec
         return Item2Vec
     elif algo_name == 'lightgcn':
-        from .LightGCNRecommender import LightGCN
+        from daisy.model.accuracyRecommender.LightGCNRecommender import LightGCN
         return LightGCN
     elif algo_name == 'sndmostpop':
-        from .SecondMostPopRecommender import SndMostPopRecommender
+        from daisy.model.accuracyRecommender.SecondMostPopRecommender import SndMostPopRecommender
         return SndMostPopRecommender
     else:
         raise ModuleNotFoundError(f"Model name '{algo_name}' not found")

@@ -1,4 +1,4 @@
-from .AbstractRecommender import GeneralRecommender
+from daisy.model.AbstractRecommender import GeneralRecommender
 from pandas import DataFrame
 import numpy as np
 import torch
