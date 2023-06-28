@@ -23,7 +23,7 @@ class RawDataReader(object):
         self.ds_path = f"{config['data_path']}{self.src}/"
         ensure_dir(self.ds_path)
         self.logger.info(f'Current data path is: {self.ds_path}, make sure you put the right raw data into it...')
-
+    # loads the data into a Pandas dataframe based on the source file (path) of the data
     def get_data(self):
         df = pd.DataFrame()
         if self.src == 'ml-100k':

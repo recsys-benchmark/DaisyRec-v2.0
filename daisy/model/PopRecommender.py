@@ -27,19 +27,20 @@ class MostPop(GeneralRecommender):
         self.cnt_col = config['IID_NAME']
 
     def fit(self, train_set):
-        item_cnt = train_set[self.cnt_col].value_counts()
-        idx, cnt = item_cnt.index, item_cnt.values
-        self.item_cnt_ref[idx] = cnt
-        self.item_score =  self.item_cnt_ref / (1 + self.item_cnt_ref)
+        item_cnt = train_set[self.cnt_col].value_counts() #from the training data, get the item counts in a series (item, count)
+        idx, cnt = item_cnt.index, item_cnt.values # get the items and counts separately
+        self.item_cnt_ref[idx] = cnt # put the counts into a numpy array, indexed to item id
+        self.item_score =  self.item_cnt_ref / (1 + self.item_cnt_ref) # score them
 
     def predict(self, u, i):
         return self.item_score[i]
 
-    def rank(self, test_loader):
+    def rank(self, test_loader: torch.utils.data.DataLoader):
+        
         item_score = torch.tensor(self.item_score, device=self.device)
 
         rec_ids = torch.tensor([], device=self.device)
-        for _, cands_ids in test_loader:
+        for _, cands_ids in test_loader: # _ loads a batch-sized array of user ids, cands_ids is corresponding array of array of items
             cands_ids = cands_ids.to(self.device)
             scores = item_score[cands_ids] # batch_size * cand_num
             rank_ids = torch.argsort(scores, descending=True)

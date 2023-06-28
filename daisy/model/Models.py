@@ -1,7 +1,5 @@
 from .AbstractRecommender import GeneralRecommender
 
-
-
 def RecommenderModel(algo_name: str) -> GeneralRecommender:
     """Takes the model name as a string and returns the model class
     """
@@ -44,6 +42,9 @@ def RecommenderModel(algo_name: str) -> GeneralRecommender:
     elif algo_name == 'lightgcn':
         from .LightGCNRecommender import LightGCN
         return LightGCN
+    elif algo_name == 'sndmostpop':
+        from .SecondMostPopRecommender import SndMostPopRecommender
+        return SndMostPopRecommender
     else:
         raise ModuleNotFoundError(f"Model name '{algo_name}' not found")
 

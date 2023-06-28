@@ -50,7 +50,7 @@ def get_ir(df):
 
     return ir
 
-def build_candidates_set(test_ur, train_ur, config, drop_past_inter=True):
+def build_candidates_set(test_ur, train_ur, item_num, candidates_num, drop_past_inter=True):
     """
     method of building candidate items for ranking
     Parameters
@@ -58,15 +58,13 @@ def build_candidates_set(test_ur, train_ur, config, drop_past_inter=True):
     test_ur : dict, ground_truth that represents the relationship of user and item in the test set
     train_ur : dict, this represents the relationship of user and item in the train set
     item_num : No. of all items
-    cand_num : int, the number of candidates
+    candidates_num : int, the number of candidates
     drop_past_inter : drop items already appeared in train set
 
     Returns
     -------
     test_ucands : dict, dictionary storing candidates for each user in test set
     """
-    item_num = config['item_num']
-    candidates_num = config['cand_num']
 
     test_ucands, test_u = [], []
     for u, r in test_ur.items():
