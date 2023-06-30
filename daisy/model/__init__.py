@@ -10,4 +10,4 @@ from daisy.model.accuracyRecommender.PopRecommender import MostPop
 from daisy.model.accuracyRecommender.PureSVDRecommender import PureSVD
 from daisy.model.accuracyRecommender.SLiMRecommender import SLiM
 from daisy.model.accuracyRecommender.VAECFRecommender import VAECF
-from daisy.model.accuracyRecommender.SecondMostPopRecommender import SndMostPopRecommender
+from daisy.model.accuracyRecommender.SecondMostPopRecommender import SndMostPop

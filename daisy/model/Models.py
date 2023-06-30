@@ -43,8 +43,8 @@ def RecommenderModel(algo_name: str) -> GeneralRecommender:
         from daisy.model.accuracyRecommender.LightGCNRecommender import LightGCN
         return LightGCN
     elif algo_name == 'sndmostpop':
-        from daisy.model.accuracyRecommender.SecondMostPopRecommender import SndMostPopRecommender
-        return SndMostPopRecommender
+        from daisy.model.accuracyRecommender.SecondMostPopRecommender import SndMostPop
+        return SndMostPop
     else:
         raise ModuleNotFoundError(f"Model name '{algo_name}' not found")
 

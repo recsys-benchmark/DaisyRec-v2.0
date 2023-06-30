@@ -4,13 +4,13 @@ import numpy as np
 import torch
 
 
-class SndMostPopRecommender(GeneralRecommender):
+class SndMostPop(GeneralRecommender):
     '''
     Model recommends user the second most popular item in the list
     '''
 
     def __init__(self, config):
-        super(SndMostPopRecommender, self).__init__(config)
+        super(SndMostPop, self).__init__(config)
         self.config = config
 
     def fit(self, training_df: DataFrame) -> np.ndarray:
