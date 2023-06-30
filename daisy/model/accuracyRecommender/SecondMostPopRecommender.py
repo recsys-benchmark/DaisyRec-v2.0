@@ -8,6 +8,7 @@ class SndMostPop(GeneralRecommender):
     '''
     Model recommends user the second most popular item in the list
     '''
+    tunable_param_names = []
 
     def __init__(self, config):
         super(SndMostPop, self).__init__(config)
@@ -23,7 +24,7 @@ class SndMostPop(GeneralRecommender):
 
         return self.item_counts_series
 
-    def rank(self, test_loader: torch.utils.data.DataLoader) -> torch.Tensor:
+    def rank(self, test_loader: torch.utils.data.DataLoader) -> np.ndarray:
         '''
         Returns rank of all 
 
@@ -48,8 +49,8 @@ class SndMostPop(GeneralRecommender):
                 # we must first score the items
                 candidate_item_scores = self.item_counts_array[candidate_items]
 
-                # Find the indices of the top k scores
-                top_k_indices = np.argsort(candidate_item_scores)[-k:]
+                # Find the indices of the top 1 to k+1 scores
+                top_k_indices = np.argsort(candidate_item_scores)[-(k+1):-1]
 
                 # Use the indices to get the item IDs with the top k scores
                 top_k_items = candidate_items[top_k_indices]
