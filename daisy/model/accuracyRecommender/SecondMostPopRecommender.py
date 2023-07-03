@@ -26,8 +26,8 @@ class SndMostPop(GeneralRecommender):
 
     def rank(self, test_loader: torch.utils.data.DataLoader) -> np.ndarray:
         '''
-        Returns rank of all 
-
+        From a given candidate list of items per user (in test_loader), the algorithm makes a recommendation of the top k
+        items from this candidate list for the user. 
         '''
 
         # Pick out the top k
@@ -37,16 +37,16 @@ class SndMostPop(GeneralRecommender):
         predictions_cur_index = 0
 
         for batch in test_loader:
+            # we get 128 (u, [1000 item]) pairs in 1 batch. We now extract the 1000 candidate items lists 
             _, candidate_items_lists = batch
-            # we get 128 (u, [1000 item]) pairs
             for candidate_items in candidate_items_lists:
 
-                # convert to np array
+                # convert item counts series and candidate items tensor to np array
                 candidate_items = np.array(candidate_items)
                 self.item_counts_array = np.zeros(self.config['item_num'])
                 self.item_counts_array[self.item_counts_series.index] = self.item_counts_series.values
 
-                # we must first score the items
+                # we must first score the items based on their counts
                 candidate_item_scores = self.item_counts_array[candidate_items]
 
                 # Find the indices of the top 1 to k+1 scores
