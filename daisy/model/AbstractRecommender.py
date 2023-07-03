@@ -16,10 +16,10 @@ class AbstractRecommender(nn.Module):
         self.logger = None
 
         self.initializer_param_config = {
-            'normal': {'mean':0.0, 'std':0.01},
-            'uniform': {'a':0.0, 'b':1.0},
-            'xavier_normal': {'gain':1.0},
-            'xavier_uniform': {'gain':1.0}
+            'normal': {'mean': 0.0, 'std': 0.01},
+            'uniform': {'a': 0.0, 'b': 1.0},
+            'xavier_normal': {'gain': 1.0},
+            'xavier_uniform': {'gain': 1.0}
         }
 
         self.initializer_config = {
@@ -31,7 +31,7 @@ class AbstractRecommender(nn.Module):
 
     def calc_loss(self, batch):
         raise NotImplementedError
-    
+
     def fit(self, train_loader):
         raise NotImplementedError
 
@@ -40,7 +40,7 @@ class AbstractRecommender(nn.Module):
 
     def full_rank(self, u):
         raise NotImplementedError
-    
+
     def predict(self, u, i):
         raise NotImplementedError
 
@@ -60,18 +60,21 @@ class AbstractRecommender(nn.Module):
         elif learner.lower() == 'sparse_adam':
             optimizer = optim.SparseAdam(params, lr=learning_rate)
         else:
-            self.logger.info('Received unrecognized optimizer, set default Adam optimizer')
+            self.logger.info(
+                'Received unrecognized optimizer, set default Adam optimizer')
             optimizer = optim.Adam(params, lr=learning_rate)
 
         return optimizer
 
     def _init_weight(self, m):
         if isinstance(m, nn.Linear):
-            self.initializer_config[self.initializer](m.weight, **self.initializer_param_config[self.initializer])
+            self.initializer_config[self.initializer](
+                m.weight, **self.initializer_param_config[self.initializer])
             if m.bias is not None:
                 nn.init.constant_(m.bias.data, 0.)
         elif isinstance(m, nn.Embedding):
-            self.initializer_config[self.initializer](m.weight, **self.initializer_param_config[self.initializer])
+            self.initializer_config[self.initializer](
+                m.weight, **self.initializer_param_config[self.initializer])
         else:
             pass
 
@@ -87,12 +90,15 @@ class AbstractRecommender(nn.Module):
         elif loss_type.upper() == 'TL':
             criterion = TOP1Loss()
         else:
-            raise NotImplementedError(f'Invalid loss type: {self.loss_type}...')
+            raise NotImplementedError(
+                f'Invalid loss type: {self.loss_type}...')
 
         return criterion
 
+
 class GeneralRecommender(AbstractRecommender):
     tunable_param_names = []
+
     def __init__(self, config):
         super(GeneralRecommender, self).__init__()
 
@@ -120,7 +126,8 @@ class GeneralRecommender(AbstractRecommender):
                 loss = self.calc_loss(batch)
 
                 if torch.isnan(loss):
-                    raise ValueError(f'Loss=Nan or Infinity: current settings does not fit the recommender')
+                    raise ValueError(
+                        f'Loss=Nan or Infinity: current settings does not fit the recommender')
 
                 loss.backward()
                 optimizer.step()
@@ -136,10 +143,11 @@ class GeneralRecommender(AbstractRecommender):
             else:
                 last_loss = current_loss
 
+
 class AERecommender(GeneralRecommender):
     def __init__(self, config):
         super(AERecommender, self).__init__(config)
-        self.user_num = None 
+        self.user_num = None
         self.item_num = None
         self.history_user_id, self.history_item_id = None, None
         self.history_user_value, self.history_item_value = None, None
@@ -149,19 +157,24 @@ class AERecommender(GeneralRecommender):
         just convert the raw rating matrix to a much smaller matrix for calculation,
         the row index will be the new id for uid, but col index will still remain the old iid
         '''
-        col_indices = self.history_item_id[user].flatten() # batch * max_inter_by_user -> (batch * max_inter_by_user)
+        col_indices = self.history_item_id[user].flatten(
+        )  # batch * max_inter_by_user -> (batch * max_inter_by_user)
         row_indices = torch.arange(user.shape[0]).to(self.device).repeat_interleave(
-            self.history_item_id.shape[1], dim=0) # batch -> (batch * max_inter_by_user)
-        rating_matrix = torch.zeros(1).to(self.device).repeat(user.shape[0], self.item_num) # batch * item_num
-        rating_matrix.index_put_((row_indices, col_indices), self.history_item_value[user].flatten())
-        
+            self.history_item_id.shape[1], dim=0)  # batch -> (batch * max_inter_by_user)
+        rating_matrix = torch.zeros(1).to(self.device).repeat(
+            user.shape[0], self.item_num)  # batch * item_num
+        rating_matrix.index_put_(
+            (row_indices, col_indices), self.history_item_value[user].flatten())
+
         return rating_matrix
 
     def get_item_rating_matrix(self, item):
         col_indices = self.history_user_id[item].flatten()
         row_indices = torch.arange(item.shape[0]).to(self.device).repeat_interleave(
             self.history_user_id.shape[1], dim=0)
-        rating_matrix = torch.zeros(1).to(self.device).repeat(item.shape[0], self.user_num)
-        rating_matrix.index_put_((row_indices, col_indices), self.history_user_value[item].flatten())
-        
+        rating_matrix = torch.zeros(1).to(
+            self.device).repeat(item.shape[0], self.user_num)
+        rating_matrix.index_put_(
+            (row_indices, col_indices), self.history_user_value[item].flatten())
+
         return rating_matrix
