@@ -3,11 +3,10 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import abc
 from daisy.utils.loss import BPRLoss, TOP1Loss, HingeLoss
 
 
-class AbstractRecommender(nn.Module, abc.ABC):
+class AbstractRecommender(nn.Module):
     def __init__(self):
         super(AbstractRecommender, self).__init__()
         self.optimizer = None
@@ -33,7 +32,6 @@ class AbstractRecommender(nn.Module, abc.ABC):
     def calc_loss(self, batch):
         raise NotImplementedError
     
-    @abc.abstractclassmethod
     def fit(self, train_loader):
         raise NotImplementedError
 
