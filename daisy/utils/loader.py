@@ -37,17 +37,17 @@ def load_rate(src='ml-100k', prepro='origin', binary=True, pos_threshold=None, l
         df = pd.read_csv(f'./data/{src}/ratings.dat', sep='::', header=None, 
                          names=['user', 'item', 'rating', 'timestamp'], engine='python')
         # only consider rating >=4 for data density
-        # df = df.query('rating >= 4').reset_index(drop=True).copy()
+        df = df.query('rating >= 4').reset_index(drop=True).copy()
 
     elif src == 'ml-10m':
         df = pd.read_csv(f'./data/{src}/ratings.dat', sep='::', header=None, 
                          names=['user', 'item', 'rating', 'timestamp'], engine='python')
-        # df = df.query('rating >= 4').reset_index(drop=True).copy()
+        df = df.query('rating >= 4').reset_index(drop=True).copy()
 
     elif src == 'ml-20m':
         df = pd.read_csv(f'./data/{src}/ratings.csv')
         df.rename(columns={'userId':'user', 'movieId':'item'}, inplace=True)
-        # df = df.query('rating >= 4').reset_index(drop=True)
+        df = df.query('rating >= 4').reset_index(drop=True)
 
     elif src == 'netflix':
         cnt = 0
