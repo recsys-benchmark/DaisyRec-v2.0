@@ -85,6 +85,8 @@ class PointNeuMF(nn.Module):
 
         if optimizer == 'default':
             optimizer = 'adam'
+        if initializer == 'default':
+            initializer = 'normal'
         self._init_weight_(initializer)
 
         self.loss_type = loss_type
@@ -98,7 +100,7 @@ class PointNeuMF(nn.Module):
             initializer_config[initializer](self.embed_item_GMF.weight, **model_config['initializer'][initializer])
             initializer_config[initializer](self.embed_user_MLP.weight, **model_config['initializer'][initializer])
             initializer_config[initializer](self.embed_item_MLP.weight, **model_config['initializer'][initializer])
-            if initializer == 'default':
+            if initializer == 'normal':
                 for m in self.MLP_layers:
                     if isinstance(m, nn.Linear):
                         nn.init.xavier_uniform_(m.weight)

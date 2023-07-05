@@ -65,6 +65,8 @@ class PairNFM(nn.Module):
         self.loss_type = loss_type
         if optimizer == 'default':
             optimizer = 'sgd'
+        if initializer == 'default':
+            optimizer = 'noraml'
         self.optimizer = optimizer
         self.early_stop = early_stop
 
