@@ -467,8 +467,8 @@ if __name__ == '__main__':
             print(key, 'loguniform', np.log(val[0]), np.log(val[1]))
             space[key] = hp.loguniform(key, np.log(val[0]), np.log(val[1]))
         elif val[3] == 'choice':
-            print(key, 'choice', val[0])
-            space[key] = hp.choice(key, val[0])
+            print(key, 'choice', val[2])
+            space[key] = hp.choice(key, val[2])
         else:
             raise ValueError(f'Invalid space parameter {val[3]}')
     # space = {
