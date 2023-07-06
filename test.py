@@ -9,6 +9,26 @@ from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.dataset import get_dataloader, BasicDataset, CandidatesDataset, AEDataset
 from daisy.utils.utils import ensure_dir, get_ur, get_history_matrix, build_candidates_set, get_inter_matrix
 
+def sampler_compare(train_set, config):
+    sampler = BasicNegtiveSampler(train_set, config)
+
+    for num_neg in 4:
+        print(f'\n Now calculating for num neg: {num_neg}')
+        sampler.num_ng = num_neg
+        s = time.time()
+        sampler.sampling()
+        e = time.time()
+
+        print(f'Prev sampling time: {e - s}')
+
+        s = time.time()
+        sampler.itemwise_sampling()
+        e = time.time()
+        print(f'New sampling time: {e - s}')
+
+
+    import sys
+    sys.exit()
 
 
 if __name__ == '__main__':
@@ -42,6 +62,7 @@ if __name__ == '__main__':
     test_ur = get_ur(test_set)
     total_train_ur = get_ur(train_set)
     config['train_ur'] = total_train_ur
+    sampler_compare(train_set, config)
 
     ''' build and train model '''
     s_time = time.time()

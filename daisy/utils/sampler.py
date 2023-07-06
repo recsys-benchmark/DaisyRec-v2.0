@@ -1,4 +1,6 @@
 import numpy as np
+from pandas import DataFrame
+
 
 class AbstractSampler(object):
     def __init__(self, config):
@@ -10,8 +12,9 @@ class AbstractSampler(object):
     def sampling(self):
         raise NotImplementedError
 
+
 class BasicNegtiveSampler(AbstractSampler):
-    def __init__(self, df, config):
+    def __init__(self, df: DataFrame, config):
         """
         negative sampling class for <u, pos_i, neg_i> or <u, pos_i, r>
         Parameters
@@ -34,12 +37,13 @@ class BasicNegtiveSampler(AbstractSampler):
         self.sample_ratio = config['sample_ratio']
         self.loss_type = config['loss_type'].upper()
 
-        assert self.sample_method in ['uniform', 'low-pop', 'high-pop'], f'Invalid sampling method: {self.sample_method}'
+        assert self.sample_method in [
+            'uniform', 'low-pop', 'high-pop'], f'Invalid sampling method: {self.sample_method}'
         assert 0 <= self.sample_ratio <= 1, 'Invalid sample ratio value'
 
         self.df = df
         self.pop_prob = None
-        
+
         if self.sample_method in ['high-pop', 'low-pop']:
             pop = df.groupby(self.iid_name).size()
             # rescale to [0, 1]
@@ -58,10 +62,13 @@ class BasicNegtiveSampler(AbstractSampler):
             if self.loss_type in ['CL', 'SL']:
                 return self.df[[self.uid_name, self.iid_name, self.inter_name]].values.astype(np.int32)
             else:
-                raise NotImplementedError('loss function (BPR, TL, HL) need num_ng > 0')
+                raise NotImplementedError(
+                    'loss function (BPR, TL, HL) need num_ng > 0')
+
 
         js = np.zeros((self.user_num, self.num_ng), dtype=np.int32)
-        if self.sample_method in ['low-pop', 'high-pop']:
+
+        if self.sample_method in ['low-pop', 'high-pop'] :
             other_num = int(self.sample_ratio * self.num_ng)
             uniform_num = self.num_ng - other_num
 
@@ -69,7 +76,7 @@ class BasicNegtiveSampler(AbstractSampler):
                 past_inter = list(self.ur[u])
 
                 uni_negs = np.random.choice(
-                    np.setdiff1d(np.arange(self.item_num), past_inter), 
+                    np.setdiff1d(np.arange(self.item_num), past_inter),
                     size=uniform_num
                 )
                 other_negs = np.random.choice(
@@ -78,29 +85,121 @@ class BasicNegtiveSampler(AbstractSampler):
                     p=self.pop_prob
                 )
                 js[u] = np.concatenate((uni_negs, other_negs), axis=None)
-
-        else:
+        else: # uniform
             # all negative samples are sampled by uniform distribution
             for u in range(self.user_num):
                 past_inter = list(self.ur[u])
                 js[u] = np.random.choice(
-                    np.setdiff1d(np.arange(self.item_num), past_inter), 
+                    np.setdiff1d(np.arange(self.item_num), past_inter),
                     size=self.num_ng
                 )
+
 
         self.df['neg_set'] = self.df[self.uid_name].agg(lambda u: js[u])
 
         if self.loss_type.upper() in ['CL', 'SL']:
-            point_pos = self.df[[self.uid_name, self.iid_name, self.inter_name]]
-            point_neg = self.df[[self.uid_name, 'neg_set', self.inter_name]].copy()
+            point_pos = self.df[[self.uid_name,
+                                 self.iid_name, self.inter_name]]
+            point_neg = self.df[[self.uid_name,
+                                 'neg_set', self.inter_name]].copy()
             point_neg[self.inter_name] = 0
-            point_neg = point_neg.explode('neg_set')    
+            point_neg = point_neg.explode('neg_set')
             return np.vstack([point_pos.values, point_neg.values]).astype(np.int32)
         elif self.loss_type.upper() in ['BPR', 'HL', 'TL']:
-            self.df = self.df[[self.uid_name, self.iid_name, 'neg_set']].explode('neg_set')
+            self.df = self.df[[self.uid_name, self.iid_name,
+                               'neg_set']].explode('neg_set')
             return self.df.values.astype(np.int32)
         else:
             raise NotImplementedError
+
+    def itemwise_sampling(self):
+        if self.num_ng == 0:
+            self.df['neg_set'] = self.df.apply(lambda x: [], axis=1)
+            if self.loss_type in ['CL', 'SL']:
+                return self.df[[self.uid_name, self.iid_name, self.inter_name]].values.astype(np.int32)
+            else:
+                raise NotImplementedError(
+                    'loss function (BPR, TL, HL) need num_ng > 0')
+
+        def uniform_items_clean(num_uniform_samples, all_items, past_interactions):
+            neg_items = set()
+            interaction_ratio = self.item_num // len(past_interactions)
+
+            if interaction_ratio > 1:
+                for _ in range(num_uniform_samples):
+                    new_neg_item = np.random.randint(self.item_num)
+                    while new_neg_item in past_interactions or new_neg_item in neg_items:
+                        new_neg_item = np.random.randint(self.item_num)
+                    neg_items.add(new_neg_item)
+                return list(neg_items)
+
+            else:
+                un_interacted_items = all_items.difference(past_interactions)
+                neg_items = np.random.choice(
+                    list(un_interacted_items), size=num_uniform_samples)
+                return neg_items
+
+        def uniform_sampler(num_uniform_samples, num_other_samples=0):
+
+            # random assignment
+            candidate_negative_items = np.random.randint(
+                self.item_num, size=(len(self.df), num_uniform_samples))
+
+            # This is the final array shape if there are other samples
+            result_items = np.ndarray(
+                (len(self.df), num_uniform_samples+num_other_samples))
+
+            # Get all user ids (in order) and item ids
+            all_user_ids = self.df[self.uid_name]
+            all_item_ids_set = set(range(self.item_num))
+            all_item_ids_arr = np.arange(self.item_num)
+
+            # Run through all the random arrays, check and clean them
+            for index, candidate_items_list in enumerate(candidate_negative_items):
+                user_id = all_user_ids.iloc[index]
+                past_interactions = self.ur[user_id]
+                candidate_items_set = set(candidate_items_list)
+
+                # If there are duplicates in the array or item already interacted with
+                if len(candidate_items_set) != num_uniform_samples or past_interactions.intersection(candidate_items_set):
+                    # Get a fresh set and re-assign
+                    candidate_items_list = uniform_items_clean(
+                        num_uniform_samples, all_item_ids_set, past_interactions)
+                    candidate_negative_items[index] = candidate_items_list
+
+                if num_other_samples:
+                    other_negs = np.random.choice(
+                        all_item_ids_arr,
+                        size=num_other_samples,
+                        p=self.pop_prob
+                    )
+                    result_items[index] = np.concatenate(
+                        (candidate_items_list, other_negs), axis=None)
+
+            return result_items if num_other_samples else candidate_negative_items
+
+        if self.sample_method in ['low-pop', 'high-pop']:
+            other_num = int(self.sample_ratio * self.num_ng)
+            uniform_num = self.num_ng - other_num
+            self.df['neg_set'] = uniform_sampler(uniform_num, other_num)
+        else:
+            self.df['neg_set'] = uniform_sampler(self.num_ng)
+
+        if self.loss_type.upper() in ['CL', 'SL']:
+            point_pos = self.df[[self.uid_name,
+                                 self.iid_name, self.inter_name]]
+            point_neg = self.df[[self.uid_name,
+                                 'neg_set', self.inter_name]].copy()
+            point_neg[self.inter_name] = 0
+            point_neg = point_neg.explode('neg_set')
+            return np.vstack([point_pos.values, point_neg.values]).astype(np.int32)
+        elif self.loss_type.upper() in ['BPR', 'HL', 'TL']:
+            self.df = self.df[[self.uid_name, self.iid_name,
+                               'neg_set']].explode('neg_set')
+            return self.df.values.astype(np.int32)
+        else:
+            raise NotImplementedError
+
 
 class SkipGramNegativeSampler(AbstractSampler):
     def __init__(self, df, config, discard=False):
@@ -116,8 +215,8 @@ class SkipGramNegativeSampler(AbstractSampler):
         context_window: int, context range around target
         train_ur: dict, ground truth for each user in train set
         item_num: int, the number of items
-        '''    
-        super(SkipGramNegativeSampler, self).__init__(config)    
+        '''
+        super(SkipGramNegativeSampler, self).__init__(config)
         self.context_window = config['context_window']
 
         word_frequecy = df[self.iid_name].value_counts()
@@ -151,7 +250,7 @@ class SkipGramNegativeSampler(AbstractSampler):
                 num_ng = len(context_list)
                 for neg_item in np.random.choice(cands, size=num_ng):
                     sgns_samples.append([target, neg_item, 0])
-        
+
         return np.array(sgns_samples)
 
     def _build_seqs(self, df):

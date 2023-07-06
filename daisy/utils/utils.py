@@ -10,18 +10,20 @@ def ensure_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
+
 def get_local_time():
     cur = datetime.datetime.now()
     cur = cur.strftime('%b-%d-%Y_%H-%M-%S')
 
     return cur
 
+
 def get_ur(df):
     """
-    Method of getting user-rating pairs
+    Method of getting user-item pairs
     Parameters
     ----------
-    df : pd.DataFrame, rating dataframe
+    df : pd.DataFrame, item dataframe
 
     Returns
     -------
@@ -29,16 +31,19 @@ def get_ur(df):
     """
     ur = defaultdict(set)
     for _, row in df.iterrows():
-        ur[int(row['user'])].add(int(row['item']))
+        # TODO 'user' and 'item' should not be hardcoded, but accessed from config
+        user_id, item_id = int(row['user']), int(row['item'])
+        ur[user_id].add(item_id)
 
     return ur
 
+
 def get_ir(df):
     """
-    Method of getting item-rating pairs
+    Method of getting item-user pairs
     Parameters
     ----------
-    df : pd.DataFrame, rating dataframe
+    df : pd.DataFrame,item dataframe
 
     Returns
     -------
@@ -49,6 +54,7 @@ def get_ir(df):
         ir[int(row['item'])].add(int(row['user']))
 
     return ir
+
 
 def build_candidates_set(test_ur, train_ur, config, drop_past_inter=True):
     """
@@ -74,15 +80,17 @@ def build_candidates_set(test_ur, train_ur, config, drop_past_inter=True):
         if sample_num == 0:
             samples = np.random.choice(list(r), candidates_num)
         else:
-            pos_items = list(r) + list(train_ur[u]) if drop_past_inter else list(r)
+            pos_items = list(
+                r) + list(train_ur[u]) if drop_past_inter else list(r)
             neg_items = np.setdiff1d(np.arange(item_num), pos_items)
             samples = np.random.choice(neg_items, size=sample_num)
             samples = np.concatenate((samples, list(r)), axis=None)
 
         test_ucands.append([u, samples])
         test_u.append(u)
-    
+
     return test_u, test_ucands
+
 
 def get_history_matrix(df, config, row='user', use_config_value_name=False):
     '''
@@ -90,7 +98,7 @@ def get_history_matrix(df, config, row='user', use_config_value_name=False):
     '''
     logger = config['logger']
     assert row in df.columns, f'invalid name {row}: not in columns of history dataframe'
-    uid_name, iid_name  = config['UID_NAME'], config['IID_NAME']
+    uid_name, iid_name = config['UID_NAME'], config['IID_NAME']
     user_ids, item_ids = df[uid_name].values, df[iid_name].values
     value_name = config['INTER_NAME'] if use_config_value_name else None
 
@@ -100,7 +108,7 @@ def get_history_matrix(df, config, row='user', use_config_value_name=False):
     if row == 'user':
         row_num, max_col_num = user_num, item_num
         row_ids, col_ids = user_ids, item_ids
-    else: # 'item'
+    else:  # 'item'
         row_num, max_col_num = item_num, user_num
         row_ids, col_ids = item_ids, user_ids
 
@@ -110,7 +118,8 @@ def get_history_matrix(df, config, row='user', use_config_value_name=False):
 
     col_num = np.max(history_len)
     if col_num > max_col_num * 0.2:
-        logger.info(f'Max value of {row}\'s history interaction records has reached: {col_num / max_col_num * 100:.4f}% of the total.')
+        logger.info(
+            f'Max value of {row}\'s history interaction records has reached: {col_num / max_col_num * 100:.4f}% of the total.')
 
     history_matrix = np.zeros((row_num, col_num), dtype=np.int64)
     history_value = np.zeros((row_num, col_num))
@@ -121,6 +130,7 @@ def get_history_matrix(df, config, row='user', use_config_value_name=False):
         history_len[row_id] += 1
 
     return torch.LongTensor(history_matrix), torch.FloatTensor(history_value), torch.LongTensor(history_len)
+
 
 def get_inter_matrix(df, config, form='coo'):
     '''
@@ -141,5 +151,5 @@ def get_inter_matrix(df, config, form='coo'):
     elif form == 'csr':
         return mat.tocsr()
     else:
-        raise NotImplementedError(f'Sparse matrix format [{form}] has not been implemented...')
-
+        raise NotImplementedError(
+            f'Sparse matrix format [{form}] has not been implemented...')
