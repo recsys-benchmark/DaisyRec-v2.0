@@ -32,6 +32,7 @@ class BasicNegtiveSampler(AbstractSampler):
         self.inter_name = config['INTER_NAME']
         self.sample_method = config['sample_method']
         self.sample_ratio = config['sample_ratio']
+        self.sampling_batch = config['batch_size']
         self.loss_type = config['loss_type'].upper()
 
         assert self.sample_method in ['uniform', 'low-pop', 'high-pop'], f'Invalid sampling method: {self.sample_method}'
@@ -101,6 +102,38 @@ class BasicNegtiveSampler(AbstractSampler):
             return self.df.values.astype(np.int32)
         else:
             raise NotImplementedError
+        
+    def batch_sampling(self, sampling_batch_size=None):
+
+        if not sampling_batch_size:
+            sampling_batch_size = self.sampling_batch
+
+        # First we split the dataset into batches
+        def batch_generator():
+            batch_index_start = 0
+            batch_index_end = sampling_batch_size
+
+            while True:
+                yield self.df.iloc[batch_index_start:batch_index_end]
+                batch_index_start += sampling_batch_size
+                batch_index_end += sampling_batch_size
+                if batch_index_end >= len(self.df):
+                    yield self.df.iloc[batch_index_start:batch_index_end]
+                    break
+
+        # Next we create a list of all items available in the batches
+
+        # For every row in the batch we will perform set difference
+
+        # If the set difference returns enough samples, randomly choose 
+
+        # Else perform guess-and-check sampling
+
+        # Append to df
+
+        # Perform explosion and conversion
+         
+        pass
 
 class SkipGramNegativeSampler(AbstractSampler):
     def __init__(self, df, config, discard=False):

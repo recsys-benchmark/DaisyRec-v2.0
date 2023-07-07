@@ -8,7 +8,7 @@ hyperopt_trail: 30
 tune_testset: False
 tune_pack: '{}'
 
-algo_name: 'mf'
+algo_name: 'neumf'
 val_method: 'tsbr'
 test_method: 'tsbr'
 fold_num: 1
