@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+
 
 class AbstractSampler(object):
     def __init__(self, config):
@@ -9,6 +11,7 @@ class AbstractSampler(object):
 
     def sampling(self):
         raise NotImplementedError
+
 
 class BasicNegtiveSampler(AbstractSampler):
     def __init__(self, df, config):
@@ -35,12 +38,13 @@ class BasicNegtiveSampler(AbstractSampler):
         self.sampling_batch = config['batch_size']
         self.loss_type = config['loss_type'].upper()
 
-        assert self.sample_method in ['uniform', 'low-pop', 'high-pop'], f'Invalid sampling method: {self.sample_method}'
+        assert self.sample_method in [
+            'uniform', 'low-pop', 'high-pop'], f'Invalid sampling method: {self.sample_method}'
         assert 0 <= self.sample_ratio <= 1, 'Invalid sample ratio value'
 
         self.df = df
         self.pop_prob = None
-        
+
         if self.sample_method in ['high-pop', 'low-pop']:
             pop = df.groupby(self.iid_name).size()
             # rescale to [0, 1]
@@ -59,7 +63,8 @@ class BasicNegtiveSampler(AbstractSampler):
             if self.loss_type in ['CL', 'SL']:
                 return self.df[[self.uid_name, self.iid_name, self.inter_name]].values.astype(np.int32)
             else:
-                raise NotImplementedError('loss function (BPR, TL, HL) need num_ng > 0')
+                raise NotImplementedError(
+                    'loss function (BPR, TL, HL) need num_ng > 0')
 
         js = np.zeros((self.user_num, self.num_ng), dtype=np.int32)
         if self.sample_method in ['low-pop', 'high-pop']:
@@ -70,7 +75,7 @@ class BasicNegtiveSampler(AbstractSampler):
                 past_inter = list(self.ur[u])
 
                 uni_negs = np.random.choice(
-                    np.setdiff1d(np.arange(self.item_num), past_inter), 
+                    np.setdiff1d(np.arange(self.item_num), past_inter),
                     size=uniform_num
                 )
                 other_negs = np.random.choice(
@@ -85,55 +90,93 @@ class BasicNegtiveSampler(AbstractSampler):
             for u in range(self.user_num):
                 past_inter = list(self.ur[u])
                 js[u] = np.random.choice(
-                    np.setdiff1d(np.arange(self.item_num), past_inter), 
+                    np.setdiff1d(np.arange(self.item_num), past_inter),
                     size=self.num_ng
                 )
 
         self.df['neg_set'] = self.df[self.uid_name].agg(lambda u: js[u])
 
         if self.loss_type.upper() in ['CL', 'SL']:
-            point_pos = self.df[[self.uid_name, self.iid_name, self.inter_name]]
-            point_neg = self.df[[self.uid_name, 'neg_set', self.inter_name]].copy()
+            point_pos = self.df[[self.uid_name,
+                                 self.iid_name, self.inter_name]]
+            point_neg = self.df[[self.uid_name,
+                                 'neg_set', self.inter_name]].copy()
             point_neg[self.inter_name] = 0
-            point_neg = point_neg.explode('neg_set')    
+            point_neg = point_neg.explode('neg_set')
             return np.vstack([point_pos.values, point_neg.values]).astype(np.int32)
         elif self.loss_type.upper() in ['BPR', 'HL', 'TL']:
-            self.df = self.df[[self.uid_name, self.iid_name, 'neg_set']].explode('neg_set')
+            self.df = self.df[[self.uid_name, self.iid_name,
+                               'neg_set']].explode('neg_set')
             return self.df.values.astype(np.int32)
         else:
             raise NotImplementedError
-        
+
     def batch_sampling(self, sampling_batch_size=None):
 
+        # Handle case where no negative sampling is needed
+        if self.num_ng == 0:
+            self.df['neg_set'] = self.df.apply(lambda x: [], axis=1)
+            if self.loss_type in ['CL', 'SL']:
+                return self.df[[self.uid_name, self.iid_name, self.inter_name]].values.astype(np.int32)
+            else:
+                raise NotImplementedError(
+                    'loss function (BPR, TL, HL) need num_ng > 0')
+
+        # Sampling batch size is same as training batch by default
         if not sampling_batch_size:
             sampling_batch_size = self.sampling_batch
+
+        # Shuffle dataframe
+        self.df = self.df.sample(frac=1).reset_index(drop=True)
 
         # First we split the dataset into batches
         def batch_generator():
             batch_index_start = 0
             batch_index_end = sampling_batch_size
 
-            while True:
-                yield self.df.iloc[batch_index_start:batch_index_end]
+            while batch_index_end < len(self.df):
+                next_batch = self.df.iloc[batch_index_start:batch_index_end]
+                yield next_batch
                 batch_index_start += sampling_batch_size
                 batch_index_end += sampling_batch_size
-                if batch_index_end >= len(self.df):
-                    yield self.df.iloc[batch_index_start:batch_index_end]
-                    break
 
-        # Next we create a list of all items available in the batches
+        # We create a function to apply to every row in the df
+        def get_neg_sample(user, all_items):
 
-        # For every row in the batch we will perform set difference
+            # For every row in the batch we will perform set difference
+            past_interactions = self.ur[user]
+            set_difference = set(all_items).difference(past_interactions)
 
-        # If the set difference returns enough samples, randomly choose 
+            # If the set difference returns enough samples, randomly choose
+            if len(set_difference) >= self.num_ng:
+                return np.random.choice(np.array(set_difference))
 
-        # Else perform guess-and-check sampling
+            # Else perform guess-and-check sampling
 
-        # Append to df
+        for batch in batch_generator():
+            # Next we create a list of all items available in the batches
+            all_items = batch[self.iid_name].unique()
+
+            # Append to df
+            self.df['neg_set'] = batch.apply(
+                lambda row: get_neg_sample(row[self.uid_name, all_items]))
 
         # Perform explosion and conversion
-         
-        pass
+        if self.loss_type.upper() in ['CL', 'SL']:
+            point_pos = self.df[[self.uid_name,
+                                 self.iid_name, self.inter_name]]
+            point_neg = self.df[[self.uid_name,
+                                 'neg_set', self.inter_name]].copy()
+            point_neg[self.inter_name] = 0
+            point_neg = point_neg.explode('neg_set')
+            return np.vstack([point_pos.values, point_neg.values]).astype(np.int32)
+        elif self.loss_type.upper() in ['BPR', 'HL', 'TL']:
+            self.df = self.df[[self.uid_name, self.iid_name,
+                               'neg_set']].explode('neg_set')
+            return self.df.values.astype(np.int32)
+        else:
+            raise NotImplementedError("That loss type has not yet been implemented")
+
 
 class SkipGramNegativeSampler(AbstractSampler):
     def __init__(self, df, config, discard=False):
@@ -149,8 +192,8 @@ class SkipGramNegativeSampler(AbstractSampler):
         context_window: int, context range around target
         train_ur: dict, ground truth for each user in train set
         item_num: int, the number of items
-        '''    
-        super(SkipGramNegativeSampler, self).__init__(config)    
+        '''
+        super(SkipGramNegativeSampler, self).__init__(config)
         self.context_window = config['context_window']
 
         word_frequecy = df[self.iid_name].value_counts()
@@ -184,7 +227,7 @@ class SkipGramNegativeSampler(AbstractSampler):
                 num_ng = len(context_list)
                 for neg_item in np.random.choice(cands, size=num_ng):
                     sgns_samples.append([target, neg_item, 0])
-        
+
         return np.array(sgns_samples)
 
     def _build_seqs(self, df):
