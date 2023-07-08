@@ -112,10 +112,12 @@ class BasicNegtiveSampler(AbstractSampler):
             raise NotImplementedError
 
     def batch_sampling(self, sampling_batch_size=None):
+        if self.sample_method != "uniform":
+            raise NotImplementedError("popularity batch sampling not implemeneted")
 
         # Handle case where no negative sampling is needed
         if self.num_ng == 0:
-            self.df['neg_set'] = self.df.apply(lambda x: [], axis=1)
+            self.df['neg_set'] = self.df.apply(lambda _: [], axis=1)
             if self.loss_type in ['CL', 'SL']:
                 return self.df[[self.uid_name, self.iid_name, self.inter_name]].values.astype(np.int32)
             else:
@@ -139,12 +141,25 @@ class BasicNegtiveSampler(AbstractSampler):
                 yield next_batch
                 batch_index_start += sampling_batch_size
                 batch_index_end += sampling_batch_size
+        
+        def guess_and_check_sampling(past_interactions):
+            # Guesses an item from the entire database and checks
+            
+            neg_items = set()
+            for _ in range(self.num_ng):
+                new_neg_item = np.random.randint(self.item_num)
+                while new_neg_item in past_interactions or new_neg_item in neg_items:
+                    new_neg_item = np.random.randint(self.item_num)
+                neg_items.add(new_neg_item)
+
+            return np.array(neg_items)
+
 
         # We create a function to apply to every row in the df
-        def get_neg_sample(user, all_items):
+        def get_neg_sample(user_id, all_items):
 
             # For every row in the batch we will perform set difference
-            past_interactions = self.ur[user]
+            past_interactions = self.ur[user_id]
             set_difference = set(all_items).difference(past_interactions)
 
             # If the set difference returns enough samples, randomly choose
@@ -152,6 +167,7 @@ class BasicNegtiveSampler(AbstractSampler):
                 return np.random.choice(np.array(set_difference))
 
             # Else perform guess-and-check sampling
+            return guess_and_check_sampling(past_interactions)
 
         for batch in batch_generator():
             # Next we create a list of all items available in the batches
@@ -159,7 +175,7 @@ class BasicNegtiveSampler(AbstractSampler):
 
             # Append to df
             self.df['neg_set'] = batch.apply(
-                lambda row: get_neg_sample(row[self.uid_name, all_items]))
+                lambda row: get_neg_sample(row[self.uid_name], all_items))
 
         # Perform explosion and conversion
         if self.loss_type.upper() in ['CL', 'SL']:
