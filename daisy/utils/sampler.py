@@ -111,9 +111,136 @@ class BasicNegtiveSampler(AbstractSampler):
         else:
             raise NotImplementedError
 
+    def guess_and_check_sampling(self):
+        '''
+        Finds num_ng negative items *for every* user-item pair
+        Simply guesses num_ng items and checks if user has interacted with the guesses
+
+        If popularity sampling employed, the set difference between all items and user-interacted items
+        will be taken and sampled from
+        '''
+        # Handle 0 negative sample case
+        if self.num_ng == 0:
+            self.df['neg_set'] = self.df.apply(lambda x: [], axis=1)
+            if self.loss_type in ['CL', 'SL']:
+                return self.df[[self.uid_name, self.iid_name, self.inter_name]].values.astype(np.int32)
+            else:
+                raise NotImplementedError(
+                    'loss function (BPR, TL, HL) need num_ng > 0')
+
+        # This function checks if the guesses for a given user are correct
+        def uniform_items_check(num_uniform_samples, all_items, past_interactions):
+
+            neg_items = set()
+            interaction_ratio = self.item_num // len(past_interactions)
+
+            if True or interaction_ratio > 1:
+
+                # Repeat for every uniform sample needed
+                for _ in range(num_uniform_samples):
+
+                    # Guess an item
+                    new_neg_item = np.random.randint(self.item_num)
+
+                    # While guess is already interacted or guess already in negative set, guess again
+                    while new_neg_item in past_interactions or new_neg_item in neg_items:
+                        new_neg_item = np.random.randint(self.item_num)
+
+                    neg_items.add(new_neg_item)
+
+                return list(neg_items)
+
+            else:
+                '''
+                This code is currently unreachable. 
+                Used for when guess-and-check is not as efficient as set difference.
+                Further exploration is needed on when this needs to be the case. 
+                My hypothesis is when interaction ratio > 1, but empirical testing shows otherwise
+                Also using floor division for calculating interaction ratio for some performance gains
+                '''
+                un_interacted_items = all_items.difference(past_interactions)
+                neg_items = np.random.choice(
+                    list(un_interacted_items), size=num_uniform_samples)
+                return neg_items
+
+        def combined_sampler(num_uniform_samples, num_other_samples=0):
+            '''
+            One-time use function for getting all samples
+            Will perform guess-and-check for uniform samples, set difference for popularity samples
+            '''
+
+            # Guess the items
+            candidate_negative_items = np.random.randint(
+                self.item_num, size=(len(self.df), num_uniform_samples))
+
+            # This is the final array shape if there are popularity (non-uniform) samples
+            result_items = np.ndarray(
+                (len(self.df), num_uniform_samples+num_other_samples))
+
+            # Get all user ids (in order) and item ids
+            all_user_ids = self.df[self.uid_name]
+            all_item_ids_set = set(range(self.item_num))
+            all_item_ids_arr = np.arange(self.item_num)
+
+            # Run through all the guessed arrays, check them
+            for index, candidate_items_list in enumerate(candidate_negative_items):
+                user_id = all_user_ids.iloc[index]
+                past_interactions = self.ur[user_id]
+
+                # When we convert the items to set, due to duplicates the length of the set might decrease 
+                candidate_items_set = set(candidate_items_list)
+
+                # If check failed: there are duplicates in the array or item already interacted with
+                if len(candidate_items_set) != num_uniform_samples or past_interactions.intersection(candidate_items_set):
+                    
+                    # Guess and check a fresh set and re-assign
+                    candidate_items_list = uniform_items_check(
+                        num_uniform_samples, all_item_ids_set, past_interactions)
+                    candidate_negative_items[index] = candidate_items_list
+
+                # If there are popularity samples then re-assign
+                if num_other_samples:
+                    other_negs = np.random.choice(
+                        all_item_ids_arr,
+                        size=num_other_samples,
+                        p=self.pop_prob
+                    )
+                    result_items[index] = np.concatenate(
+                        (candidate_items_list, other_negs), axis=None)
+
+            return result_items if num_other_samples else candidate_negative_items
+
+        self.df['neg_set'] = np.NaN
+        self.df['neg_set'] = self.df['neg_set'].astype('object')
+
+        if self.sample_method in ['low-pop', 'high-pop']:
+            other_num = int(self.sample_ratio * self.num_ng)
+            uniform_num = self.num_ng - other_num
+            self.df['neg_set'] = combined_sampler(uniform_num, other_num)
+        else:
+            self.df['neg_set'] = combined_sampler(self.num_ng)
+
+        if self.loss_type.upper() in ['CL', 'SL']:
+            point_pos = self.df[[self.uid_name,
+                                 self.iid_name, self.inter_name]]
+            point_neg = self.df[[self.uid_name,
+                                 'neg_set', self.inter_name]].copy()
+            point_neg[self.inter_name] = 0
+            point_neg = point_neg.explode('neg_set')
+            return np.vstack([point_pos.values, point_neg.values]).astype(np.int32)
+        elif self.loss_type.upper() in ['BPR', 'HL', 'TL']:
+            self.df = self.df[[self.uid_name, self.iid_name,
+                               'neg_set']].explode('neg_set')
+            return self.df.values.astype(np.int32)
+        else:
+            raise NotImplementedError
+
     def batch_sampling(self, sampling_batch_size=None):
+
+        # We will implement non-uniform later
         if self.sample_method != "uniform":
-            raise NotImplementedError("popularity batch sampling not implemeneted")
+            raise NotImplementedError(
+                "popularity batch sampling not implemeneted")
 
         # Handle case where no negative sampling is needed
         if self.num_ng == 0:
@@ -128,32 +255,37 @@ class BasicNegtiveSampler(AbstractSampler):
         if not sampling_batch_size:
             sampling_batch_size = self.sampling_batch
 
-        # Shuffle dataframe
+        # Shuffle dataframe and initialise negative set
         self.df = self.df.sample(frac=1).reset_index(drop=True)
+        self.df['neg_set'] = np.NaN
+        self.df['neg_set'] = self.df['neg_set'].astype('object') # So arrays can be a assigned to a single cell in df
 
-        # First we split the dataset into batches
+        # Python generator that splits the dataset into batches
         def batch_generator():
             batch_index_start = 0
             batch_index_end = sampling_batch_size
+            df_length = len(self.df)
 
-            while batch_index_end < len(self.df):
+            while batch_index_end < df_length:
                 next_batch = self.df.iloc[batch_index_start:batch_index_end]
-                yield next_batch
+                yield (batch_index_start, batch_index_end), next_batch
                 batch_index_start += sampling_batch_size
                 batch_index_end += sampling_batch_size
-        
-        def guess_and_check_sampling(past_interactions):
-            # Guesses an item from the entire database and checks
-            
+
+            last_batch = self.df.iloc[batch_index_start:df_length]
+            yield (batch_index_start, df_length), last_batch
+
+        # Guesses an item from the entire database and checks
+        def guess_and_check(past_interactions):
             neg_items = set()
+
             for _ in range(self.num_ng):
                 new_neg_item = np.random.randint(self.item_num)
                 while new_neg_item in past_interactions or new_neg_item in neg_items:
                     new_neg_item = np.random.randint(self.item_num)
                 neg_items.add(new_neg_item)
 
-            return np.array(neg_items)
-
+            return np.array(list(neg_items))
 
         # We create a function to apply to every row in the df
         def get_neg_sample(user_id, all_items):
@@ -164,18 +296,25 @@ class BasicNegtiveSampler(AbstractSampler):
 
             # If the set difference returns enough samples, randomly choose
             if len(set_difference) >= self.num_ng:
-                return np.random.choice(np.array(set_difference))
+                return np.random.choice(list(set_difference), size=self.num_ng)
 
             # Else perform guess-and-check sampling
-            return guess_and_check_sampling(past_interactions)
+            return guess_and_check(past_interactions)
 
-        for batch in batch_generator():
+        all_batches = batch_generator()
+
+        for indices, batch in all_batches:
+            start_i, end_i = indices
+
             # Next we create a list of all items available in the batches
-            all_items = batch[self.iid_name].unique()
+            batch_items = batch[self.iid_name].unique()
 
-            # Append to df
-            self.df['neg_set'] = batch.apply(
-                lambda row: get_neg_sample(row[self.uid_name], all_items))
+            # Get all the users in the batch in order
+            batch_users = batch[self.uid_name]
+
+            for i in range(start_i, end_i):
+                self.df.at[i, 'neg_set'] = get_neg_sample(
+                    batch_users[i], batch_items)
 
         # Perform explosion and conversion
         if self.loss_type.upper() in ['CL', 'SL']:
@@ -191,7 +330,8 @@ class BasicNegtiveSampler(AbstractSampler):
                                'neg_set']].explode('neg_set')
             return self.df.values.astype(np.int32)
         else:
-            raise NotImplementedError("That loss type has not yet been implemented")
+            raise NotImplementedError(
+                "That loss type has not yet been implemented")
 
 
 class SkipGramNegativeSampler(AbstractSampler):

@@ -10,6 +10,66 @@ from daisy.utils.dataset import get_dataloader, BasicDataset, CandidatesDataset,
 from daisy.utils.utils import ensure_dir, get_ur, get_history_matrix, build_candidates_set, get_inter_matrix
 
 
+def sampler_compare(train_set, config):
+
+    for num_neg in 4, 5, 6:
+        print("\n======================================")
+        print(f'Now calculating for {num_neg} negative samples per user-item pair:')
+
+        sampler = BasicNegtiveSampler(train_set.copy(), config)
+        sampler.num_ng = num_neg
+        s = time.time()
+        sampler.sampling()
+        e = time.time()
+        old_time = e-s
+        print(f'Prev sampling time: {round(old_time, 5)}')
+        del sampler
+
+        sampler = BasicNegtiveSampler(train_set.copy(), config)
+        sampler.num_ng = num_neg
+        s = time.time()
+        sampler.guess_and_check_sampling()
+        e = time.time()
+        guessandcheck_time = e-s
+        print(f'Guess and check sampling time: {round(guessandcheck_time,3)}s')
+        del sampler
+
+        sampler = BasicNegtiveSampler(train_set.copy(), config)
+        sampler.num_ng = num_neg
+        s = time.time()
+        sampler.batch_sampling(sampling_batch_size=64)
+        e = time.time()
+        new_64_time = e-s
+        print(f'Batch-aware sampling time: {round(new_64_time,3)}s (batch-size=64)')
+        del sampler
+
+        sampler = BasicNegtiveSampler(train_set.copy(), config)
+        sampler.num_ng = num_neg
+        s = time.time()
+        sampler.batch_sampling(sampling_batch_size=128)
+        e = time.time()
+        new_128_time = e-s
+        print(f'Batch-aware sampling time: {round(new_128_time,3)}s (batch-size=128)')
+        del sampler
+
+        sampler = BasicNegtiveSampler(train_set.copy(), config)
+        sampler.num_ng = num_neg
+        s = time.time()
+        sampler.batch_sampling(sampling_batch_size=256)
+        e = time.time()
+        new_256_time = e-s
+        print(f'Batch-aware sampling time: {round(new_256_time,3)}s  (batch-size=256)')
+        del sampler
+
+        print(f'\nFor {num_neg} negative items per user-item pair: ')
+        print(f'The guess-and-check sampling time is {round(guessandcheck_time/old_time, 2)} times slower')
+        print(f'The  64 batch-aware sampling time is {round(new_64_time/old_time, 2)} times slower')
+        print(f'The 128 batch-aware sampling time is {round(new_128_time/old_time, 2)} times slower')
+        print(f'The 256 batch-aware sampling time is {round(new_256_time/old_time, 2)} times slower')
+
+    import sys
+    sys.exit()
+
 
 if __name__ == '__main__':
     ''' summarize hyper-parameter part (basic yaml + args + model yaml) '''
@@ -23,7 +83,7 @@ if __name__ == '__main__':
     logger = getLogger()
     logger.info(config)
     config['logger'] = logger
-    
+
     ''' Test Process for Metrics Exporting '''
     reader, processor = RawDataReader(config), Preprocessor(config)
     df = reader.get_data()
@@ -36,12 +96,16 @@ if __name__ == '__main__':
     ''' Train Test split '''
     splitter = TestSplitter(config)
     train_index, test_index = splitter.split(df)
-    train_set, test_set = df.iloc[train_index, :].copy(), df.iloc[test_index, :].copy()
+    train_set, test_set = df.iloc[train_index,
+                                  :].copy(), df.iloc[test_index, :].copy()
 
     ''' get ground truth '''
     test_ur = get_ur(test_set)
     total_train_ur = get_ur(train_set)
     config['train_ur'] = total_train_ur
+
+    # TODO: REMOVE, FOR DEBUGGING ONLY
+    sampler_compare(train_set, config)
 
     ''' build and train model '''
     s_time = time.time()
@@ -50,11 +114,13 @@ if __name__ == '__main__':
         model.fit(train_set)
 
     elif config['algo_name'].lower() in ['multi-vae']:
-        history_item_id, history_item_value, _  = get_history_matrix(train_set, config, row='user')
+        history_item_id, history_item_value, _ = get_history_matrix(
+            train_set, config, row='user')
         config['history_item_id'], config['history_item_value'] = history_item_id, history_item_value
         model = RecommenderModel(config['algo_name'])(config)
         train_dataset = AEDataset(train_set, yield_col=config['UID_NAME'])
-        train_loader = get_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
+        train_loader = get_dataloader(
+            train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
 
     elif config['algo_name'].lower() in ['mf', 'fm', 'neumf', 'nfm', 'ngcf', 'lightgcn']:
@@ -64,7 +130,8 @@ if __name__ == '__main__':
         sampler = BasicNegtiveSampler(train_set, config)
         train_samples = sampler.sampling()
         train_dataset = BasicDataset(train_samples)
-        train_loader = get_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
+        train_loader = get_dataloader(
+            train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
 
     elif config['algo_name'].lower() in ['item2vec']:
@@ -72,13 +139,16 @@ if __name__ == '__main__':
         sampler = SkipGramNegativeSampler(train_set, config)
         train_samples = sampler.sampling()
         train_dataset = BasicDataset(train_samples)
-        train_loader = get_dataloader(train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
+        train_loader = get_dataloader(
+            train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=4)
         model.fit(train_loader)
 
     else:
-        raise NotImplementedError('Something went wrong when building and training...')
+        raise NotImplementedError(
+            'Something went wrong when building and training...')
     elapsed_time = time.time() - s_time
-    logger.info(f"Finish training: {config['dataset']} {config['prepro']} {config['algo_name']} with {config['loss_type']} and {config['sample_method']} sampling, {elapsed_time:.4f}")
+    logger.info(
+        f"Finish training: {config['dataset']} {config['prepro']} {config['algo_name']} with {config['loss_type']} and {config['sample_method']} sampling, {elapsed_time:.4f}")
 
     ''' build candidates set '''
     logger.info('Start Calculating Metrics...')
@@ -89,8 +159,9 @@ if __name__ == '__main__':
     logger.info('Generate recommend list...')
     logger.info('==========================')
     test_dataset = CandidatesDataset(test_ucands)
-    test_loader = get_dataloader(test_dataset, batch_size=128, shuffle=False, num_workers=0)
-    preds = model.rank(test_loader) # np.array (u, topk)
+    test_loader = get_dataloader(
+        test_dataset, batch_size=128, shuffle=False, num_workers=0)
+    preds = model.rank(test_loader)  # np.array (u, topk)
 
     ''' calculating KPIs '''
     logger.info('Save metric@k result to res folder...')
@@ -102,4 +173,5 @@ if __name__ == '__main__':
     config['res_path'] = result_save_path
 
     results = calc_ranking_results(test_ur, preds, test_u, config)
-    results.to_csv(f'{result_save_path}{algo_prefix}_{common_prefix}_kpi_results.csv', index=False)
+    results.to_csv(
+        f'{result_save_path}{algo_prefix}_{common_prefix}_kpi_results.csv', index=False)
