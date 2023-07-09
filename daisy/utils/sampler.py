@@ -210,9 +210,11 @@ class BasicNegtiveSampler(AbstractSampler):
 
             return result_items if num_other_samples else candidate_negative_items
 
+        # Assign to dataframe
         self.df['neg_set'] = np.NaN
         self.df['neg_set'] = self.df['neg_set'].astype('object')
 
+        # Peform explosion and conversion
         if self.sample_method in ['low-pop', 'high-pop']:
             other_num = int(self.sample_ratio * self.num_ng)
             uniform_num = self.num_ng - other_num
@@ -236,7 +238,12 @@ class BasicNegtiveSampler(AbstractSampler):
             raise NotImplementedError
 
     def batch_sampling(self, sampling_batch_size=None):
+        '''
+        Finds num_ng negative items *for every* user-item pair
+        Samples from items within batches of specified batch size
 
+        popularity sampling not implemented
+        '''
         # We will implement non-uniform later
         if self.sample_method != "uniform":
             raise NotImplementedError(
@@ -302,7 +309,6 @@ class BasicNegtiveSampler(AbstractSampler):
             return guess_and_check(past_interactions)
 
         all_batches = batch_generator()
-
         for indices, batch in all_batches:
             start_i, end_i = indices
 
@@ -312,9 +318,10 @@ class BasicNegtiveSampler(AbstractSampler):
             # Get all the users in the batch in order
             batch_users = batch[self.uid_name]
 
+            # Append the negative sample across all given indices
             for i in range(start_i, end_i):
-                self.df.at[i, 'neg_set'] = get_neg_sample(
-                    batch_users[i], batch_items)
+                self.df.at[i, 'neg_set'] = get_neg_sample(batch_users[i], batch_items)
+                # self.df.at[i, 'neg_set'] = guess_and_check(self.ur[batch_users[i]])
 
         # Perform explosion and conversion
         if self.loss_type.upper() in ['CL', 'SL']:
