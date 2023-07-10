@@ -1,6 +1,8 @@
 import os
 import numpy as np
 import pandas as pd
+from categorymap import item_category_OHEvectors
+
 
 class Metric(object):
     def __init__(self, config) -> None:
@@ -8,6 +10,7 @@ class Metric(object):
         self.item_num = config['item_num']
         self.item_pop = config['item_pop'] if 'coverage' in self.metrics else None
         self.i_categories = config['i_categories'] if 'diversity' in self.metrics else None
+        self.topk = config['topk']
 
     def run(self, test_ur, pred_ur, test_u):
         res = []
@@ -130,7 +133,7 @@ def MRR(test_ur, pred_ur, test_u):
         mrr = 0.
         for index, item in enumerate(pred):
             if item in gt:
-              mrr += 1 / (index + 1)
+                mrr += 1 / (index + 1)
         res.append(mrr)
 
     return np.mean(res)
@@ -235,21 +238,45 @@ def F1(test_ur, pred_ur, test_u):
 
 # ---- divesity metrics -------
 
-def Intra_List_Distance(test_ur, pred_ur, test_u):
+
+def Intra_List_Distance(topk, pred_ur, item_num):
     # TODO: Implement
-    pass
+
+    res = []
+
+    item_cat_map = item_category_OHEvectors(item_num) # Returns the one-hot encoding of categories of items
+    RL = topk
+    denom = RL*(RL-1)
+
+    for v in pred_ur:
+        dist = 0
+        for i in v:
+            for j in v:
+                if i == j:
+                    continue
+                dist += np.linalg.norm(item_cat_map[i] - item_cat_map[j])
+        res.append(dist/denom)
+
+    return np.mean(res)
+
 
 def DiversityScore(test_ur, pred_ur, test_u):
     # TODO: Implement
+
     pass
+
 
 def Entropy(test_ur, pred_ur, test_u):
     # TODO: Implement
     pass
 
-def FScore(test_ur, pred_ur, test_u):
+
+def FScore(test_ur, pred_ur, test_u, topk, item_num):
     # TODO: Implement
-    pass
+    HR_score = HR(test_ur, pred_ur, test_u)
+    ILD = Intra_List_Distance(topk, pred_ur, item_num)
+
+    return (2*HR_score * ILD) / (HR_score + ILD)
 
 
 metrics_config = {
@@ -265,6 +292,7 @@ metrics_config = {
     "diversity": {"name": "Diversity", "evaluator": Diversity},
     "popularity": {"name": "Average Popularity", "evaluator": Popularity}
 }
+
 
 def calc_ranking_results(test_ur, pred_ur, test_u, config):
     '''
