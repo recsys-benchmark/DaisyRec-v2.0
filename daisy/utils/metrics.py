@@ -261,10 +261,22 @@ def Intra_List_Distance(topk, pred_ur, item_num):
     return np.mean(res)
 
 
-def DiversityScore(test_ur, pred_ur, test_u):
+def DiversityScore(topk, pred_ur, item_num):
     # TODO: Implement
+    res = []
+    item_cat_map = item_category_OHEvectors(item_num) # Returns the one-hot encoding of categories of items
+    for items in pred_ur:
 
-    pass
+        # Find number of items of each category
+        num_items_per_cat = sum(item_cat_map[items])
+
+        # Find number of non-zero items per category, thus number of categories
+        num_cats = np.count_nonzero(num_items_per_cat)
+
+        res.append(num_cats/topk)
+    
+    return np.mean(res)
+
 
 
 def Entropy(test_ur, pred_ur, test_u, item_num):
