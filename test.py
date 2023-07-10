@@ -7,8 +7,8 @@ from daisy.utils.loader import RawDataReader, Preprocessor
 from daisy.utils.config import init_seed, init_config, init_logger
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.dataset import get_dataloader, BasicDataset, CandidatesDataset, AEDataset
-from daisy.utils.utils import ensure_dir, get_ur, get_history_matrix, build_candidates_set, get_inter_matrix
-
+from daisy.utils.utils import ensure_dir, get_ur, get_history_matrix, build_candidates_set, get_inter_matrix, get_ur_new
+from sys import exit
 
 def sampler_compare(train_set, config):
 
@@ -23,6 +23,15 @@ def sampler_compare(train_set, config):
         e = time.time()
         old_time = e-s
         print(f'Prev sampling time: {round(old_time, 5)}')
+        del sampler
+
+        sampler = BasicNegtiveSampler(train_set.copy(), config)
+        sampler.num_ng = num_neg
+        s = time.time()
+        sampler.set_diff_sampling()
+        e = time.time()
+        setdifftime = e-s
+        print(f'Set diff sampling time: {round(setdifftime, 4)}')
         del sampler
 
         sampler = BasicNegtiveSampler(train_set.copy(), config)
@@ -63,12 +72,12 @@ def sampler_compare(train_set, config):
 
         print(f'\nFor {num_neg} negative items per user-item pair: ')
         print(f'The guess-and-check sampling time is {round(guessandcheck_time/old_time, 2)} times slower')
+        print(f'The set difference  sampling time is {round(setdifftime/old_time, 2)} times slower')
         print(f'The  64 batch-aware sampling time is {round(new_64_time/old_time, 2)} times slower')
         print(f'The 128 batch-aware sampling time is {round(new_128_time/old_time, 2)} times slower')
         print(f'The 256 batch-aware sampling time is {round(new_256_time/old_time, 2)} times slower')
 
-    import sys
-    sys.exit()
+    exit()
 
 
 if __name__ == '__main__':
@@ -101,7 +110,17 @@ if __name__ == '__main__':
 
     ''' get ground truth '''
     test_ur = get_ur(test_set)
+
+    s = time.time()
     total_train_ur = get_ur(train_set)
+    e = time.time()
+    print(f"old time: {e - s}")
+
+    s = time.time()
+    total_train_ur = get_ur_new(train_set, item_num)
+    e = time.time()
+    print(f"new time: {e - s}")
+
     config['train_ur'] = total_train_ur
 
     # TODO: REMOVE, FOR DEBUGGING ONLY
