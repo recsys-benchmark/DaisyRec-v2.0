@@ -295,11 +295,11 @@ class BasicNegtiveSampler(AbstractSampler):
             return np.array(list(neg_items))
 
         # We create a function to apply to every row in the df
-        def get_neg_sample(user_id, all_items):
+        def get_neg_sample(user_id, batch_items_set):
 
             # For every row in the batch we will perform set difference
             past_interactions = self.ur[user_id]
-            set_difference = set(all_items).difference(past_interactions)
+            set_difference = batch_items_set.difference(past_interactions)
 
             # If the set difference returns enough samples, randomly choose
             if len(set_difference) >= self.num_ng:
@@ -314,13 +314,14 @@ class BasicNegtiveSampler(AbstractSampler):
 
             # Next we create a list of all items available in the batches
             batch_items = batch[self.iid_name].unique()
+            batch_items_set = set(batch_items)
 
             # Get all the users in the batch in order
             batch_users = batch[self.uid_name]
 
             # Append the negative sample across all given indices
             for i in range(start_i, end_i):
-                self.df.at[i, 'neg_set'] = get_neg_sample(batch_users[i], batch_items)
+                self.df.at[i, 'neg_set'] = get_neg_sample(batch_users[i], batch_items_set)
                 # self.df.at[i, 'neg_set'] = guess_and_check(self.ur[batch_users[i]])
 
         # Perform explosion and conversion
