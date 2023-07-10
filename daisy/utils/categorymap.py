@@ -23,5 +23,9 @@ def item_category_OHEvectors(num_items):
     return np.random.randint(low=0, high=2, size=(num_items, 10)
     )
 
-print(item_category_OHEvectors(10).shape[1])
+print(
+    item_category_OHEvectors(10)[[
+        1,3
+    ]]
+    )
 

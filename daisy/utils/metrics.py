@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 from categorymap import item_category_OHEvectors
+from scipy.stats import entropy
 
 
 class Metric(object):
@@ -266,9 +267,13 @@ def DiversityScore(test_ur, pred_ur, test_u):
     pass
 
 
-def Entropy(test_ur, pred_ur, test_u):
+def Entropy(test_ur, pred_ur, test_u, item_num):
     # TODO: Implement
-    pass
+    flattened_items = pred_ur.flatten()
+    item_cat_map = item_category_OHEvectors(item_num) # Returns the one-hot encoding of categories of items
+    recomm_cat_map = item_cat_map[flattened_items]
+    distribution = sum(recomm_cat_map)
+    return entropy(distribution)
 
 
 def FScore(test_ur, pred_ur, test_u, topk, item_num):
