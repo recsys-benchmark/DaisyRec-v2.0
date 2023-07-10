@@ -233,6 +233,24 @@ def F1(test_ur, pred_ur, test_u):
 
     return np.mean(res)
 
+# ---- divesity metrics -------
+
+def Intra_List_Distance(test_ur, pred_ur, test_u):
+    # TODO: Implement
+    pass
+
+def DiversityScore(test_ur, pred_ur, test_u):
+    # TODO: Implement
+    pass
+
+def Entropy(test_ur, pred_ur, test_u):
+    # TODO: Implement
+    pass
+
+def FScore(test_ur, pred_ur, test_u):
+    # TODO: Implement
+    pass
+
 
 metrics_config = {
     "recall": {"name": "Recall", "evaluator": Recall},
