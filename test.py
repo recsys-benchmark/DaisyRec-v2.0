@@ -24,6 +24,15 @@ def sampler_compare(train_set, config):
         old_time = e-s
         print(f'Prev sampling time: {round(old_time, 5)}')
         del sampler
+        
+        sampler = BasicNegtiveSampler(train_set.copy(), config)
+        sampler.num_ng = num_neg
+        s = time.time()
+        sampler.guess_and_check_sampling()
+        e = time.time()
+        guessandcheck_time = e-s
+        print(f'Guess and check sampling time: {round(guessandcheck_time,3)}s')
+        del sampler
 
         sampler = BasicNegtiveSampler(train_set.copy(), config)
         sampler.num_ng = num_neg
@@ -34,14 +43,6 @@ def sampler_compare(train_set, config):
         print(f'Set diff sampling time: {round(setdifftime, 4)}')
         del sampler
 
-        sampler = BasicNegtiveSampler(train_set.copy(), config)
-        sampler.num_ng = num_neg
-        s = time.time()
-        sampler.guess_and_check_sampling()
-        e = time.time()
-        guessandcheck_time = e-s
-        print(f'Guess and check sampling time: {round(guessandcheck_time,3)}s')
-        del sampler
 
         sampler = BasicNegtiveSampler(train_set.copy(), config)
         sampler.num_ng = num_neg

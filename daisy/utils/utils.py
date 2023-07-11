@@ -65,7 +65,7 @@ def get_ur_new(df, item_num):
     
     for key in ur:
         if key < 0:
-            ur[key] = list(ur[key])
+            ur[key] = np.array(list(ur[key]))
 
     return ur
 

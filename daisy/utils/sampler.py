@@ -125,10 +125,19 @@ class BasicNegtiveSampler(AbstractSampler):
                 raise NotImplementedError(
                     'loss function (BPR, TL, HL) need num_ng > 0')
 
-        u_i_pairs = self.ur
+        df_len = len(self.df)
+        neg_samples = np.ndarray((df_len, self.num_ng))
+        all_users = self.df[self.uid_name]
 
-        self.df['neg_set'] = self.df[self.uid_name].apply(
-            lambda u: np.random.choice(u_i_pairs[~u], size=self.num_ng))
+        for i in range(df_len):
+            cand_neg_i = self.ur[~all_users[i]]
+            indices = np.random.randint(len(cand_neg_i), size=self.num_ng)
+            neg_samples[i] = (np.array(cand_neg_i))[indices]
+
+        # Assign to dataframe
+        self.df['neg_set'] = np.NaN
+        self.df['neg_set'] = self.df['neg_set'].astype('object')
+        self.df['neg_set'] = neg_samples
 
         if self.loss_type.upper() in ['CL', 'SL']:
             point_pos = self.df[[self.uid_name,
