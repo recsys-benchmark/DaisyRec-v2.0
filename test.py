@@ -7,7 +7,7 @@ from daisy.utils.loader import RawDataReader, Preprocessor
 from daisy.utils.config import init_seed, init_config, init_logger
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.dataset import get_dataloader, BasicDataset, CandidatesDataset, AEDataset
-from daisy.utils.utils import ensure_dir, get_ur, get_history_matrix, build_candidates_set, get_inter_matrix, get_ur_new
+from daisy.utils.utils import ensure_dir, get_ur, get_history_matrix, build_candidates_set, get_inter_matrix, get_ur_with_negatives
 from sys import exit
 
 def sampler_compare(train_set, config):
@@ -117,16 +117,7 @@ if __name__ == '__main__':
 
     ''' get ground truth '''
     test_ur = get_ur(test_set)
-
-    s = time.time()
-    total_train_ur = get_ur(train_set)
-    e = time.time()
-    print(f"old time: {e - s}")
-
-    s = time.time()
-    total_train_ur = get_ur_new(train_set, item_num)
-    e = time.time()
-    print(f"new time: {e - s}")
+    total_train_ur = get_ur_with_negatives(train_set, item_num)
 
     config['train_ur'] = total_train_ur
 

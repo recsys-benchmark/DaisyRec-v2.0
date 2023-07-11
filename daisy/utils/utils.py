@@ -38,7 +38,7 @@ def get_ur(df):
     return ur
 
 
-def get_ur_new(df, item_num):
+def get_ur_with_negatives(df, item_num):
     """
     Method of getting user-rating pairs
     Parameters
