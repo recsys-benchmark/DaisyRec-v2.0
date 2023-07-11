@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from daisy.utils.utils import get_random_choice_custom
 
 
 class AbstractSampler(object):
@@ -131,13 +132,10 @@ class BasicNegtiveSampler(AbstractSampler):
 
         for i in range(df_len):
             cand_neg_i = self.ur[~all_users[i]]
-            indices = np.random.randint(len(cand_neg_i), size=self.num_ng)
-            neg_samples[i] = (np.array(cand_neg_i))[indices]
+            neg_samples[i] = get_random_choice_custom(cand_neg_i, self.num_ng)
 
         # Assign to dataframe
-        self.df['neg_set'] = np.NaN
-        self.df['neg_set'] = self.df['neg_set'].astype('object')
-        self.df['neg_set'] = neg_samples
+        self.df['neg_set'] = list(neg_samples)
 
         if self.loss_type.upper() in ['CL', 'SL']:
             point_pos = self.df[[self.uid_name,
@@ -253,12 +251,8 @@ class BasicNegtiveSampler(AbstractSampler):
                     result_items[index] = np.concatenate(
                         (candidate_items_list, other_negs), axis=None)
 
-            return result_items if num_other_samples else candidate_negative_items
-
-        # Assign to dataframe
-        self.df['neg_set'] = np.NaN
-        self.df['neg_set'] = self.df['neg_set'].astype('object')
-
+            return list(result_items) if num_other_samples else list(candidate_negative_items)
+        
         # Peform explosion and conversion
         if self.sample_method in ['low-pop', 'high-pop']:
             other_num = int(self.sample_ratio * self.num_ng)

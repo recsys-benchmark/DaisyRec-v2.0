@@ -185,3 +185,7 @@ def get_inter_matrix(df, config, form='coo'):
     else:
         raise NotImplementedError(
             f'Sparse matrix format [{form}] has not been implemented...')
+
+def get_random_choice_custom(np_arr: np.ndarray ,size:int) -> np.ndarray:
+    indices = np.random.randint(len(np_arr), size=size)
+    return np_arr[indices]

@@ -12,7 +12,7 @@ from sys import exit
 
 def sampler_compare(train_set, config):
 
-    for num_neg in 4, 5, 6:
+    for num_neg in 4, 5, 6, 7, 8, 9:
         print("\n======================================")
         print(f'Now calculating for {num_neg} negative samples per user-item pair:')
 
@@ -23,8 +23,9 @@ def sampler_compare(train_set, config):
         e = time.time()
         old_time = e-s
         print(f'Prev sampling time: {round(old_time, 5)}')
+        assert len(sampler.df) == len(train_set) * num_neg
         del sampler
-        
+
         sampler = BasicNegtiveSampler(train_set.copy(), config)
         sampler.num_ng = num_neg
         s = time.time()
@@ -32,6 +33,7 @@ def sampler_compare(train_set, config):
         e = time.time()
         guessandcheck_time = e-s
         print(f'Guess and check sampling time: {round(guessandcheck_time,3)}s')
+        assert len(sampler.df) == len(train_set) * num_neg
         del sampler
 
         sampler = BasicNegtiveSampler(train_set.copy(), config)
@@ -41,6 +43,7 @@ def sampler_compare(train_set, config):
         e = time.time()
         setdifftime = e-s
         print(f'Set diff sampling time: {round(setdifftime, 4)}')
+        assert len(sampler.df) == len(train_set) * num_neg
         del sampler
 
 
@@ -51,6 +54,7 @@ def sampler_compare(train_set, config):
         e = time.time()
         new_64_time = e-s
         print(f'Batch-aware sampling time: {round(new_64_time,3)}s (batch-size=64)')
+        assert len(sampler.df) == len(train_set) * num_neg
         del sampler
 
         sampler = BasicNegtiveSampler(train_set.copy(), config)
@@ -60,6 +64,7 @@ def sampler_compare(train_set, config):
         e = time.time()
         new_128_time = e-s
         print(f'Batch-aware sampling time: {round(new_128_time,3)}s (batch-size=128)')
+        assert len(sampler.df) == len(train_set) * num_neg
         del sampler
 
         sampler = BasicNegtiveSampler(train_set.copy(), config)
@@ -69,6 +74,7 @@ def sampler_compare(train_set, config):
         e = time.time()
         new_256_time = e-s
         print(f'Batch-aware sampling time: {round(new_256_time,3)}s  (batch-size=256)')
+        assert len(sampler.df) == len(train_set) * num_neg
         del sampler
 
         print(f'\nFor {num_neg} negative items per user-item pair: ')
