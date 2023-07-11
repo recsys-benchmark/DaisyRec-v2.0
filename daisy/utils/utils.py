@@ -20,10 +20,10 @@ def get_local_time():
 
 def get_ur(df):
     """
-    Method of getting user-rating pairs
+    Method of getting user-item pairs
     Parameters
     ----------
-    df : pd.DataFrame, rating dataframe
+    df : pd.DataFrame, item dataframe
 
     Returns
     -------
@@ -72,10 +72,10 @@ def get_ur_with_negatives(df, item_num):
 
 def get_ir(df):
     """
-    Method of getting item-rating pairs
+    Method of getting item-user pairs
     Parameters
     ----------
-    df : pd.DataFrame, rating dataframe
+    df : pd.DataFrame,item dataframe
 
     Returns
     -------

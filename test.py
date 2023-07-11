@@ -120,6 +120,7 @@ if __name__ == '__main__':
     total_train_ur = get_ur_with_negatives(train_set, item_num)
 
     config['train_ur'] = total_train_ur
+    sampler_compare(train_set, config)
 
     # TODO: REMOVE, FOR DEBUGGING ONLY
     sampler_compare(train_set, config)

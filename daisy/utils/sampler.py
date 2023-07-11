@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from daisy.utils.utils import get_random_choice_custom
 
 
@@ -68,7 +67,8 @@ class BasicNegtiveSampler(AbstractSampler):
                     'loss function (BPR, TL, HL) need num_ng > 0')
 
         js = np.zeros((self.user_num, self.num_ng), dtype=np.int32)
-        if self.sample_method in ['low-pop', 'high-pop']:
+
+        if self.sample_method in ['low-pop', 'high-pop'] :
             other_num = int(self.sample_ratio * self.num_ng)
             uniform_num = self.num_ng - other_num
 
@@ -85,8 +85,7 @@ class BasicNegtiveSampler(AbstractSampler):
                     p=self.pop_prob
                 )
                 js[u] = np.concatenate((uni_negs, other_negs), axis=None)
-
-        else:
+        else: # uniform
             # all negative samples are sampled by uniform distribution
             for u in range(self.user_num):
                 past_inter = list(self.ur[u])
@@ -94,6 +93,7 @@ class BasicNegtiveSampler(AbstractSampler):
                     np.setdiff1d(np.arange(self.item_num), past_inter),
                     size=self.num_ng
                 )
+
 
         self.df['neg_set'] = self.df[self.uid_name].agg(lambda u: js[u])
 
