@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import pandas as pd
-from categorymap import item_category_OHEvectors
 from scipy.stats import entropy
 
 
@@ -240,12 +239,11 @@ def F1(test_ur, pred_ur, test_u):
 # ---- divesity metrics -------
 
 
-def Intra_List_Distance(topk, pred_ur, item_num):
-    # TODO: Implement
+def Intra_List_Distance(topk, pred_ur, item_cat_map):
+    # TODO: Implement - checked
 
     res = []
 
-    item_cat_map = item_category_OHEvectors(item_num) # Returns the one-hot encoding of categories of items
     RL = topk
     denom = RL*(RL-1)
 
@@ -261,10 +259,9 @@ def Intra_List_Distance(topk, pred_ur, item_num):
     return np.mean(res)
 
 
-def DiversityScore(topk, pred_ur, item_num):
-    # TODO: Implement
+def DiversityScore(topk, pred_ur, item_cat_map):
+    # TODO: Implement - checked
     res = []
-    item_cat_map = item_category_OHEvectors(item_num) # Returns the one-hot encoding of categories of items
     for items in pred_ur:
 
         # Find number of items of each category
@@ -279,19 +276,18 @@ def DiversityScore(topk, pred_ur, item_num):
 
 
 
-def Entropy(test_ur, pred_ur, test_u, item_num):
+def Entropy(pred_ur, item_cat_map):
     # TODO: Implement
     flattened_items = pred_ur.flatten()
-    item_cat_map = item_category_OHEvectors(item_num) # Returns the one-hot encoding of categories of items
     recomm_cat_map = item_cat_map[flattened_items]
     distribution = sum(recomm_cat_map)
     return entropy(distribution)
 
 
-def FScore(test_ur, pred_ur, test_u, topk, item_num):
+def FScore(test_ur, pred_ur, test_u, topk, item_cat_map):
     # TODO: Implement
     HR_score = HR(test_ur, pred_ur, test_u)
-    ILD = Intra_List_Distance(topk, pred_ur, item_num)
+    ILD = Intra_List_Distance(topk, pred_ur, item_cat_map)
 
     return (2*HR_score * ILD) / (HR_score + ILD)
 

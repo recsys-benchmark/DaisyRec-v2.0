@@ -19,13 +19,8 @@ def category_mapper(config) -> np.ndarray:
     return item_map, categories
 
 
-def item_category_OHEvectors(num_items):
-    return np.random.randint(low=0, high=2, size=(num_items, 10)
+def item_category_OHEvectors(num_items, numcats):
+    return np.random.choice([0,1], size=(num_items, numcats), p = [0.95, 0.05]
     )
 
-print(
-    item_category_OHEvectors(10)[[
-        1,3
-    ]]
-    )
 
