@@ -12,6 +12,7 @@ from debug.sampler_compare import sampler_compare
 
 
 if __name__ == '__main__':
+    start_script = time.time()
     ''' summarize hyper-parameter part (basic yaml + args + model yaml) '''
     config = init_config()
 
@@ -29,6 +30,7 @@ if __name__ == '__main__':
     df = reader.get_data()
     df = processor.process(df)
     user_num, item_num = processor.user_num, processor.item_num
+    print(f"\nData loading complete at time {time.time() - start_script}")
 
     config['user_num'] = user_num
     config['item_num'] = item_num
@@ -38,10 +40,13 @@ if __name__ == '__main__':
     train_index, test_index = splitter.split(df)
     train_set, test_set = df.iloc[train_index,
                                   :].copy(), df.iloc[test_index, :].copy()
+    print(f"\nData splitting complete at time {time.time() - start_script}")
+    
 
     ''' get ground truth '''
     test_ur = get_ur(test_set)
     total_train_ur = get_ur(train_set)
+    print(f"Get_ur complete at time {time.time() - start_script}")
 
     config['train_ur'] = total_train_ur
 
@@ -66,12 +71,13 @@ if __name__ == '__main__':
             config['inter_matrix'] = get_inter_matrix(train_set, config)
         model = RecommenderModel(config['algo_name'])(config)
         
-        start_time = time.time()
+        start_sampling = time.time()
         train_samples = train_set[[config['UID_NAME'], config['IID_NAME']]]
         train_dataset = BasicDataset(train_samples.to_numpy(), config)
         train_loader = train_dataset.get_dataloader(batch_size=config['batch_size'], shuffle=True, num_workers=4)
-        end_time = time.time()
-        print(end_time - start_time)
+        print(f"Sampling time is: {time.time() - start_sampling}")
+        print(f"\nTotal time elaplsed time {time.time() - start_script}")
+
         raise RuntimeError
 
         model.fit(train_loader)

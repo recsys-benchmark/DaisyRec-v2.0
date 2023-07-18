@@ -169,6 +169,9 @@ log/
 # local files
 /local_files
 
+#large datasets
+data/ml-20m
+
 
 #VSCode config files
 .vscode/

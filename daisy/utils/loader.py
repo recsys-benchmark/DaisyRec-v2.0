@@ -184,7 +184,7 @@ class Preprocessor(object):
         if self.get_pop:
             self.__get_item_popularity(df)
 
-        self.logger.info(f'Finish loading [{self.src}]-[{self.prepro}] dataset')
+        self.logger.info(f'Finish loading [{self.src}]-[{self.prepro}] dataset with {"{:,}".format(len(df))} rows')
 
         return df
 
