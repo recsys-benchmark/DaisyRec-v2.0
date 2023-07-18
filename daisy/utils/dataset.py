@@ -60,28 +60,22 @@ class BasicDataset(Dataset):
             # guess an item
             negative_item = np.random.randint(num_of_items_total)
 
-            past_interactions = user_items_interaction_map[user]
-
             # check the item. Guess again while in past interactions
-            while negative_item in past_interactions:
+            while user_items_interaction_map[user, negative_item]:
                 negative_item = np.random.randint(num_of_items_total)
 
             # if all is well, add it in to the list
             final_train_data[index] = [user, item, negative_item]
 
         return torch.tensor(final_train_data.transpose(), dtype=torch.long)
-            
-                
-
-
 
     def get_dataloader(self, batch_size, shuffle, num_workers=4):
-
 
         return DataLoader(
             self.data, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers,
             collate_fn=self.guess_and_check_negative_sampler
             )
+    
 class CandidatesDataset(Dataset):
     def __init__(self, ucands):
         super(CandidatesDataset, self).__init__()

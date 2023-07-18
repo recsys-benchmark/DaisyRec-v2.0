@@ -44,8 +44,11 @@ if __name__ == '__main__':
     
 
     ''' get ground truth '''
-    test_ur = get_ur(test_set)
-    total_train_ur = get_ur(train_set)
+    # test_ur = get_ur(test_set)
+    # total_train_ur = get_ur(train_set)
+
+    test_ur = get_inter_matrix(test_set, config)
+    total_train_ur = get_inter_matrix(train_set, config)
     print(f"Get_ur complete at time {time.time() - start_script}")
 
     config['train_ur'] = total_train_ur
