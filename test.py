@@ -8,7 +8,7 @@ from daisy.utils.config import init_seed, init_config, init_logger
 from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
 from daisy.utils.dataset import get_dataloader, BasicDataset, CandidatesDataset, AEDataset
 from daisy.utils.utils import ensure_dir, get_ur, get_history_matrix, build_candidates_set, get_inter_matrix, get_ur_with_negatives
-from debug.sampler_compare import sampler_compare
+from debug.sampler_compare import sampler_compare2
 
 
 
@@ -41,13 +41,15 @@ if __name__ == '__main__':
                                   :].copy(), df.iloc[test_index, :].copy()
 
     ''' get ground truth '''
-    test_ur = get_ur(test_set)
-    total_train_ur = get_ur_with_negatives(train_set, item_num)
+    # test_ur = get_ur(test_set)
+    # total_train_ur = get_ur(train_set)
+    test_ur = get_inter_matrix(test_set, config, form='csr')
+    total_train_ur = get_ur(train_set, config, form='csr')
 
     config['train_ur'] = total_train_ur
 
     # TODO: REMOVE, FOR DEBUGGING ONLY
-    sampler_compare(train_set, config)
+    sampler_compare2(train_set, config)
 
     ''' build and train model '''
     s_time = time.time()

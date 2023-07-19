@@ -77,3 +77,29 @@ def sampler_compare(train_set, config):
         print(f'The 256 batch-aware sampling time is {round(new_256_time/old_time, 2)} times slower')
 
     exit()
+
+def sampler_compare2(train_set, config):
+
+    sampler = BasicNegtiveSampler(train_set.copy(), config)
+    sampler.num_ng = 4
+    s = time.time()
+    sampler.sampling()
+    e = time.time()
+    old_time = e-s
+    print(f'Prev sampling time: {round(old_time, 5)}')
+    assert len(sampler.df) == len(train_set) * 4
+    del sampler
+
+    sampler = BasicNegtiveSampler(train_set.copy(), config)
+    sampler.num_ng = 4
+    s = time.time()
+    sampler.guess_and_check_sampling()
+    e = time.time()
+    guessandcheck_time = e-s
+    print(f'Guess and check sampling time: {round(guessandcheck_time,3)}s')
+    assert len(sampler.df) == len(train_set) * 4
+    del sampler
+
+    print(f'The guess-and-check sampling time is {round(guessandcheck_time/old_time, 2)} times slower')
+
+    exit()
