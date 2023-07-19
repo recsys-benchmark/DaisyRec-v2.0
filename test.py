@@ -40,6 +40,7 @@ if __name__ == '__main__':
     train_index, test_index = splitter.split(df)
     train_set, test_set = df.iloc[train_index,
                                   :].copy(), df.iloc[test_index, :].copy()
+    config['train_set'], config['test_set'] = train_set, test_set
     print(f"\nData splitting complete at time {time.time() - start_script}")
     
 
@@ -47,8 +48,8 @@ if __name__ == '__main__':
     # test_ur = get_ur(test_set)
     # total_train_ur = get_ur(train_set)
 
-    test_ur = get_inter_matrix(test_set, config)
-    total_train_ur = get_inter_matrix(train_set, config)
+    test_ur = get_inter_matrix(test_set, config, form='csr')
+    total_train_ur = get_inter_matrix(train_set, config, form='csr')
     print(f"Get_ur complete at time {time.time() - start_script}")
 
     config['train_ur'] = total_train_ur
@@ -76,13 +77,10 @@ if __name__ == '__main__':
         
         start_sampling = time.time()
         train_samples = train_set[[config['UID_NAME'], config['IID_NAME']]]
-        train_dataset = BasicDataset(train_samples.to_numpy(), config)
+        train_dataset = BasicDataset(train_samples, config)
         train_loader = train_dataset.get_dataloader(batch_size=config['batch_size'], shuffle=True, num_workers=4)
         print(f"Sampling time is: {time.time() - start_sampling}")
         print(f"\nTotal time elaplsed time {time.time() - start_script}")
-
-        raise RuntimeError
-
         model.fit(train_loader)
 
     elif config['algo_name'].lower() in ['item2vec']:
