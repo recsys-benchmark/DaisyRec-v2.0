@@ -1,5 +1,6 @@
 import numpy as np
 from daisy.utils.utils import get_random_choice_custom
+from torch.utils.data import DataLoader
 
 
 class AbstractSampler(object):
@@ -68,7 +69,7 @@ class BasicNegtiveSampler(AbstractSampler):
 
         js = np.zeros((self.user_num, self.num_ng), dtype=np.int32)
 
-        if self.sample_method in ['low-pop', 'high-pop'] :
+        if self.sample_method in ['low-pop', 'high-pop']:
             other_num = int(self.sample_ratio * self.num_ng)
             uniform_num = self.num_ng - other_num
 
@@ -85,7 +86,7 @@ class BasicNegtiveSampler(AbstractSampler):
                     p=self.pop_prob
                 )
                 js[u] = np.concatenate((uni_negs, other_negs), axis=None)
-        else: # uniform
+        else:  # uniform
             # all negative samples are sampled by uniform distribution
             for u in range(self.user_num):
                 past_inter = list(self.ur[u])
@@ -93,7 +94,6 @@ class BasicNegtiveSampler(AbstractSampler):
                     np.setdiff1d(np.arange(self.item_num), past_inter),
                     size=self.num_ng
                 )
-
 
         self.df['neg_set'] = self.df[self.uid_name].agg(lambda u: js[u])
 
@@ -252,7 +252,7 @@ class BasicNegtiveSampler(AbstractSampler):
                         (candidate_items_list, other_negs), axis=None)
 
             return list(result_items) if num_other_samples else list(candidate_negative_items)
-        
+
         # Peform explosion and conversion
         if self.sample_method in ['low-pop', 'high-pop']:
             other_num = int(self.sample_ratio * self.num_ng)
@@ -381,6 +381,73 @@ class BasicNegtiveSampler(AbstractSampler):
         else:
             raise NotImplementedError(
                 "That loss type has not yet been implemented")
+
+
+class ParallelNegativeSampler(AbstractSampler):
+
+    def __init__(self, df, config):
+        """
+        negative sampling class for <u, pos_i, neg_i> or <u, pos_i, r>
+        Parameters
+        ----------
+        df : pd.DataFrame, the raw <u, i, r> dataframe
+        user_num: int, the number of users
+        item_num: int, the number of items
+        num_ng : int, No. of nagative sampling per sample, default is 4
+        sample_method : str, sampling method, default is 'uniform',
+                        'uniform' discrete uniform sampling
+                        'high-pop' sample items with high popularity as priority
+                        'low-pop' sample items with low popularity as prority
+        sample_ratio : float, scope [0, 1], it determines the ratio that the other sample method except 'uniform' occupied, default is 0
+        """
+        super(ParallelNegativeSampler, self).__init__(config)
+        self.user_num = config['user_num']
+        self.num_ng = config['num_ng']
+        self.inter_name = config['INTER_NAME']
+        self.sample_method = config['sample_method']
+        self.sample_ratio = config['sample_ratio']
+        self.sampling_batch = config['batch_size']
+        self.loss_type = config['loss_type'].upper()
+
+        assert self.sample_method in [
+            'uniform', 'low-pop', 'high-pop'], f'Invalid sampling method: {self.sample_method}'
+        assert 0 <= self.sample_ratio <= 1, 'Invalid sample ratio value'
+
+        self.df = df
+        self.pop_prob = None
+
+        if self.sample_method in ['high-pop', 'low-pop']:
+            pop = df.groupby(self.iid_name).size()
+            # rescale to [0, 1]
+            pop /= pop.sum()
+            if self.sample_method == 'high-pop':
+                norm_pop = np.zeros(self.item_num)
+                norm_pop[pop.index] = pop.values
+            if self.sample_method == 'low-pop':
+                norm_pop = np.ones(self.item_num)
+                norm_pop[pop.index] = (1 - pop.values)
+            self.pop_prob = norm_pop / norm_pop.sum()
+
+    def guess_and_check_negative_sampler(batch):
+        pass
+
+    def popularity_sampler(batch):
+        pass
+
+    def sampling(self, batch_size, num_workers=4):
+
+        sampler_data_loader = None
+
+        if self.sample_method == 'uniform':
+            sampler_data_loader = DataLoader(
+                self.df.to_numpy(), batch_size=batch_size, shuffle=False, num_workers=num_workers,
+                collate_fn=self.guess_and_check_negative_sampler
+            )
+        else:
+            sampler_data_loader = DataLoader(
+                self.df.to_numpy(), batch_size=batch_size, shuffle=False, num_workers=num_workers,
+                collate_fn=self.popularity_sampler
+            )
 
 
 class SkipGramNegativeSampler(AbstractSampler):
