@@ -16,7 +16,7 @@ val_size: 0.1
 test_size: 0.2
 topk: 50
 cand_num: 1000
-sample_method: 'high-pop'
+sample_method: 'uniform'
 sample_ratio: 0
 num_ng: 4
 

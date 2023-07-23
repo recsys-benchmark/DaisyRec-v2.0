@@ -5,7 +5,7 @@ from daisy.utils.splitter import TestSplitter
 from daisy.utils.metrics import calc_ranking_results
 from daisy.utils.loader import RawDataReader, Preprocessor
 from daisy.utils.config import init_seed, init_config, init_logger
-from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler
+from daisy.utils.sampler import BasicNegtiveSampler, SkipGramNegativeSampler, ParallelNegativeSampler
 from daisy.utils.dataset import BasicDataset, CandidatesDataset, AEDataset
 from daisy.utils.utils import ensure_dir, get_ur, get_history_matrix, build_candidates_set, get_inter_matrix, get_ur_with_negatives
 from debug.sampler_compare import sampler_compare
@@ -41,7 +41,6 @@ if __name__ == '__main__':
     train_set, test_set = df.iloc[train_index,
                                   :].copy(), df.iloc[test_index, :].copy()
     config['train_set'], config['test_set'] = train_set, test_set
-    print(f"\nData splitting complete at time {time.time() - start_script}")
     
 
     ''' get ground truth '''
@@ -50,7 +49,6 @@ if __name__ == '__main__':
 
     test_ur = get_inter_matrix(test_set, config, form='csr')
     total_train_ur = get_inter_matrix(train_set, config, form='csr')
-    print(f"Get_ur complete at time {time.time() - start_script}")
 
     config['train_ur'] = total_train_ur
 
@@ -74,12 +72,12 @@ if __name__ == '__main__':
         if config['algo_name'].lower() in ['lightgcn', 'ngcf']:
             config['inter_matrix'] = get_inter_matrix(train_set, config)
         model = RecommenderModel(config['algo_name'])(config)
-        
         start_sampling = time.time()
-        train_samples = train_set[[config['UID_NAME'], config['IID_NAME']]]
-        train_dataset = BasicDataset(train_samples, config)
-        train_loader = train_dataset.get_dataloader(batch_size=config['batch_size'], shuffle=True, num_workers=4)
+        sampler = ParallelNegativeSampler(train_set, config)
+        train_samples = sampler.sampling(batch_size=len(train_set), num_workers=4)
         print(f"Sampling time is: {time.time() - start_sampling}")
+        train_dataset = BasicDataset(train_samples)
+        train_loader = train_dataset.get_dataloader(batch_size=config['batch_size'], shuffle=True, num_workers=4)
         print(f"\nTotal time elaplsed time {time.time() - start_script}")
         model.fit(train_loader)
 

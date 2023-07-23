@@ -414,6 +414,7 @@ class ParallelNegativeSampler(AbstractSampler):
         assert 0 <= self.sample_ratio <= 1, 'Invalid sample ratio value'
 
         self.df = df
+        self.num_rows = len(df)
         self.pop_prob = None
 
         if self.sample_method in ['high-pop', 'low-pop']:
@@ -428,26 +429,62 @@ class ParallelNegativeSampler(AbstractSampler):
                 norm_pop[pop.index] = (1 - pop.values)
             self.pop_prob = norm_pop / norm_pop.sum()
 
-    def guess_and_check_negative_sampler(batch):
-        pass
+    def guess_and_check_negative_sampler(self, batch):
+
+        batch_size = len(batch)
+
+        # we need to initialise the resulting array: batch * num_negatives rows, 3 columns for each <user, positive-item, negative-item>
+        final_train_data = np.ndarray(
+            (batch_size * self.num_ng, 3))
+
+        # first we go through the data. We repeat each sample num_negative times for the sampling
+        for index, row in enumerate(np.repeat(batch, repeats=self.num_ng, axis=0)):
+            user, item = row
+
+            # guess an item
+            negative_item = np.random.randint(self.item_num)
+
+            # check the item. Guess again while in past interactions
+            while self.ur[user, negative_item]:
+                negative_item = np.random.randint(self.item_num)
+
+            # if all is well, add it in to the list
+            final_train_data[index] = [user, item, negative_item]
+
+        return final_train_data
 
     def popularity_sampler(batch):
         pass
 
     def sampling(self, batch_size, num_workers=4):
 
+        sampling_data = self.df[[self.uid_name, self.iid_name]].to_numpy()
         sampler_data_loader = None
 
         if self.sample_method == 'uniform':
             sampler_data_loader = DataLoader(
-                self.df.to_numpy(), batch_size=batch_size, shuffle=False, num_workers=num_workers,
+                sampling_data, batch_size=batch_size, shuffle=False, num_workers=num_workers,
                 collate_fn=self.guess_and_check_negative_sampler
             )
         else:
             sampler_data_loader = DataLoader(
-                self.df.to_numpy(), batch_size=batch_size, shuffle=False, num_workers=num_workers,
+                self.df, batch_size=batch_size, shuffle=False, num_workers=num_workers,
                 collate_fn=self.popularity_sampler
             )
+
+        final_sampled_data = np.ndarray(
+            (self.num_rows * self.num_ng, 3), dtype=np.int)
+
+        index = 0
+
+        for batch in sampler_data_loader:
+
+            batch_data_size = batch.shape[0]
+
+            final_sampled_data[index: index+batch_data_size] = batch
+            index += batch_data_size
+
+        return final_sampled_data
 
 
 class SkipGramNegativeSampler(AbstractSampler):
