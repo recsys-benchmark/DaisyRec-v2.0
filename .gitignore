@@ -166,6 +166,9 @@ res/
 tune_res/
 log/
 
+# Large data
+/data/ml-20m
+
 
 
 #VSCode config files
