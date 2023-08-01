@@ -27,11 +27,14 @@ if __name__ == '__main__':
     ''' Test Process for Metrics Exporting '''
     reader, processor = RawDataReader(config), Preprocessor(config)
     df = reader.get_data()
+    categories_df = reader.get_categories()
     df = processor.process(df)
     user_num, item_num = processor.user_num, processor.item_num
 
     config['user_num'] = user_num
     config['item_num'] = item_num
+    config['item_cat'] = categories_df
+    print(categories_df)
 
     ''' Train Test split '''
     splitter = TestSplitter(config)

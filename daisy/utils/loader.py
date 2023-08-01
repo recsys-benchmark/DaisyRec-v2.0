@@ -13,16 +13,37 @@ from daisy.utils.utils import ensure_dir
 
 class RawDataReader(object):
     def __init__(self, config):
+        self.config = config
         self.src = config['dataset']
         self.uid_name = config['UID_NAME']
         self.iid_name = config['IID_NAME']
         self.tid_name = config['TID_NAME']
         self.inter_name = config['INTER_NAME']
         self.logger = config['logger']
-
         self.ds_path = f"{config['data_path']}{self.src}/"
         ensure_dir(self.ds_path)
         self.logger.info(f'Current data path is: {self.ds_path}, make sure you put the right raw data into it...')
+
+    def get_categories(self):
+        # Returns a one-hot encoding of the categories of every item in the dataset
+        # The categories are identified by indices and not by their actual name
+        df = None
+        
+        if self.src == 'ml-100k':
+            fp = f'{self.ds_path}u.item'
+            df = pd.read_csv(fp, sep='|', header=None, encoding='latin-1')
+            df = df.drop(columns=[0,1,2,3,4]) # Grab only the columns with the one-hot encoding
+            df = df.reset_index(drop=True).T.reset_index(drop=True).T # Reset both row and column indices
+            self.config['diversity'] = True
+
+        else:
+            self.config['diversity'] = False
+            self.logger.warn(f'Categories either do not exist, could not be found, or not implemented for "{self.src}" dataset')
+            self.logger.warn(f'Diversity metrics will not be calculated')
+
+        return df
+
+        
 
     def get_data(self):
         df = pd.DataFrame()
