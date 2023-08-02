@@ -168,6 +168,7 @@ log/
 
 # Large data
 /data/ml-20m
+/data/ml-1m
 
 
 

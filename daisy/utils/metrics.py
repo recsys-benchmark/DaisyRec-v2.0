@@ -6,14 +6,28 @@ from scipy.stats import entropy
 
 class Metric(object):
     def __init__(self, config) -> None:
+
+        categories_df = config['item_cat']
+        # If categories couldn't be loaded, remove all category related metrics
+        if categories_df is None:
+            metrics = config['metrics']
+            config['metrics'] = list(np.setdiff1d(
+                metrics,
+                ['ILD', 'diversityscore', 'FScore','entropy', 'diversity']
+            ))
+        else:
+            self.i_categories = len(categories_df.columns)
+        
         self.metrics = config['metrics']
         self.item_num = config['item_num']
         self.item_pop = config['item_pop'] if 'coverage' in self.metrics else None
-        self.i_categories = config['i_categories'] if 'diversity' in self.metrics else None
         self.topk = config['topk']
 
-    def run(self, test_ur, pred_ur, test_u):
+    def run(self, test_ur, pred_ur, test_u, categories_df):
         res = []
+        if not (categories_df is None):
+            categories_np = categories_df.to_numpy()
+            
         for mc in self.metrics:
             if mc == "coverage":
                 kpi = Coverage(pred_ur, self.item_num)
@@ -33,10 +47,18 @@ class Metric(object):
                 kpi = HR(test_ur, pred_ur, test_u)
             elif mc == 'map':
                 kpi = MAP(test_ur, pred_ur, test_u)
-            elif kpi == 'f1':
+            elif mc == 'f1':
                 kpi = F1(test_ur, pred_ur, test_u)
-            elif kpi == 'auc':
+            elif mc == 'auc':
                 kpi = AUC(test_ur, pred_ur, test_u)
+            elif mc == 'ILD':
+                kpi = Intra_List_Distance(self.topk, pred_ur, categories_np)
+            elif mc == 'diversityscore':
+                kpi = DiversityScore(self.topk, pred_ur, categories_np)
+            elif mc == 'FScore':
+                kpi = FScore(test_ur, pred_ur, test_u, self.topk, categories_np)
+            elif mc == 'entropy':
+                kpi = Entropy(pred_ur, categories_np)
             else:
                 raise ValueError(f'Invalid metric name {mc}')
 
@@ -263,7 +285,6 @@ def DiversityScore(topk, pred_ur, item_cat_map):
     # TODO: Implement - checked
     res = []
     for items in pred_ur:
-
         # Find number of items of each category
         num_items_per_cat = sum(item_cat_map[items])
 
@@ -303,11 +324,15 @@ metrics_config = {
     "auc": {"name": "AUC", "evaluator": AUC},
     "coverage": {"name": "Coverage", "evaluator": Coverage},
     "diversity": {"name": "Diversity", "evaluator": Diversity},
-    "popularity": {"name": "Average Popularity", "evaluator": Popularity}
+    "popularity": {"name": "Average Popularity", "evaluator": Popularity},
+    "ILD": {"name": "Intra List Distance", "evaluator": Intra_List_Distance},
+    "FScore": {"name": "F Score", "evaluator": FScore},
+    "diversityscore": {"name": "Diversity Score", "evaluator": DiversityScore},
+    "entropy": {"name": "Entropy", "evaluator": Entropy}
 }
 
 
-def calc_ranking_results(test_ur, pred_ur, test_u, config):
+def calc_ranking_results(test_ur, pred_ur, test_u, categories_df, config):
     '''
     calculate metrics with prediction results and candidates sets
 
@@ -320,6 +345,7 @@ def calc_ranking_results(test_ur, pred_ur, test_u, config):
     test_u : list
         the user in order from test set
     '''
+    pred_ur = pred_ur.astype(np.int)
     logger = config['logger']
     path = config['res_path']
     if not os.path.exists(path):
@@ -338,7 +364,7 @@ def calc_ranking_results(test_ur, pred_ur, test_u, config):
             continue
         else:
             rank_list = pred_ur[:, :topk]
-            kpis = metric.run(test_ur, rank_list, test_u)
+            kpis = metric.run(test_ur, rank_list, test_u, categories_df)
             if topk == 10:
                 for kpi_name, kpi_res in zip(config['metrics'], kpis):
                     kpi_name = metrics_config[kpi_name]['name']

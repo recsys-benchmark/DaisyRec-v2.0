@@ -10,5 +10,5 @@ df = df.drop(columns=[0,1,2,3,4])
 df = df.reset_index(drop=True).T.reset_index(drop=True).T
 
 print(
-    df.to_numpy().shape
+    df.to_numpy()[2,4,45,6,23]
 )

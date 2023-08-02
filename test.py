@@ -34,7 +34,6 @@ if __name__ == '__main__':
     config['user_num'] = user_num
     config['item_num'] = item_num
     config['item_cat'] = categories_df
-    print(categories_df)
 
     ''' Train Test split '''
     splitter = TestSplitter(config)
@@ -104,5 +103,5 @@ if __name__ == '__main__':
     ensure_dir(result_save_path)
     config['res_path'] = result_save_path
 
-    results = calc_ranking_results(test_ur, preds, test_u, config)
+    results = calc_ranking_results(test_ur, preds, test_u, categories_df, config)
     results.to_csv(f'{result_save_path}{algo_prefix}_{common_prefix}_kpi_results.csv', index=False)
