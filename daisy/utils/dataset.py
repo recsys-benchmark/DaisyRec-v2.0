@@ -2,6 +2,11 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 
+def get_dataloader(self, batch_size=256, shuffle=True, num_workers=4):
+    return DataLoader(
+        self.data, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers
+    )
+
 class BasicDataset(Dataset):
     def __init__(self, df):
         '''
@@ -21,10 +26,6 @@ class BasicDataset(Dataset):
     def __getitem__(self, index):
         return self.data[index][0], self.data[index][1]
 
-    def get_dataloader(self, batch_size=256, shuffle=True, num_workers=4):
-        return DataLoader(
-            self.data, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers
-        )
 
 
 
